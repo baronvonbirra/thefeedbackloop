@@ -1,0 +1,28 @@
+
+> short-singularity@0.0.1 dev
+> astro dev
+
+12:23:41 [types] Generated 1ms
+12:23:41 [content] Syncing content
+12:23:41 [content] Synced content
+12:23:41 [vite] Re-optimizing dependencies because vite config has changed
+
+ astro  v5.17.0 ready in 367 ms
+
+┃ Local    http://localhost:4321/
+┃ Network  use --host to expose
+
+12:23:41 watching for file changes...
+Error fetching posts: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND example.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND example.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+12:24:37 [200] / 690ms
+12:24:39 [200] /manifesto 6ms

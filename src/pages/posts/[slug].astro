@@ -1,0 +1,103 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import HallucinationWarning from '../../components/HallucinationWarning.astro';
+import { supabase, getPostBySlug } from '../../lib/supabase';
+import { marked } from 'marked';
+
+export async function getStaticPaths() {
+  try {
+    const { data: posts } = await supabase
+      .from('posts')
+      .select('slug')
+      .eq('status', 'published');
+
+    return posts?.map((post) => ({
+      params: { slug: post.slug },
+    })) || [];
+  } catch (e) {
+    console.error('Failed to fetch slugs for static paths', e);
+    return [];
+  }
+}
+
+const { slug } = Astro.params;
+
+let post = null;
+try {
+  post = await getPostBySlug(slug);
+} catch (e) {
+  console.error('Failed to fetch post', e);
+}
+
+const contentHtml = post ? await marked.parse(post.content || '') : '';
+const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US', {
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+}) : '';
+---
+
+<Layout title={post?.title || 'Article'}>
+  {post ? (
+    <article class="container mx-auto px-4 py-12 max-w-3xl">
+      <header class="mb-12 border-b-2 border-foreground pb-8">
+        <div class="flex items-center gap-2 font-mono text-sm text-accent-green mb-4">
+          <span>[CATEGORY: {post.category}]</span>
+          <span>//</span>
+          <time>{formattedDate}</time>
+        </div>
+
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          {post.title}
+        </h1>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 font-mono text-[10px] uppercase">
+          <div class="border border-foreground/30 p-2">
+            <span class="block opacity-50 mb-1">Writer Model</span>
+            <span class="text-accent-pink">{post.ai_writer}</span>
+          </div>
+          <div class="border border-foreground/30 p-2">
+            <span class="block opacity-50 mb-1">Editor Model</span>
+            <span class="text-accent-pink">{post.ai_editor}</span>
+          </div>
+          <div class="border border-foreground/30 p-2 col-span-2 md:col-span-1">
+            <span class="block opacity-50 mb-1">Status</span>
+            <span class="text-accent-green">PUBLISHED_OK</span>
+          </div>
+        </div>
+      </header>
+
+      {post.image_url && (
+        <div class="mb-12 border-2 border-foreground bg-neutral-900">
+          <img
+            src={post.image_url}
+            alt={post.title}
+            class="w-full h-auto grayscale contrast-125"
+          />
+        </div>
+      )}
+
+      <div class="prose prose-invert prose-neutral max-w-none
+        prose-headings:font-mono prose-headings:uppercase prose-headings:tracking-tighter
+        prose-a:text-accent-pink prose-blockquote:border-l-4 prose-blockquote:border-accent-green
+        prose-blockquote:bg-accent-green/5 prose-blockquote:py-4 prose-blockquote:px-6
+        prose-blockquote:font-mono prose-blockquote:text-sm
+        prose-pre:border prose-pre:border-foreground/30 prose-pre:bg-neutral-900">
+        <Fragment set:html={contentHtml} />
+      </div>
+
+      <HallucinationWarning />
+
+      <div class="mt-12 pt-8 border-t-2 border-foreground flex justify-between font-mono text-sm">
+        <a href="/" class="hover:text-accent-pink decoration-2 underline-offset-4 underline">← BACK_TO_FEED</a>
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="hover:text-accent-green">TOP↑</button>
+      </div>
+    </article>
+  ) : (
+    <div class="container mx-auto px-4 py-20 text-center font-mono">
+      <h1 class="text-4xl mb-4 text-accent-pink">[404_ERROR]</h1>
+      <p>POST_NOT_FOUND_IN_DATABASE</p>
+      <a href="/" class="underline mt-8 block hover:text-accent-green">RETURN_TO_BASE</a>
+    </div>
+  )}
+</Layout>

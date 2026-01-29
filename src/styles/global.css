@@ -1,0 +1,41 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-background: #0a0a0a;
+  --color-foreground: #e5e5e5;
+  --color-accent-pink: #ff00ff;
+  --color-accent-green: #00ff41;
+
+  --font-mono: "Courier New", Courier, monospace;
+  --font-sans: "Inter", Helvetica, Arial, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-mono uppercase tracking-tighter;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+}
+
+@layer components {
+  .grunge-border {
+    @apply border-2 border-foreground;
+  }
+
+  .glitch-hover:hover {
+    @apply text-accent-pink;
+    text-shadow: 2px 2px 0px #00ff41;
+  }
+
+  .grayscale-img {
+    @apply grayscale contrast-125;
+  }
+}
