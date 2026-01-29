@@ -1,8 +1,15 @@
 name: Deploy to GitHub Pages
 
 on:
+  # 1. Trigger on every push to main
   push:
-    branches: [ main ]
+    branches: [main]
+
+  # 2. Trigger EVERY DAY at midnight (UTC)
+  schedule:
+    - cron: '0 0 * * *'
+
+  # 3. Allow you to click a button to rebuild manually
   workflow_dispatch:
 
 permissions:
@@ -20,6 +27,8 @@ jobs:
       - name: Install, build, and upload
         uses: withastro/action@v3
         env:
+          PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
