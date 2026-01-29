@@ -2,18 +2,19 @@
 > short-singularity@0.0.1 dev
 > astro dev
 
-15:20:32 [types] Generated 1ms
-15:20:32 [content] Syncing content
-15:20:32 [content] Synced content
+20:10:31 [types] Generated 1ms
+20:10:31 [content] Syncing content
+20:10:32 [content] Synced content
+20:10:32 [vite] Re-optimizing dependencies because vite config has changed
 
- astro  v5.17.0 ready in 330 ms
+ astro  v5.17.0 ready in 426 ms
 
 ┃ Local    http://localhost:4321/thefeedbackloop
 ┃ Network  use --host to expose
 
-15:20:32 watching for file changes...
+20:10:32 watching for file changes...
 ⚠️ SUPABASE WARNING: Environment variables are missing!
-Error fetching posts: {
+Error fetching posts: TypeError: fetch failed {
   message: 'TypeError: fetch failed',
   details: 'TypeError: fetch failed\n' +
     '\n' +
@@ -24,8 +25,5 @@ Error fetching posts: {
   hint: '',
   code: ''
 }
-15:21:05 [200] / 200ms
-15:21:07 [200] /staff/axel_wire 14ms
-15:21:08 [200] /staff/v3ra_l1ght 6ms
-15:22:18 [watch] tests/final_verification.spec.ts
-15:22:18 [watch] tests/final_verification.spec.ts
+20:11:32 [200] / 287ms
+20:11:37 [200] /manifesto 11ms

@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Specifically Allow AI Crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+Sitemap: https://baronvonbirra.github.io/thefeedbackloop/sitemap-index.xml

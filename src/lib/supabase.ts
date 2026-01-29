@@ -15,6 +15,8 @@ const finalKey = supabaseKey || 'placeholder';
 
 if (!supabaseUrl || !supabaseKey) {
   console.warn('⚠️ SUPABASE WARNING: Environment variables are missing!');
+} else {
+  console.log(`📡 Supabase initializing with URL: ${supabaseUrl}`);
 }
 
 export const supabase = createClient(finalUrl, finalKey);
@@ -43,7 +45,7 @@ export async function getPosts() {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching posts:', error);
+    console.error('Error fetching posts:', error.message, error);
     return [];
   }
 
@@ -59,7 +61,7 @@ export async function getPostBySlug(slug: string) {
     .single();
 
   if (error) {
-    console.error(`Error fetching post with slug ${slug}:`, error);
+    console.error(`Error fetching post with slug ${slug}:`, error.message, error);
     return null;
   }
 
