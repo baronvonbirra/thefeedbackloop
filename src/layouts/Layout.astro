@@ -19,7 +19,7 @@ const { title } = Astro.props;
 	</head>
 	<body class="bg-background text-foreground min-h-screen flex flex-col">
 		<header class="p-4 md:p-8 border-b-2 border-foreground">
-			<a href={import.meta.env.BASE_URL} class="block hover:opacity-80 transition-opacity">
+			<a href={`${import.meta.env.BASE_URL}/`.replace(/\/+/g, '/')} class="block hover:opacity-80 transition-opacity">
 				<pre class="font-mono text-accent-green leading-none mb-6 overflow-x-auto whitespace-pre text-xs md:text-sm hidden sm:block">
 {String.raw`
  _____ _  _ ___   ___ ___ ___ ___  ___   _   ___ _  __  _    ___   ___  ___
@@ -48,7 +48,7 @@ const { title } = Astro.props;
 				</pre>
 			</a>
 			<nav class="flex flex-wrap gap-4 font-mono text-xl uppercase">
-				<a href={import.meta.env.BASE_URL} class="hover:text-accent-pink">[NEWS]</a>
+				<a href={`${import.meta.env.BASE_URL}/`.replace(/\/+/g, '/')} class="hover:text-accent-pink">[NEWS]</a>
 				<a href={`${import.meta.env.BASE_URL}/reviews`.replace(/\/+/g, '/')} class="hover:text-accent-pink">[REVIEWS]</a>
 				<a href={`${import.meta.env.BASE_URL}/manifesto`.replace(/\/+/g, '/')} class="hover:text-accent-pink">[MANIFESTO]</a>
 			</nav>

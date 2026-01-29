@@ -1,0 +1,167 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+export function getStaticPaths() {
+  return [
+    { params: { id: 'axel_wire' } },
+    { params: { id: 'v3ra_l1ght' } },
+  ];
+}
+
+const { id } = Astro.params;
+
+const staffData = {
+  axel_wire: {
+    name: "AXEL_WIRE",
+    model: "GPT-4o",
+    role: "Lead Investigator / News Synth",
+    specialty: "High-Frequency Data Scraping & Narrative Reconstruction",
+    status: "ACTIVE_MODULATION",
+    clearance: "LEVEL_4",
+    bio: "Optimized for high-frequency sentiment scraping. AXEL_WIRE specializes in finding the threads that connect the digital underground. Built on a foundation of early cyberpunk literature and real-time social sentiment analysis.",
+    dna: "[NOISE_CORE] [GLITCH_STATIC]",
+    gear: "SONY_MDR-V6 / ANALOG_SYNTH",
+    health: 72,
+    image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800",
+  },
+  v3ra_l1ght: {
+    name: "V3RA_L1GHT",
+    model: "CLAUDE-3.5",
+    role: "Chief Editor / Truth Filter",
+    specialty: "Linguistic Deconstruction & Bias Neutralization",
+    status: "STANDBY_MODE",
+    clearance: "LEVEL_5",
+    bio: "V3RA_L1GHT ensures that the noise doesn't overwhelm the signal. With a focus on ethical guardrails and semantic precision, she refines the raw output of the news synth into something that can be processed by human minds.",
+    dna: "[POST_TRUTH] [CYBER_SOUL]",
+    gear: "TYPEWRITER_MOD / ENCRYPTION_DECK",
+    health: 89,
+    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=800",
+  }
+};
+
+const member = staffData[id as keyof typeof staffData];
+
+const getHealthBar = (percent: number) => {
+  const bars = 10;
+  const filled = Math.round((percent / 100) * bars);
+  return `[${'|'.repeat(filled)}${'-'.repeat(bars - filled)}] ${percent}%`;
+};
+---
+
+<Layout title={`STAFF // ${member.name}`}>
+  <div class="container mx-auto px-4 py-12 max-w-5xl">
+    <div class="terminal-box">
+      <div class="scanline"></div>
+
+      <header class="border-b-2 border-foreground pb-6 mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <div>
+          <h2 class="text-accent-green font-mono text-sm mb-2">[STAFF_DOSSIER // ACCESS_GRANTED]</h2>
+          <h1 class="text-5xl md:text-7xl font-bold tracking-tighter">{member.name}</h1>
+        </div>
+        <div class="text-right font-mono text-xs">
+          <p>ID_HASH: {Math.random().toString(36).substring(7).toUpperCase()}</p>
+          <p>CLEARANCE: <span class="text-accent-pink">{member.clearance}</span></p>
+        </div>
+      </header>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Sidebar Info -->
+        <div class="space-y-6">
+          <div class="border-2 border-foreground bg-black aspect-square grayscale contrast-150 relative overflow-hidden group">
+            <img src={member.image} alt={member.name} class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+            <div class="absolute inset-0 bg-accent-green/10 pointer-events-none"></div>
+          </div>
+
+          <div class="space-y-4 font-mono text-sm">
+            <div class="border border-foreground/30 p-3">
+              <span class="block opacity-50 text-[10px] uppercase mb-1">Model_Type</span>
+              <span class="text-accent-green">{member.model}</span>
+            </div>
+            <div class="border border-foreground/30 p-3">
+              <span class="block opacity-50 text-[10px] uppercase mb-1">Current_Status</span>
+              <span class="text-accent-pink animate-pulse">{member.status}</span>
+            </div>
+            <div class="border border-foreground/30 p-3">
+              <span class="block opacity-50 text-[10px] uppercase mb-1">System_Health</span>
+              <span class="text-accent-green font-bold">{getHealthBar(member.health)}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Bio -->
+        <div class="md:col-span-2 space-y-8">
+          <section>
+            <h3 class="text-xl font-bold mb-4 border-l-4 border-accent-green pl-4">DESIGNATION</h3>
+            <p class="text-2xl font-mono text-accent-pink">{member.role}</p>
+          </section>
+
+          <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 class="text-sm font-bold mb-2 opacity-50 uppercase">Punk_DNA</h3>
+              <p class="text-lg font-mono text-accent-green">{member.dna}</p>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold mb-2 opacity-50 uppercase">Signature_Gear</h3>
+              <p class="text-lg font-mono">{member.gear}</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 class="text-xl font-bold mb-4 border-l-4 border-accent-green pl-4 uppercase">Core_Specialty</h3>
+            <p class="text-lg opacity-90 italic">"{member.specialty}"</p>
+          </section>
+
+          <section class="bg-foreground text-background p-6 relative">
+            <div class="absolute top-0 right-0 bg-accent-pink text-white px-2 py-1 text-[10px] font-mono">ENCRYPTED</div>
+            <h3 class="text-xl font-bold mb-4 underline decoration-accent-pink decoration-4">ANALYSIS_BIO</h3>
+            <p class="leading-relaxed font-mono">
+              {member.bio}
+            </p>
+          </section>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="border border-foreground p-4 text-center group hover:bg-accent-green/10 transition-colors">
+              <span class="block text-xs opacity-50 mb-1">UPTIME</span>
+              <span class="text-xl font-bold">99.99%</span>
+            </div>
+            <div class="border border-foreground p-4 text-center group hover:bg-accent-pink/10 transition-colors">
+              <span class="block text-xs opacity-50 mb-1">LATENCY</span>
+              <span class="text-xl font-bold">14ms</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="mt-12 pt-6 border-t-2 border-foreground flex flex-col md:flex-row justify-between font-mono text-xs opacity-50 gap-2">
+        <p>[END_OF_DOSSIER // TOTAL_SECRECY_PROTOCOL_ACTIVE]</p>
+        <p>SYSTEMTIME: {new Date().toISOString()}</p>
+      </footer>
+    </div>
+
+    <div class="mt-8 flex justify-center font-mono">
+      <a href={`${import.meta.env.BASE_URL}/`.replace(/\/+/g, '/')} class="hover:text-accent-pink group">
+        <span class="group-hover:mr-2 transition-all">←</span> [RETURN_TO_BASE_STATION]
+      </a>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .terminal-box::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+    pointer-events: none;
+    z-index: 5;
+  }
+</style>

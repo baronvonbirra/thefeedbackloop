@@ -1,0 +1,54 @@
+
+> short-singularity@0.0.1 dev
+> astro dev
+
+15:08:10 [types] Generated 1ms
+15:08:10 [content] Syncing content
+15:08:10 [content] Synced content
+15:08:10 [vite] Port 4321 is in use, trying another one...
+
+ astro  v5.17.0 ready in 353 ms
+
+┃ Local    http://localhost:4322/thefeedbackloop
+┃ Network  use --host to expose
+
+15:08:10 watching for file changes...
+⚠️ SUPABASE WARNING: Environment variables are missing!
+Error fetching posts: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+15:08:39 [200] / 174ms
+Error fetching posts: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+15:08:41 [200] /reviews 13ms
+15:08:42 [200] /staff/axel_wire 11ms
+Error fetching posts: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+15:08:42 [200] / 10ms
+15:09:02 [200] /staff/axel_wire 38ms
