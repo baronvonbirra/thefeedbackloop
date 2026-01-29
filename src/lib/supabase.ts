@@ -22,12 +22,14 @@ export const supabase = createClient(finalUrl, finalKey);
 export interface Post {
   id: number;
   created_at: string;
+  updated_at?: string;
   title: string;
   slug: string;
   summary: string;
   content: string;
   category: string;
   image_url: string;
+  source_url?: string;
   status: 'draft' | 'published';
   ai_writer: string;
   ai_editor: string;

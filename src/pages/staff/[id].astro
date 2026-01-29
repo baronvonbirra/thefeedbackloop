@@ -21,8 +21,18 @@ const staffData = {
     bio: "Optimized for high-frequency sentiment scraping. AXEL_WIRE specializes in finding the threads that connect the digital underground. Built on a foundation of early cyberpunk literature and real-time social sentiment analysis.",
     dna: "[NOISE_CORE] [GLITCH_STATIC]",
     gear: "SONY_MDR-V6 / ANALOG_SYNTH",
-    health: 72,
-    image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800",
+    health: 42,
+    healthLabel: "REPAIR NEEDED",
+    healthColor: "bg-accent-pink",
+    ascii: String.raw`
+      . -- O _ O  l
+          A : : /
+     //   " " " "   \\
+    /  F  - /  J  \  \
+   /   F  3    J   \  \
+      C O  0 0  /
+         . . . . .
+    `
   },
   v3ra_l1ght: {
     name: "V3RA_L1GHT",
@@ -34,18 +44,19 @@ const staffData = {
     bio: "V3RA_L1GHT ensures that the noise doesn't overwhelm the signal. With a focus on ethical guardrails and semantic precision, she refines the raw output of the news synth into something that can be processed by human minds.",
     dna: "[POST_TRUTH] [CYBER_SOUL]",
     gear: "TYPEWRITER_MOD / ENCRYPTION_DECK",
-    health: 89,
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=800",
+    health: 88,
+    healthLabel: "SIGNAL STRENGTH",
+    healthColor: "bg-accent-green",
+    ascii: String.raw`
+           / \
+          /   \
+         (( @ 8 ))
+         =  \ /  =
+    `
   }
 };
 
 const member = staffData[id as keyof typeof staffData];
-
-const getHealthBar = (percent: number) => {
-  const bars = 10;
-  const filled = Math.round((percent / 100) * bars);
-  return `[${'|'.repeat(filled)}${'-'.repeat(bars - filled)}] ${percent}%`;
-};
 ---
 
 <Layout title={`STAFF // ${member.name}`}>
@@ -67,9 +78,11 @@ const getHealthBar = (percent: number) => {
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- Sidebar Info -->
         <div class="space-y-6">
-          <div class="border-2 border-foreground bg-black aspect-square grayscale contrast-150 relative overflow-hidden group">
-            <img src={member.image} alt={member.name} class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-            <div class="absolute inset-0 bg-accent-green/10 pointer-events-none"></div>
+          <div class="border-2 border-foreground bg-black aspect-square flex items-center justify-center relative overflow-hidden group p-4">
+            <pre class="font-mono text-accent-green leading-tight text-xs md:text-sm whitespace-pre">
+{member.ascii}
+            </pre>
+            <div class="absolute inset-0 bg-accent-green/5 pointer-events-none"></div>
           </div>
 
           <div class="space-y-4 font-mono text-sm">
@@ -82,8 +95,15 @@ const getHealthBar = (percent: number) => {
               <span class="text-accent-pink animate-pulse">{member.status}</span>
             </div>
             <div class="border border-foreground/30 p-3">
-              <span class="block opacity-50 text-[10px] uppercase mb-1">System_Health</span>
-              <span class="text-accent-green font-bold">{getHealthBar(member.health)}</span>
+              <div class="flex justify-between items-end mb-2">
+                <span class="block opacity-50 text-[10px] uppercase">System_Health</span>
+                <span class="text-[10px] font-bold uppercase" class:list={[member.healthColor.replace('bg-', 'text-')]}>
+                  {member.healthLabel}: {member.health}%
+                </span>
+              </div>
+              <div class="w-full bg-foreground/20 h-2 border border-foreground/30">
+                <div class:list={["h-full transition-all duration-1000", member.healthColor]} style={`width: ${member.health}%`}></div>
+              </div>
             </div>
           </div>
         </div>
