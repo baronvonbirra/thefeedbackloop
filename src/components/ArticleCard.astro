@@ -30,7 +30,7 @@ const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
 	<div class="flex flex-col gap-2">
 		<time class="font-mono text-sm text-accent-green">{formattedDate}</time>
 		<h2 class="text-2xl font-bold leading-tight group-hover:text-accent-pink">
-			<a href={`/posts/${post.slug}`}>{post.title}</a>
+			<a href={`${import.meta.env.BASE_URL}/posts/${post.slug}`.replace(/\/+/g, '/')}>{post.title}</a>
 		</h2>
 		<p class="text-sm line-clamp-3 italic opacity-80">{post.summary}</p>
 	</div>

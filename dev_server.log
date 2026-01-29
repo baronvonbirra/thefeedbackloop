@@ -2,27 +2,191 @@
 > short-singularity@0.0.1 dev
 > astro dev
 
-12:23:41 [types] Generated 1ms
-12:23:41 [content] Syncing content
-12:23:41 [content] Synced content
-12:23:41 [vite] Re-optimizing dependencies because vite config has changed
+14:35:29 [types] Generated 1ms
+14:35:29 [content] Syncing content
+14:35:29 [content] Synced content
+14:35:29 [vite] Re-optimizing dependencies because vite config has changed
 
- astro  v5.17.0 ready in 367 ms
+ astro  v5.17.0 ready in 370 ms
 
-┃ Local    http://localhost:4321/
+┃ Local    http://localhost:4321/thefeedbackloop
 ┃ Network  use --host to expose
 
-12:23:41 watching for file changes...
+14:35:29 watching for file changes...
+⚠️ SUPABASE WARNING: Environment variables are missing!
 Error fetching posts: {
   message: 'TypeError: fetch failed',
   details: 'TypeError: fetch failed\n' +
     '\n' +
-    'Caused by: Error: getaddrinfo ENOTFOUND example.supabase.co (ENOTFOUND)\n' +
-    'Error: getaddrinfo ENOTFOUND example.supabase.co\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n' +
     '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
     '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
   hint: '',
   code: ''
 }
-12:24:37 [200] / 690ms
-12:24:39 [200] /manifesto 6ms
+14:35:56 [200] / 317ms
+Error fetching posts: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+14:36:00 [200] / 18ms
+Error fetching posts: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+14:36:03 [200] /reviews 10ms
+14:37:17 [watch] src/layouts/Layout.astro
+14:37:17 [watch] src/layouts/Layout.astro
+14:37:32 [watch] src/pages/index.astro
+14:37:32 [watch] src/pages/index.astro
+14:37:35 [watch] src/pages/reviews.astro
+14:37:35 [watch] src/pages/reviews.astro
+Error fetching posts: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+14:37:41 [200] / 56ms
+Error fetching posts: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+14:37:45 [200] / 14ms
+Error fetching posts: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+14:37:47 [200] /reviews 12ms
+14:38:05 [watch] src/layouts/Layout.astro
+14:38:05 [watch] src/layouts/Layout.astro
+Error fetching posts: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+14:38:10 [200] / 31ms
+Error fetching posts: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+14:38:13 [200] / 26ms
+Error fetching posts: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+14:38:15 [200] /reviews 12ms
+14:39:30 [watch] src/layouts/Layout.astro
+14:39:30 [watch] src/layouts/Layout.astro
+14:39:37 [ERROR] [CompilerError] Unable to assign attributes when using <> Fragment shorthand syntax!
+  Hint:
+    To fix this, please change <  | |_| (_) | (_) |  _/
+      |_| |_||_|___| |_| |___|___|___/|___/_/ \_\___|_|\_\ |____\___/ \___/|_|
+				</pre> to use the longhand Fragment syntax: <Fragment  | |_| (_) | (_) |  _/
+      |_| |_||_|___| |_| |___|___|___/|___/_/ \_\___|_|\_\ |____\___/ \___/|_|
+				</pre>
+  Stack trace:
+    at /app/src/layouts/Layout.astro:26:53
+    [...] See full stack trace in the browser, or rerun with --verbose.
+14:39:40 [ERROR] [CompilerError] Unable to assign attributes when using <> Fragment shorthand syntax!
+  Hint:
+    To fix this, please change <  | |_| (_) | (_) |  _/
+      |_| |_||_|___| |_| |___|___|___/|___/_/ \_\___|_|\_\ |____\___/ \___/|_|
+				</pre> to use the longhand Fragment syntax: <Fragment  | |_| (_) | (_) |  _/
+      |_| |_||_|___| |_| |___|___|___/|___/_/ \_\___|_|\_\ |____\___/ \___/|_|
+				</pre>
+  Stack trace:
+    at /app/src/layouts/Layout.astro:26:53
+    [...] See full stack trace in the browser, or rerun with --verbose.
+14:40:12 [watch] src/layouts/Layout.astro
+14:40:12 [watch] src/layouts/Layout.astro
+Error fetching posts: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+14:40:18 [200] / 37ms
+Error fetching posts: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+14:40:21 [200] / 9ms
+Error fetching posts: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND placeholder.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND placeholder.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+14:40:24 [200] /reviews 7ms

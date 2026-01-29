@@ -89,7 +89,7 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
       <HallucinationWarning />
 
       <div class="mt-12 pt-8 border-t-2 border-foreground flex justify-between font-mono text-sm">
-        <a href="/" class="hover:text-accent-pink decoration-2 underline-offset-4 underline">← BACK_TO_FEED</a>
+        <a href={import.meta.env.BASE_URL} class="hover:text-accent-pink decoration-2 underline-offset-4 underline">← BACK_TO_FEED</a>
         <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="hover:text-accent-green">TOP↑</button>
       </div>
     </article>
@@ -97,7 +97,7 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
     <div class="container mx-auto px-4 py-20 text-center font-mono">
       <h1 class="text-4xl mb-4 text-accent-pink">[404_ERROR]</h1>
       <p>POST_NOT_FOUND_IN_DATABASE</p>
-      <a href="/" class="underline mt-8 block hover:text-accent-green">RETURN_TO_BASE</a>
+      <a href={import.meta.env.BASE_URL} class="underline mt-8 block hover:text-accent-green">RETURN_TO_BASE</a>
     </div>
   )}
 </Layout>
