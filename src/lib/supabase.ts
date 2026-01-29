@@ -1,13 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Access environment variables with fallbacks for CI/CD environments
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL ||
-                    import.meta.env.SUPABASE_URL ||
-                    (typeof process !== 'undefined' ? process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL : '');
-
-const supabaseKey = import.meta.env.PUBLIC_SUPABASE_KEY ||
-                    import.meta.env.SUPABASE_KEY ||
-                    (typeof process !== 'undefined' ? process.env.PUBLIC_SUPABASE_KEY || process.env.SUPABASE_KEY : '');
+// Access environment variables from Astro's import.meta.env.
+// These are populated from .env files locally and GitHub Secrets in CI/CD (via deploy.yml).
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 // Provide placeholders during build if variables are missing to prevent hard crash
 const finalUrl = supabaseUrl || 'https://placeholder.supabase.co';
