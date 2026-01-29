@@ -1,8 +1,15 @@
 name: Deploy to GitHub Pages
 
 on:
+  # 1. Trigger on every push to main
   push:
-    branches: [ main ]
+    branches: [main]
+
+  # 2. Trigger EVERY DAY at midnight (UTC)
+  schedule:
+    - cron: '0 0 * * *'
+
+  # 3. Allow you to click a button to rebuild manually
   workflow_dispatch:
 
 permissions:
