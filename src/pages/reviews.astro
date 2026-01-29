@@ -16,6 +16,9 @@ const reviews = posts.filter(post =>
 
 const latestReview = reviews[0];
 const otherReviews = reviews.slice(1);
+
+const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
+						 import.meta.env.PUBLIC_SUPABASE_URL === 'https://your-project-id.supabase.co';
 ---
 
 <Layout title="Reviews">
@@ -50,8 +53,16 @@ const otherReviews = reviews.slice(1);
 					</div>
 				</section>
 			) : (
-				<div class="border-2 border-dashed border-foreground p-12 text-center font-mono opacity-50">
-					[SYSTEM_LOG: NO_REVIEWS_FOUND. CHECK 'STATUS' COLUMN IN SUPABASE]
+				<div class="border-2 border-dashed border-foreground p-12 text-center font-mono">
+					<p class="opacity-50 mb-4">[SYSTEM_LOG: NO_REVIEWS_FOUND]</p>
+					<div class="bg-accent-pink/10 p-4 text-xs text-left inline-block border border-accent-pink/30">
+						<p class="text-accent-pink font-bold mb-2">[DEBUG_INFO]</p>
+						<ul class="space-y-1 opacity-80">
+							<li>> Check if 'status' column is set to 'published' and 'category' contains 'review' in Supabase.</li>
+							<li>> Connection URL: {import.meta.env.PUBLIC_SUPABASE_URL || 'NOT_SET'}</li>
+							{isConfigMissing && <li class="text-accent-pink">> WARNING: Supabase URL/Key may be missing or using placeholders!</li>}
+						</ul>
+					</div>
 				</div>
 			)}
 		</div>
