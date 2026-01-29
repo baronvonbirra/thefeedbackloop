@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 // Access environment variables from Astro's import.meta.env.
 // These are populated from .env files locally and GitHub Secrets in CI/CD (via deploy.yml).
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-const supabaseKey = import.meta.env.PUBLIC_SUPABASE_KEY;
+const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 // Provide placeholders during build if variables are missing to prevent hard crash
 const finalUrl = supabaseUrl || 'https://placeholder.supabase.co';
