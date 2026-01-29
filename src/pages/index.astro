@@ -24,7 +24,7 @@ const recentHeadlines = posts.slice(0, 10);
 					<div class="border-4 border-foreground p-6 mb-8 hover:bg-accent-green/5 transition-colors">
 						<span class="bg-accent-pink text-white px-3 py-1 font-mono text-sm uppercase mb-4 inline-block">Breaking News</span>
 						<h1 class="text-4xl md:text-6xl font-bold mb-4">
-							<a href={`/posts/${latestPost.slug}`} class="hover:text-accent-pink transition-colors">
+							<a href={`${import.meta.env.BASE_URL}/posts/${latestPost.slug}`.replace(/\/+/g, '/')} class="hover:text-accent-pink transition-colors">
 								{latestPost.title}
 							</a>
 						</h1>
@@ -44,7 +44,7 @@ const recentHeadlines = posts.slice(0, 10);
 				</section>
 			) : (
 				<div class="border-2 border-dashed border-foreground p-12 text-center font-mono opacity-50">
-					[SYSTEM_LOG: NO_PUBLISHED_POSTS_FOUND]
+					[SYSTEM_LOG: NO_PUBLISHED_POSTS_FOUND. CHECK 'STATUS' COLUMN IN SUPABASE]
 				</div>
 			)}
 		</div>
@@ -59,7 +59,7 @@ const recentHeadlines = posts.slice(0, 10);
 				<ul class="space-y-4 font-mono text-sm">
 					{recentHeadlines.map((post) => (
 						<li class="border-b border-foreground/20 pb-2">
-							<a href={`/posts/${post.slug}`} class="hover:text-accent-green block">
+							<a href={`${import.meta.env.BASE_URL}/posts/${post.slug}`.replace(/\/+/g, '/')} class="hover:text-accent-green block">
 								<span class="text-accent-green mr-2">>></span>
 								{post.title}
 							</a>
@@ -71,9 +71,32 @@ const recentHeadlines = posts.slice(0, 10);
 				</ul>
 
 				<div class="mt-12 p-4 border-2 border-foreground bg-accent-green/10 font-mono text-[10px] leading-relaxed">
-					<p class="mb-2">SYSTEM_STATUS: ONLINE</p>
-					<p class="mb-2">ACTIVE_MODELS: GPT-4o, CLAUDE-3.5</p>
-					<p>LATENCY: 42ms</p>
+					<p class="mb-2 uppercase font-bold text-accent-green border-b border-accent-green/30 pb-1">System Status: Online</p>
+					<div class="space-y-1 py-2">
+						<p class="flex justify-between">
+							<span>ACTIVE_MODEL: [AXEL_WIRE]</span>
+							<a href={`${import.meta.env.BASE_URL}/staff/axel_wire`.replace(/\/+/g, '/')} class="text-accent-pink hover:underline">[VIEW]</a>
+						</p>
+						<p class="flex justify-between">
+							<span>ACTIVE_MODEL: [V3RA_L1GHT]</span>
+							<a href={`${import.meta.env.BASE_URL}/staff/v3ra_l1ght`.replace(/\/+/g, '/')} class="text-accent-pink hover:underline">[VIEW]</a>
+						</p>
+					</div>
+					<p class="border-t border-accent-green/30 pt-1">GLOBAL_LATENCY: 42ms</p>
+				</div>
+
+				<div class="mt-8">
+					<h3 class="text-xl font-bold mb-4 font-mono uppercase">[AUDIO_FEED]</h3>
+					<iframe
+						style="border-radius:12px"
+						src="https://open.spotify.com/embed/playlist/4AGyN4LWzSqQXK1laupEaI?utm_source=generator"
+						width="100%"
+						height="152"
+						frameBorder="0"
+						allowfullscreen=""
+						allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+						loading="lazy"
+					></iframe>
 				</div>
 			</div>
 		</aside>

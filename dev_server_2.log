@@ -1,0 +1,16 @@
+
+> short-singularity@0.0.1 dev
+> astro dev
+
+15:19:52 [types] Generated 1ms
+15:19:52 [content] Syncing content
+15:19:52 [content] Synced content
+15:19:52 [vite] Port 4321 is in use, trying another one...
+15:19:52 [vite] Port 4322 is in use, trying another one...
+
+ astro  v5.17.0 ready in 337 ms
+
+┃ Local    http://localhost:4323/thefeedbackloop
+┃ Network  use --host to expose
+
+15:19:52 watching for file changes...

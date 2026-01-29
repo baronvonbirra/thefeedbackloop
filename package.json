@@ -15,5 +15,8 @@
     "astro": "^5.17.0",
     "marked": "^17.0.1",
     "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.0"
   }
 }
