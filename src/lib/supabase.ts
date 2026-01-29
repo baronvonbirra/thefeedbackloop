@@ -1,9 +1,23 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || import.meta.env.SUPABASE_URL;
-const supabaseKey = import.meta.env.PUBLIC_SUPABASE_KEY || import.meta.env.SUPABASE_KEY;
+// Access environment variables with fallbacks for CI/CD environments
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL ||
+                    import.meta.env.SUPABASE_URL ||
+                    (typeof process !== 'undefined' ? process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL : '');
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseKey = import.meta.env.PUBLIC_SUPABASE_KEY ||
+                    import.meta.env.SUPABASE_KEY ||
+                    (typeof process !== 'undefined' ? process.env.PUBLIC_SUPABASE_KEY || process.env.SUPABASE_KEY : '');
+
+// Provide placeholders during build if variables are missing to prevent hard crash
+const finalUrl = supabaseUrl || 'https://placeholder.supabase.co';
+const finalKey = supabaseKey || 'placeholder';
+
+if (!supabaseUrl || !supabaseKey) {
+  console.warn('⚠️ SUPABASE WARNING: Environment variables are missing!');
+}
+
+export const supabase = createClient(finalUrl, finalKey);
 
 export interface Post {
   id: number;
