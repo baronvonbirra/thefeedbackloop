@@ -32,7 +32,6 @@ try {
 }
 
 const contentHtml = await parseMarkdown(post?.content);
-const systemAlertHtml = await parseMarkdown(post?.system_alert);
 const summaryHtml = await parseMarkdown(post?.summary, true);
 const editorialNoteHtml = await parseMarkdown(post?.editorial_note, true);
 
@@ -51,15 +50,6 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
   {post ? (
     <article class="container mx-auto my-12 max-w-3xl terminal-box">
       <div class="scanline"></div>
-
-      {post.system_alert && (
-        <div class="border-2 border-orange-600 p-4 bg-orange-950/20 text-orange-500 font-mono text-xs mb-8 relative z-10 animate-pulse">
-          <span class="font-bold mr-2 text-orange-600 block mb-1 uppercase tracking-wider">[SYSTEM_ALERT // SENTINEL INTERRUPT]</span>
-          <div class="prose prose-invert prose-orange text-xs prose-p:leading-relaxed prose-p:my-0">
-            <Fragment set:html={systemAlertHtml} />
-          </div>
-        </div>
-      )}
 
       <header class="mb-12 border-b-2 border-foreground pb-8 relative z-10">
         <div class="flex items-center gap-2 font-mono text-sm text-accent-green mb-4">
@@ -113,13 +103,16 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
         <Fragment set:html={contentHtml} />
       </div>
 
-      <div class="relative z-10">
-        <EditorialBlock
-          integrityScan={post.integrity_scan}
-          factCheck={post.fact_check}
-          action={post.editorial_action}
-        />
-      </div>
+      {(post.system_alert || post.integrity_scan !== undefined || post.fact_check || post.editorial_action) && (
+        <div class="relative z-10">
+          <EditorialBlock
+            systemAlert={post.system_alert}
+            integrityScan={post.integrity_scan}
+            factCheck={post.fact_check}
+            action={post.editorial_action}
+          />
+        </div>
+      )}
 
       {post.editorial_note && (
         <footer class="mt-8 text-neutral-500 font-mono text-xs italic border-t border-foreground/10 pt-4 relative z-10">
