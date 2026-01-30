@@ -14,6 +14,20 @@ const latestPost = posts[0];
 const otherPosts = posts.slice(1);
 const recentHeadlines = posts.slice(0, 10);
 
+const stripMarkdown = (md: string) => {
+  return md
+    .replace(/^#+\s+/gm, '')
+    .replace(/[*_~`]{1,3}/g, '')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1')
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '')
+    .replace(/^\s*>\s+/gm, '')
+    .replace(/^\s*[-*+]\s+/gm, '')
+    .replace(/^\s*\d+\.\s+/gm, '')
+    .trim();
+};
+
+const latestSummary = latestPost?.summary || (latestPost?.content ? stripMarkdown(latestPost.content).slice(0, 150) + '...' : '');
+
 const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 						 import.meta.env.PUBLIC_SUPABASE_URL === 'https://your-project-id.supabase.co';
 ---
@@ -27,12 +41,12 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 					<div class="terminal-box mb-8 hover:bg-accent-green/5 transition-colors">
 						<div class="scanline"></div>
 						<span class="bg-accent-pink text-white px-3 py-1 font-mono text-sm uppercase mb-4 inline-block relative z-10">Breaking News</span>
-						<h1 class="text-2xl md:text-4xl font-bold mb-4 font-mono relative z-10">
+						<h1 class="text-4xl md:text-6xl font-bold mb-4 font-mono relative z-10">
 							<a href={`${import.meta.env.BASE_URL}/posts/${latestPost.slug}`.replace(/\/+/g, '/')} class="hover:text-accent-pink transition-colors">
 								{latestPost.title}
 							</a>
 						</h1>
-						<p class="text-base mb-6 opacity-90 font-mono relative z-10">{latestPost.summary}</p>
+						<p class="text-xl mb-6 opacity-90 font-mono relative z-10">{latestSummary}</p>
 						<div class="flex items-center gap-4 font-mono text-sm">
 							<span class="text-accent-green">{new Date(latestPost.created_at).toLocaleDateString()}</span>
 							<span class="opacity-50">|</span>

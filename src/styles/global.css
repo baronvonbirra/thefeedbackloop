@@ -91,7 +91,7 @@
     @apply font-mono text-sm;
     --tw-prose-body: var(--color-foreground);
     --tw-prose-headings: var(--color-foreground);
-    --tw-prose-links: var(--color-accent-pink);
+    --tw-prose-links: var(--color-accent-green);
     --tw-prose-bold: var(--color-foreground);
     --tw-prose-quotes: var(--color-accent-green);
     --tw-prose-quote-borders: var(--color-accent-green);
@@ -100,6 +100,19 @@
     --tw-prose-pre-code: var(--color-foreground);
     --tw-prose-pre-bg: #171717;
     --tw-prose-hr: var(--color-foreground);
+  }
+
+  .prose h2, .prose h3 {
+    @apply border-b border-accent-pink pb-1 mb-4 mt-8 uppercase font-bold;
+  }
+
+  .prose a {
+    @apply no-underline hover:text-accent-pink transition-colors relative;
+  }
+
+  .prose a:hover {
+    @apply animate-[glitch_0.3s_infinite];
+    text-shadow: 2px 2px 0px #00ff41;
   }
 }
 
