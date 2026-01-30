@@ -29,9 +29,14 @@ export const parseMarkdown = async (content: string | undefined, inline = false)
 export function parseSystemAlert(alert: string | undefined) {
   if (!alert) return { integrity: undefined, factCheck: undefined, action: undefined };
 
-  const integrityMatch = alert.match(/Integrity Scan:\s*(\d+)%/i);
-  const factCheckMatch = alert.match(/Fact-Check:\s*(.*?)(?=Action:|$)/is);
-  const actionMatch = alert.match(/Action:\s*(.*)/is);
+  // Improved regex to handle both multiline and bracketed formats
+  const integrityMatch = alert.match(/INTEGRITY_SCAN:\s*(\d+)/i);
+
+  // Lookahead to stop at next field marker or closing brackets/end of string
+  const lookahead = /(?=\s*(?:ACTION:|FACT-CHECK:|INTEGRITY_SCAN:|\]\s*\[|\]\s*$|$))/si;
+
+  const factCheckMatch = alert.match(new RegExp(`FACT-CHECK:\\s*(.*?)${lookahead.source}`, 'si'));
+  const actionMatch = alert.match(new RegExp(`ACTION:\\s*(.*?)${lookahead.source}`, 'si'));
 
   return {
     integrity: integrityMatch ? parseInt(integrityMatch[1], 10) : undefined,

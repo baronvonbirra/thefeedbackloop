@@ -58,7 +58,7 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
           <time>{formattedDate}</time>
         </div>
 
-        <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight font-mono">
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
           {post.title}
         </h1>
 
@@ -94,7 +94,7 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
 
       <div class="prose prose-invert prose-neutral max-w-none relative z-10
         text-[13px] leading-normal tracking-tight
-        prose-headings:font-mono prose-headings:uppercase prose-headings:tracking-tighter
+        prose-headings:uppercase prose-headings:tracking-tighter
         prose-a:text-accent-pink prose-blockquote:border-l-4 prose-blockquote:border-accent-green
         prose-blockquote:bg-accent-green/5 prose-blockquote:py-4 prose-blockquote:px-6
         prose-blockquote:font-mono prose-blockquote:text-xs

@@ -16,9 +16,11 @@ const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
 const displaySummary = post.summary || (post.content ? stripMarkdown(post.content).slice(0, 150) + '...' : '');
 ---
 
-<article class="border-2 border-foreground p-4 flex flex-col gap-4 hover:shadow-[8px_8px_0px_rgba(255,0,255,0.5)] transition-all group">
+<article class="terminal-box group hover:border-accent-pink transition-colors">
+	<div class="scanline"></div>
+
 	{post.image_url ? (
-		<div class="aspect-video overflow-hidden border-2 border-foreground bg-neutral-900">
+		<div class="aspect-video overflow-hidden border border-foreground/30 bg-neutral-900 relative z-10 mb-4">
 			<img
 				src={post.image_url}
 				alt={post.title}
@@ -26,18 +28,20 @@ const displaySummary = post.summary || (post.content ? stripMarkdown(post.conten
 			/>
 		</div>
 	) : (
-		<div class="aspect-video border-2 border-foreground bg-neutral-900 flex items-center justify-center font-mono text-xs text-neutral-500">
+		<div class="aspect-video border border-foreground/30 bg-neutral-900 flex items-center justify-center font-mono text-xs text-neutral-500 relative z-10 mb-4">
 			[NO_IMAGE_AVAILABLE]
 		</div>
 	)}
-	<div class="flex flex-col gap-2">
+
+	<div class="flex flex-col gap-2 relative z-10">
 		<time class="font-mono text-sm text-accent-green">{formattedDate}</time>
-		<h2 class="text-lg font-bold leading-tight group-hover:text-accent-pink font-mono">
+		<h2 class="text-xl font-bold leading-tight group-hover:text-accent-pink">
 			<a href={`${import.meta.env.BASE_URL}/posts/${post.slug}`.replace(/\/+/g, '/')}>{post.title}</a>
 		</h2>
-		<p class="text-sm line-clamp-3 italic opacity-80">{displaySummary}</p>
+		<p class="text-sm line-clamp-3 italic opacity-80 font-mono leading-relaxed">{displaySummary}</p>
 	</div>
-	<div class="mt-auto pt-4 border-t border-foreground/30 flex flex-wrap gap-2 font-mono text-[10px] uppercase">
+
+	<div class="mt-4 pt-4 border-t border-foreground/30 flex flex-wrap gap-2 font-mono text-[10px] uppercase relative z-10">
 		<span class="bg-foreground text-background px-2 py-0.5">[WRITER: {post.ai_writer}]</span>
 		<span class="border border-foreground px-2 py-0.5">[EDITOR: {post.ai_editor}]</span>
 	</div>
