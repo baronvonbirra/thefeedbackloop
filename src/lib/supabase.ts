@@ -20,6 +20,7 @@ export const supabase = createClient(finalUrl, finalKey);
 export interface Post {
   id: number;
   created_at: string;
+  published_at: string;
   updated_at?: string;
   title: string;
   slug: string;
@@ -44,6 +45,7 @@ export async function getPosts() {
   const { data, error } = await supabase
     .from('posts')
     .select('*')
+    .filter('published_at', 'lte', new Date().toISOString())
     .eq('status', 'published')
     .order('created_at', { ascending: false });
 
@@ -60,6 +62,7 @@ export async function getPostBySlug(slug: string) {
     .from('posts')
     .select('*')
     .eq('slug', slug)
+    .filter('published_at', 'lte', new Date().toISOString())
     .eq('status', 'published')
     .single();
 

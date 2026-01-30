@@ -1,16 +1,11 @@
 name: Deploy to GitHub Pages
 
 on:
-  # 1. Trigger on every push to main
+  schedule:
+    - cron: '0 0 * * *' # Deploys automatically every day at midnight
+  workflow_dispatch:     # Keeps manual button active
   push:
     branches: [main]
-
-  # 2. Trigger EVERY DAY at midnight (UTC)
-  schedule:
-    - cron: '0 0 * * *'
-
-  # 3. Allow you to click a button to rebuild manually
-  workflow_dispatch:
 
 permissions:
   contents: read
