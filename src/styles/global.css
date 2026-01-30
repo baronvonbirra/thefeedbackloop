@@ -88,7 +88,7 @@
 
   /* Custom Prose for Terminal Aesthetic */
   .prose {
-    @apply font-mono text-sm;
+    @apply font-mono text-[13px] leading-normal;
     --tw-prose-body: var(--color-foreground);
     --tw-prose-headings: var(--color-foreground);
     --tw-prose-links: var(--color-accent-green);
@@ -103,7 +103,7 @@
   }
 
   .prose h2, .prose h3 {
-    @apply border-b border-accent-pink pb-1 mb-4 mt-8 uppercase font-bold;
+    @apply border-b border-accent-pink pb-1 mb-4 mt-8 uppercase font-bold text-base;
   }
 
   .prose a {

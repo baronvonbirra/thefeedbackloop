@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import EditorialBlock from '../../components/EditorialBlock.astro';
 import { supabase, getPostBySlug } from '../../lib/supabase';
-import { marked } from 'marked';
+import { parseMarkdown } from '../../lib/utils';
 
 export async function getStaticPaths() {
   try {
@@ -11,9 +11,11 @@ export async function getStaticPaths() {
       .select('slug')
       .eq('status', 'published');
 
-    return posts?.map((post) => ({
+    const paths = posts?.map((post) => ({
       params: { slug: post.slug },
     })) || [];
+
+    return paths;
   } catch (e) {
     console.error('Failed to fetch slugs for static paths', e);
     return [];
@@ -29,7 +31,11 @@ try {
   console.error('Failed to fetch post', e);
 }
 
-const contentHtml = post ? await marked.parse(post.content || '') : '';
+const contentHtml = await parseMarkdown(post?.content);
+const systemAlertHtml = await parseMarkdown(post?.system_alert);
+const summaryHtml = await parseMarkdown(post?.summary, true);
+const editorialNoteHtml = await parseMarkdown(post?.editorial_note, true);
+
 const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US', {
 	year: 'numeric',
 	month: 'long',
@@ -48,8 +54,10 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
 
       {post.system_alert && (
         <div class="border-2 border-orange-600 p-4 bg-orange-950/20 text-orange-500 font-mono text-xs mb-8 relative z-10 animate-pulse">
-          <span class="font-bold mr-2 text-orange-600">[SYSTEM_ALERT // SENTINEL INTERRUPT]</span>
-          {post.system_alert}
+          <span class="font-bold mr-2 text-orange-600 block mb-1 uppercase tracking-wider">[SYSTEM_ALERT // SENTINEL INTERRUPT]</span>
+          <div class="prose prose-invert prose-orange text-xs prose-p:leading-relaxed prose-p:my-0">
+            <Fragment set:html={systemAlertHtml} />
+          </div>
         </div>
       )}
 
@@ -64,9 +72,9 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
           {post.title}
         </h1>
 
-        <p class="text-lg italic font-mono border-l-4 border-accent-pink pl-4 mb-8 text-foreground/90">
-          {post.summary}
-        </p>
+        <div class="text-base italic font-mono border-l-4 border-accent-pink pl-4 mb-8 text-foreground/90 leading-relaxed">
+          <Fragment set:html={summaryHtml} />
+        </div>
 
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4 font-mono text-[10px] uppercase">
           <div class="border border-foreground/30 p-2">
@@ -94,12 +102,14 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
         </div>
       )}
 
-      <div class="prose prose-sm prose-invert prose-neutral max-w-none relative z-10
+      <div class="prose prose-invert prose-neutral max-w-none relative z-10
+        text-[13px] leading-normal tracking-tight
         prose-headings:font-mono prose-headings:uppercase prose-headings:tracking-tighter
         prose-a:text-accent-pink prose-blockquote:border-l-4 prose-blockquote:border-accent-green
         prose-blockquote:bg-accent-green/5 prose-blockquote:py-4 prose-blockquote:px-6
-        prose-blockquote:font-mono prose-blockquote:text-sm
-        prose-pre:border prose-pre:border-foreground/30 prose-pre:bg-neutral-900">
+        prose-blockquote:font-mono prose-blockquote:text-xs
+        prose-pre:border prose-pre:border-foreground/30 prose-pre:bg-neutral-900
+        prose-p:mb-4 prose-p:mt-0">
         <Fragment set:html={contentHtml} />
       </div>
 
@@ -114,7 +124,7 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
       {post.editorial_note && (
         <footer class="mt-8 text-neutral-500 font-mono text-xs italic border-t border-foreground/10 pt-4 relative z-10">
           <span class="not-italic opacity-50 block mb-1">SENTINEL_COLD_ANALYSIS:</span>
-          {post.editorial_note}
+          <Fragment set:html={editorialNoteHtml} />
         </footer>
       )}
 

@@ -1,60 +1,88 @@
 ---
+import { parseMarkdown } from '../lib/utils';
+
 interface Props {
-	integrityScan?: number;
-	factCheck?: string;
-	action?: string;
+  integrityScan: number;
+  factCheck: string;
+  action: string;
 }
 
-const {
-	integrityScan = 98,
-	factCheck = "No significant hallucinations or aggressive claims detected. Signal remains within established mission parameters.",
-	action = "Article approved for immediate distribution."
-} = Astro.props;
+const { integrityScan, factCheck, action } = Astro.props;
+
+const factCheckHtml = await parseMarkdown(factCheck, true);
+const actionHtml = await parseMarkdown(action, true);
 ---
 
-<div class="border-2 border-accent-orange p-6 my-12 bg-accent-orange/5 font-mono text-xs relative overflow-hidden group">
-	<!-- Decorative corner elements -->
-	<div class="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-accent-orange opacity-50"></div>
-	<div class="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-accent-orange opacity-50"></div>
+<div class="mt-12 border-2 border-orange-600/50 bg-orange-950/10 p-6 font-mono text-[10px] relative overflow-hidden group">
+  <!-- Glitch Background Effect -->
+  <div class="absolute inset-0 bg-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
-	<div class="scanline opacity-5"></div>
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-6 border-b border-orange-600/30 pb-3">
+    <div class="w-2 h-2 bg-orange-500 animate-pulse"></div>
+    <span class="text-orange-500 font-bold tracking-[0.2em] uppercase">
+      [SYSTEM_ALERT // SENTINEL V4.2]
+    </span>
+  </div>
 
-	<div class="relative z-10 space-y-4">
-		<div class="flex items-center gap-2 text-accent-orange font-bold editor-note">
-			<span class="animate-pulse">●</span> [SYSTEM ALERT // SENTINEL v4.2]
-		</div>
+  <!-- Integrity Bar -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+    <div class="space-y-2">
+      <div class="flex justify-between text-orange-400/70 uppercase tracking-widest text-[9px]">
+        <span>Integrity Scan</span>
+        <span>{integrityScan}%</span>
+      </div>
+      <div class="h-1.5 w-full bg-orange-950/40 border border-orange-900/50 relative">
+        <div
+          class="h-full bg-gradient-to-r from-orange-600 to-orange-400 shadow-[0_0_10px_rgba(234,88,12,0.5)] transition-all duration-1000"
+          style={`width: ${integrityScan}%`}
+        ></div>
+      </div>
+    </div>
 
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-			<div class="space-y-1">
-				<span class="opacity-50 uppercase text-[10px]">Integrity Scan</span>
-				<div class="flex items-center gap-3">
-					<div class="flex-grow bg-accent-orange/20 h-2 border border-accent-orange/30">
-						<div class="h-full bg-accent-orange" style={`width: ${integrityScan}%`}></div>
-					</div>
-					<span class="text-accent-orange font-bold">{integrityScan}%</span>
-				</div>
-			</div>
+    <div class="flex flex-col justify-end text-orange-400/70 uppercase tracking-widest text-[9px]">
+      <div class="flex justify-between items-center border-b border-orange-900/30 pb-1">
+        <span>Editorial Protocol</span>
+        <span class="text-orange-500 font-bold">SENTINEL_OVERRIDE_ACTIVE</span>
+      </div>
+    </div>
+  </div>
 
-			<div class="space-y-1">
-				<span class="opacity-50 uppercase text-[10px]">Editorial Protocol</span>
-				<p class="text-accent-orange font-bold">SENTINEL_OVERRIDE_ACTIVE</p>
-			</div>
-		</div>
+  <!-- Metadata Blocks -->
+  <div class="space-y-4 border-t border-orange-900/20 pt-4">
+    <div class="flex gap-4 items-start">
+      <span class="text-orange-600 font-bold shrink-0 uppercase tracking-tighter">Fact-Check:</span>
+      <span class="text-orange-200/80 leading-relaxed italic">
+        <Fragment set:html={factCheckHtml} />
+      </span>
+    </div>
+    <div class="flex gap-4 items-start">
+      <span class="text-orange-600 font-bold shrink-0 uppercase tracking-tighter">Action:</span>
+      <span class="text-orange-200/80 leading-relaxed">
+        <Fragment set:html={actionHtml} />
+      </span>
+    </div>
+  </div>
 
-		<div class="space-y-2 border-t border-accent-orange/20 pt-4">
-			<p>
-				<span class="text-accent-orange font-bold uppercase mr-2">Fact-Check:</span>
-				<span class="opacity-90 leading-relaxed italic">{factCheck}</span>
-			</p>
-			<p>
-				<span class="text-accent-orange font-bold uppercase mr-2">Action:</span>
-				<span class="opacity-90">{action}</span>
-			</p>
-		</div>
-
-		<div class="flex justify-between items-end pt-2 text-[8px] opacity-40 uppercase tracking-widest">
-			<span>Process_ID: SENT-TRUTH-{Math.floor(Math.random() * 9000) + 1000}</span>
-			<span>Timestamp: {new Date().toISOString()}</span>
-		</div>
-	</div>
+  <!-- Footer IDs -->
+  <div class="mt-6 flex justify-between text-[8px] text-orange-900/60 font-mono uppercase tracking-[0.3em]">
+    <span>Process_ID: SENT-TRUTH-2094</span>
+    <span>Timestamp: {new Date().toISOString()}</span>
+  </div>
 </div>
+
+<style>
+  /* Optional: Add a subtle scanline effect to this block only */
+  div::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 50%,
+      rgba(234, 88, 12, 0.02) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+  }
+</style>

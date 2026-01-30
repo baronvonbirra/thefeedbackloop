@@ -1,3 +1,5 @@
+import { marked } from 'marked';
+
 export const stripMarkdown = (md: string) => {
   if (!md) return '';
   return md
@@ -10,4 +12,13 @@ export const stripMarkdown = (md: string) => {
     .replace(/^\s*\d+\.\s+/gm, '')
     .replace(/\n+/g, ' ')
     .trim();
+};
+
+/**
+ * Parses markdown while handling literal \n characters and optional inline rendering.
+ */
+export const parseMarkdown = async (content: string | undefined, inline = false) => {
+  if (!content) return '';
+  const processed = content.replace(/\\n/g, '\n');
+  return inline ? marked.parseInline(processed) : await marked.parse(processed);
 };
