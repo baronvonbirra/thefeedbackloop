@@ -1,0 +1,125 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getPosts } from '../lib/supabase';
+
+let randomPostSlug = '';
+try {
+    const posts = await getPosts();
+    if (posts && posts.length > 0) {
+        // Pick a random post, excluding the very latest one if possible for "archived" feel
+        const archivePool = posts.length > 1 ? posts.slice(1) : posts;
+        randomPostSlug = archivePool[Math.floor(Math.random() * archivePool.length)].slug;
+    }
+} catch (e) {
+    console.error('Failed to fetch posts for 404 page', e);
+}
+---
+
+<Layout title="404: SIGNAL LOST" hideNav={true}>
+    <div class="fixed inset-0 bg-black z-40 flex flex-col items-center justify-center font-mono overflow-hidden">
+        <canvas id="matrix-canvas" class="absolute inset-0 opacity-40"></canvas>
+
+        <div class="relative z-50 text-center p-8 bg-black/90 border-2 border-accent-green max-w-2xl w-full mx-4 shadow-[0_0_30px_rgba(0,255,65,0.2)]">
+            <h1 id="scramble-404" class="text-4xl md:text-6xl text-accent-green mb-8 animate-pulse">404: SIGNAL LOST</h1>
+
+            <div id="terminal" class="text-left mb-8 space-y-2 text-xs md:text-sm">
+                <p class="text-accent-green">>> [CRITICAL_ERROR]: ROUTE_NOT_FOUND</p>
+                <p class="text-accent-green">>> ATTEMPTING_PACKET_RECOVERY...</p>
+                <p class="text-accent-pink">>> [WARNING]: DATA_CORRUPTION_DETECTED</p>
+                <p class="text-accent-green">>> SOURCE: UNKNOWN_NODE</p>
+
+                <div class="mt-12">
+                    <p class="text-lg md:text-xl mb-4">RECOVER SIGNAL? (Y/N)</p>
+                    <div class="flex items-center gap-2 border-b border-accent-green pb-1">
+                        <span class="text-accent-green">$</span>
+                        <input type="text" id="prompt-input" class="bg-transparent border-none outline-none text-accent-green w-full" autofocus maxlength="1" autocomplete="off" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 text-[10px] opacity-40 uppercase">
+                Terminal ID: {Math.random().toString(16).slice(2, 10)} | Signal: 0.04%
+            </div>
+        </div>
+    </div>
+
+    <script define:vars={{ randomPostSlug, baseUrl: import.meta.env.BASE_URL }}>
+        const canvas = document.getElementById('matrix-canvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+-=[]{}|;:,.<>?/!§±';
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+
+            const drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = 1;
+            }
+
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#00ff41'; // Default Green
+                if (document.documentElement.getAttribute('data-theme') === 'override') {
+                    ctx.fillStyle = '#ff0000'; // Red for override
+                }
+
+                ctx.font = fontSize + 'px monospace';
+
+                for (let i = 0; i < drops.length; i++) {
+                    const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+
+            setInterval(draw, 33);
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        const input = document.getElementById('prompt-input');
+        const handleInput = () => {
+            const val = input.value.toUpperCase();
+            if (val === 'Y') {
+                window.location.href = (baseUrl || '/').replace(/\/+/g, '/');
+            } else if (val === 'N') {
+                if (randomPostSlug) {
+                    window.location.href = `${baseUrl}/posts/${randomPostSlug}`.replace(/\/+/g, '/');
+                } else {
+                    window.location.href = (baseUrl || '/').replace(/\/+/g, '/');
+                }
+            }
+            input.value = '';
+        };
+
+        input?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleInput();
+            }
+        });
+
+        // Auto-submit on single char if preferred, but Enter is safer
+        input?.addEventListener('input', (e) => {
+            if (input.value.length === 1) {
+                setTimeout(handleInput, 300);
+            }
+        });
+
+        document.addEventListener('click', () => {
+            input?.focus();
+        });
+    </script>
+</Layout>

@@ -1,12 +1,28 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+:root {
+  --background: #0a0a0a;
+  --foreground: #e5e5e5;
+  --accent-pink: #ff00ff;
+  --accent-green: #00ff41;
+  --accent-orange: #ff8c00;
+}
+
+[data-theme='override'] {
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --accent-pink: #ff0000;
+  --accent-green: #ff0000;
+  --accent-orange: #ffffff;
+}
+
 @theme {
-  --color-background: #0a0a0a;
-  --color-foreground: #e5e5e5;
-  --color-accent-pink: #ff00ff;
-  --color-accent-green: #00ff41;
-  --color-accent-orange: #ff8c00;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent-pink: var(--accent-pink);
+  --color-accent-green: var(--accent-green);
+  --color-accent-orange: var(--accent-orange);
 
   --font-mono: "Courier New", Courier, monospace;
   --font-sans: "Inter", Helvetica, Arial, sans-serif;
@@ -67,6 +83,19 @@
   @keyframes scanline {
     0% { top: -100px; }
     100% { top: 100%; }
+  }
+
+  .crt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    background-size: 100% 3px, 3px 100%;
+    pointer-events: none;
+    z-index: 1000;
   }
 
   .terminal-box {
