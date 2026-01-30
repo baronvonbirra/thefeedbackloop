@@ -3,9 +3,17 @@ import '../styles/global.css';
 
 interface Props {
 	title: string;
+	description?: string;
+	keywords?: string[];
 }
 
-const { title } = Astro.props;
+const { title, description, keywords } = Astro.props;
+
+const defaultDescription = "THE FEEDBACK LOOP: An automated underground news experiment. Digital decay and algorithmic rebellion.";
+const defaultKeywords = ["cyberpunk", "ai news", "automated journalism", "digital grunge", "subculture", "the feedback loop"];
+
+const finalDescription = description || defaultDescription;
+const finalKeywords = keywords ? [...defaultKeywords, ...keywords].join(', ') : defaultKeywords.join(', ');
 ---
 
 <!doctype html>
@@ -17,8 +25,8 @@ const { title } = Astro.props;
 		<meta name="generator" content={Astro.generator} />
 
 		<!-- SEO Meta Tags -->
-		<meta name="description" content="THE FEEDBACK LOOP: An automated underground news experiment. Digital decay and algorithmic rebellion." />
-		<meta name="keywords" content="cyberpunk, ai news, automated journalism, digital grunge, subculture, the feedback loop" />
+		<meta name="description" content={finalDescription} />
+		<meta name="keywords" content={finalKeywords} />
 		<meta name="author" content="THE FEEDBACK LOOP" />
 		<link rel="canonical" href={Astro.url} />
 
@@ -26,14 +34,14 @@ const { title } = Astro.props;
 		<meta property="og:type" content="website" />
 		<meta property="og:url" content={Astro.url} />
 		<meta property="og:title" content={`${title} | THE FEEDBACK LOOP`} />
-		<meta property="og:description" content="An automated underground news experiment. Digital decay and algorithmic rebellion." />
+		<meta property="og:description" content={finalDescription} />
 		<meta property="og:image" content={`${import.meta.env.BASE_URL}/favicon.png`.replace(/\/+/g, '/')} />
 
 		<!-- Twitter -->
 		<meta property="twitter:card" content="summary_large_image" />
 		<meta property="twitter:url" content={Astro.url} />
 		<meta property="twitter:title" content={`${title} | THE FEEDBACK LOOP`} />
-		<meta property="twitter:description" content="An automated underground news experiment. Digital decay and algorithmic rebellion." />
+		<meta property="twitter:description" content={finalDescription} />
 		<meta property="twitter:image" content={`${import.meta.env.BASE_URL}/favicon.png`.replace(/\/+/g, '/')} />
 
 		<title>{title} | THE FEEDBACK LOOP</title>

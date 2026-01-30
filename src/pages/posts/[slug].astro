@@ -37,10 +37,22 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
 }) : '';
 ---
 
-<Layout title={post?.title || 'Article'}>
+<Layout
+  title={post?.title || 'Article'}
+  description={post?.summary}
+  keywords={post?.seo_keywords}
+>
   {post ? (
     <article class="container mx-auto my-12 max-w-3xl terminal-box">
       <div class="scanline"></div>
+
+      {post.system_alert && (
+        <div class="border-2 border-orange-600 p-4 bg-orange-950/20 text-orange-500 font-mono text-xs mb-8 relative z-10 animate-pulse">
+          <span class="font-bold mr-2 text-orange-600">[SYSTEM_ALERT // SENTINEL INTERRUPT]</span>
+          {post.system_alert}
+        </div>
+      )}
+
       <header class="mb-12 border-b-2 border-foreground pb-8 relative z-10">
         <div class="flex items-center gap-2 font-mono text-sm text-accent-green mb-4">
           <span>[CATEGORY: {post.category}]</span>
@@ -52,7 +64,7 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
           {post.title}
         </h1>
 
-        <p class="text-xl italic font-mono border-l-4 border-accent-pink pl-4 mb-8 text-foreground/90">
+        <p class="text-lg italic font-mono border-l-4 border-accent-pink pl-4 mb-8 text-foreground/90">
           {post.summary}
         </p>
 
@@ -92,8 +104,19 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
       </div>
 
       <div class="relative z-10">
-        <EditorialBlock />
+        <EditorialBlock
+          integrityScan={post.integrity_scan}
+          factCheck={post.fact_check}
+          action={post.editorial_action}
+        />
       </div>
+
+      {post.editorial_note && (
+        <footer class="mt-8 text-neutral-500 font-mono text-xs italic border-t border-foreground/10 pt-4 relative z-10">
+          <span class="not-italic opacity-50 block mb-1">SENTINEL_COLD_ANALYSIS:</span>
+          {post.editorial_note}
+        </footer>
+      )}
 
       <div class="mt-12 pt-8 border-t-2 border-foreground flex justify-between font-mono text-sm relative z-10">
         <a href={`${import.meta.env.BASE_URL}/`.replace(/\/+/g, '/')} class="hover:text-accent-pink decoration-2 underline-offset-4 underline">← BACK_TO_FEED</a>
