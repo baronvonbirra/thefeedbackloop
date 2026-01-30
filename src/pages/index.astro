@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
+import VisualUplink from '../components/VisualUplink.astro';
 import { getPosts } from '../lib/supabase';
 import { stripMarkdown } from '../lib/utils';
 
@@ -29,17 +30,33 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 				<section class="mb-12">
 					<div class="terminal-box mb-8 hover:bg-accent-green/5 transition-colors">
 						<div class="scanline"></div>
-						<span class="bg-accent-pink text-white px-3 py-1 font-mono text-sm uppercase mb-4 inline-block relative z-10">Breaking News</span>
-						<h1 class="text-4xl md:text-6xl font-bold mb-4 relative z-10">
-							<a href={`${import.meta.env.BASE_URL}/posts/${latestPost.slug}`.replace(/\/+/g, '/')} class="hover:text-accent-pink transition-colors">
-								{latestPost.title}
-							</a>
-						</h1>
-						<p class="text-lg mb-6 opacity-90 font-mono relative z-10">{latestSummary}</p>
-						<div class="flex items-center gap-4 font-mono text-sm">
-							<span class="text-accent-green">{new Date(latestPost.created_at).toLocaleDateString()}</span>
-							<span class="opacity-50">|</span>
-							<span>[WRITER: {latestPost.ai_writer}]</span>
+						<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
+							<div>
+								<VisualUplink
+									imageUrl={latestPost.image_url || `${import.meta.env.BASE_URL}/images/posts/${latestPost.slug}.png`.replace(/\/+/g, '/')}
+									alt={latestPost.title}
+									metadata={latestPost.image_metadata}
+								/>
+							</div>
+							<div class="flex flex-col">
+								<span class="bg-accent-pink text-white px-3 py-1 font-mono text-sm uppercase mb-4 self-start">Breaking News</span>
+								<h1 class="text-3xl md:text-5xl font-bold mb-4 leading-tight">
+									<a href={`${import.meta.env.BASE_URL}/posts/${latestPost.slug}`.replace(/\/+/g, '/')} class="hover:text-accent-pink transition-colors">
+										{latestPost.title}
+									</a>
+								</h1>
+								<p class="text-lg mb-6 opacity-90 font-mono line-clamp-4 leading-relaxed italic">{latestSummary}</p>
+								<div class="mt-auto pt-4 border-t border-foreground/20 flex items-center justify-between font-mono text-xs">
+									<div class="flex items-center gap-3">
+										<span class="text-accent-green">{new Date(latestPost.created_at).toLocaleDateString()}</span>
+										<span class="opacity-30">|</span>
+										<span class="uppercase">WRITER: {latestPost.ai_writer}</span>
+									</div>
+									<a href={`${import.meta.env.BASE_URL}/posts/${latestPost.slug}`.replace(/\/+/g, '/')} class="text-accent-pink hover:underline">
+										READ_FULL_STORY →
+									</a>
+								</div>
+							</div>
 						</div>
 					</div>
 
