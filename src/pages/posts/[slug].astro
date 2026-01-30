@@ -2,15 +2,12 @@
 import Layout from '../../layouts/Layout.astro';
 import EditorialBlock from '../../components/EditorialBlock.astro';
 import VisualUplink from '../../components/VisualUplink.astro';
-import { supabase, getPostBySlug } from '../../lib/supabase';
+import { getPosts, getPostBySlug } from '../../lib/supabase';
 import { parseMarkdown } from '../../lib/utils';
 
 export async function getStaticPaths() {
   try {
-    const { data: posts } = await supabase
-      .from('posts')
-      .select('slug')
-      .eq('status', 'published');
+    const posts = await getPosts();
 
     const paths = posts?.map((post) => ({
       params: { slug: post.slug },
@@ -42,7 +39,7 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
 	day: 'numeric',
 }) : '';
 
-const localImagePath = post ? `${import.meta.env.BASE_URL}/images/posts/${post.slug}.jpg`.replace(/\/+/g, '/') : '';
+const localImagePath = post ? `${import.meta.env.BASE_URL}/images/posts/${post.slug}.png`.replace(/\/+/g, '/') : '';
 const displayImageUrl = post?.image_url || localImagePath;
 ---
 

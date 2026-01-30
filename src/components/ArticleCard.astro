@@ -9,7 +9,7 @@ interface Props {
 
 const { post } = Astro.props;
 
-const localImagePath = `${import.meta.env.BASE_URL}/images/posts/${post.slug}.jpg`.replace(/\/+/g, '/');
+const localImagePath = `${import.meta.env.BASE_URL}/images/posts/${post.slug}.png`.replace(/\/+/g, '/');
 // If image_url starts with http, it's external. If it's missing or just a filename, we can try to use it.
 // For now, we'll favor the local path if it exists (by convention), otherwise fallback to DB's image_url.
 const displayImageUrl = post.image_url || localImagePath;

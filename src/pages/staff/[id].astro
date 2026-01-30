@@ -34,6 +34,7 @@ const staffData = {
       C O  0 0  /
          . . . . .
     `,
+    image: "axel.png",
     imageMetadata: "ISO: 6400 | LENS: 24mm Wide-Angle Neural | SHUTTER: 1/500"
   },
   v3ra_l1ght: {
@@ -55,6 +56,7 @@ const staffData = {
          (( @ 8 ))
          =  \ /  =
     `,
+    image: "vera.png",
     imageMetadata: "ISO: 1600 | LENS: 50mm Prime Signal-Jacker | SHUTTER: 1/60"
   }
 };
@@ -82,7 +84,7 @@ const member = staffData[id as keyof typeof staffData];
         <!-- Sidebar Info -->
         <div class="space-y-6">
           <VisualUplink
-            imageUrl={`${import.meta.env.BASE_URL}/images/portraits/${id}.jpg`.replace(/\/+/g, '/')}
+            imageUrl={`${import.meta.env.BASE_URL}/images/portraits/${member.image}`.replace(/\/+/g, '/')}
             alt={member.name}
             metadata={member.imageMetadata}
           />
