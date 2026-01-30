@@ -2,15 +2,21 @@
 import { parseMarkdown } from '../lib/utils';
 
 interface Props {
-  integrityScan: number;
-  factCheck: string;
-  action: string;
+  systemAlert?: string;
+  integrityScan?: number;
+  factCheck?: string;
+  action?: string;
 }
 
-const { integrityScan, factCheck, action } = Astro.props;
+const { systemAlert, integrityScan, factCheck, action } = Astro.props;
 
-const factCheckHtml = await parseMarkdown(factCheck, true);
-const actionHtml = await parseMarkdown(action, true);
+// Fallback logic as per plan
+const displayIntegrity = integrityScan ?? (systemAlert ? 100 : undefined);
+const displayFactCheck = factCheck || systemAlert || '';
+const displayAction = action || systemAlert || '';
+
+const factCheckHtml = await parseMarkdown(displayFactCheck, true);
+const actionHtml = await parseMarkdown(displayAction, true);
 ---
 
 <div class="mt-12 border-2 border-orange-600/50 bg-orange-950/10 p-6 font-mono text-[10px] relative overflow-hidden group">
@@ -26,42 +32,48 @@ const actionHtml = await parseMarkdown(action, true);
   </div>
 
   <!-- Integrity Bar -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-    <div class="space-y-2">
-      <div class="flex justify-between text-orange-400/70 uppercase tracking-widest text-[9px]">
-        <span>Integrity Scan</span>
-        <span>{integrityScan}%</span>
+  {(displayIntegrity !== undefined) && (
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+      <div class="space-y-2">
+        <div class="flex justify-between text-orange-400/70 uppercase tracking-widest text-[9px]">
+          <span>Integrity Scan</span>
+          <span>{displayIntegrity}%</span>
+        </div>
+        <div class="h-1.5 w-full bg-orange-950/40 border border-orange-900/50 relative">
+          <div
+            class="h-full bg-gradient-to-r from-orange-600 to-orange-400 shadow-[0_0_10px_rgba(234,88,12,0.5)] transition-all duration-1000"
+            style={`width: ${displayIntegrity}%`}
+          ></div>
+        </div>
       </div>
-      <div class="h-1.5 w-full bg-orange-950/40 border border-orange-900/50 relative">
-        <div
-          class="h-full bg-gradient-to-r from-orange-600 to-orange-400 shadow-[0_0_10px_rgba(234,88,12,0.5)] transition-all duration-1000"
-          style={`width: ${integrityScan}%`}
-        ></div>
-      </div>
-    </div>
 
-    <div class="flex flex-col justify-end text-orange-400/70 uppercase tracking-widest text-[9px]">
-      <div class="flex justify-between items-center border-b border-orange-900/30 pb-1">
-        <span>Editorial Protocol</span>
-        <span class="text-orange-500 font-bold">SENTINEL_OVERRIDE_ACTIVE</span>
+      <div class="flex flex-col justify-end text-orange-400/70 uppercase tracking-widest text-[9px]">
+        <div class="flex justify-between items-center border-b border-orange-900/30 pb-1">
+          <span>Editorial Protocol</span>
+          <span class="text-orange-500 font-bold">SENTINEL_OVERRIDE_ACTIVE</span>
+        </div>
       </div>
     </div>
-  </div>
+  )}
 
   <!-- Metadata Blocks -->
   <div class="space-y-4 border-t border-orange-900/20 pt-4">
-    <div class="flex gap-4 items-start">
-      <span class="text-orange-600 font-bold shrink-0 uppercase tracking-tighter">Fact-Check:</span>
-      <span class="text-orange-200/80 leading-relaxed italic">
-        <Fragment set:html={factCheckHtml} />
-      </span>
-    </div>
-    <div class="flex gap-4 items-start">
-      <span class="text-orange-600 font-bold shrink-0 uppercase tracking-tighter">Action:</span>
-      <span class="text-orange-200/80 leading-relaxed">
-        <Fragment set:html={actionHtml} />
-      </span>
-    </div>
+    {displayFactCheck && (
+      <div class="flex gap-4 items-start">
+        <span class="text-orange-600 font-bold shrink-0 uppercase tracking-tighter">Fact-Check:</span>
+        <span class="text-orange-200/80 leading-relaxed italic">
+          <Fragment set:html={factCheckHtml} />
+        </span>
+      </div>
+    )}
+    {displayAction && (
+      <div class="flex gap-4 items-start">
+        <span class="text-orange-600 font-bold shrink-0 uppercase tracking-tighter">Action:</span>
+        <span class="text-orange-200/80 leading-relaxed">
+          <Fragment set:html={actionHtml} />
+        </span>
+      </div>
+    )}
   </div>
 
   <!-- Footer IDs -->
