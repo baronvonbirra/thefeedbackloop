@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import { getPosts } from '../lib/supabase';
+import { stripMarkdown } from '../lib/utils';
 
 let posts = [];
 try {
@@ -13,6 +14,8 @@ try {
 const latestPost = posts[0];
 const otherPosts = posts.slice(1);
 const recentHeadlines = posts.slice(0, 10);
+
+const latestSummary = latestPost?.summary || (latestPost?.content ? stripMarkdown(latestPost.content).slice(0, 150) + '...' : '');
 
 const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 						 import.meta.env.PUBLIC_SUPABASE_URL === 'https://your-project-id.supabase.co';
@@ -32,7 +35,7 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 								{latestPost.title}
 							</a>
 						</h1>
-						<p class="text-xl mb-6 opacity-90 font-mono relative z-10">{latestPost.summary}</p>
+						<p class="text-lg mb-6 opacity-90 font-mono relative z-10">{latestSummary}</p>
 						<div class="flex items-center gap-4 font-mono text-sm">
 							<span class="text-accent-green">{new Date(latestPost.created_at).toLocaleDateString()}</span>
 							<span class="opacity-50">|</span>

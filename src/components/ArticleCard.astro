@@ -1,5 +1,6 @@
 ---
 import type { Post } from '../lib/supabase';
+import { stripMarkdown } from '../lib/utils';
 
 interface Props {
 	post: Post;
@@ -11,6 +12,8 @@ const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
 	month: 'short',
 	day: '2-digit',
 });
+
+const displaySummary = post.summary || (post.content ? stripMarkdown(post.content).slice(0, 150) + '...' : '');
 ---
 
 <article class="border-2 border-foreground p-4 flex flex-col gap-4 hover:shadow-[8px_8px_0px_rgba(255,0,255,0.5)] transition-all group">
@@ -29,10 +32,10 @@ const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
 	)}
 	<div class="flex flex-col gap-2">
 		<time class="font-mono text-sm text-accent-green">{formattedDate}</time>
-		<h2 class="text-2xl font-bold leading-tight group-hover:text-accent-pink font-mono">
+		<h2 class="text-lg font-bold leading-tight group-hover:text-accent-pink font-mono">
 			<a href={`${import.meta.env.BASE_URL}/posts/${post.slug}`.replace(/\/+/g, '/')}>{post.title}</a>
 		</h2>
-		<p class="text-sm line-clamp-3 italic opacity-80">{post.summary}</p>
+		<p class="text-sm line-clamp-3 italic opacity-80">{displaySummary}</p>
 	</div>
 	<div class="mt-auto pt-4 border-t border-foreground/30 flex flex-wrap gap-2 font-mono text-[10px] uppercase">
 		<span class="bg-foreground text-background px-2 py-0.5">[WRITER: {post.ai_writer}]</span>

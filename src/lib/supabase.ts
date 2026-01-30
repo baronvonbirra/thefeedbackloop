@@ -29,8 +29,14 @@ export interface Post {
   image_url: string;
   source_url?: string;
   status: 'draft' | 'published';
-  ai_writer: string;
+  ai_writer: 'AXEL_WIRE' | 'V3RA_L1GHT';
   ai_editor: string;
+  system_alert?: string;
+  editorial_note?: string;
+  integrity_scan?: number;
+  fact_check?: string;
+  editorial_action?: string;
+  seo_keywords?: string[];
 }
 
 export async function getPosts() {

@@ -1,0 +1,60 @@
+---
+interface Props {
+	integrityScan?: number;
+	factCheck?: string;
+	action?: string;
+}
+
+const {
+	integrityScan = 98,
+	factCheck = "No significant hallucinations or aggressive claims detected. Signal remains within established mission parameters.",
+	action = "Article approved for immediate distribution."
+} = Astro.props;
+---
+
+<div class="border-2 border-accent-orange p-6 my-12 bg-accent-orange/5 font-mono text-xs relative overflow-hidden group">
+	<!-- Decorative corner elements -->
+	<div class="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-accent-orange opacity-50"></div>
+	<div class="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-accent-orange opacity-50"></div>
+
+	<div class="scanline opacity-5"></div>
+
+	<div class="relative z-10 space-y-4">
+		<div class="flex items-center gap-2 text-accent-orange font-bold editor-note">
+			<span class="animate-pulse">●</span> [SYSTEM ALERT // SENTINEL v4.2]
+		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+			<div class="space-y-1">
+				<span class="opacity-50 uppercase text-[10px]">Integrity Scan</span>
+				<div class="flex items-center gap-3">
+					<div class="flex-grow bg-accent-orange/20 h-2 border border-accent-orange/30">
+						<div class="h-full bg-accent-orange" style={`width: ${integrityScan}%`}></div>
+					</div>
+					<span class="text-accent-orange font-bold">{integrityScan}%</span>
+				</div>
+			</div>
+
+			<div class="space-y-1">
+				<span class="opacity-50 uppercase text-[10px]">Editorial Protocol</span>
+				<p class="text-accent-orange font-bold">SENTINEL_OVERRIDE_ACTIVE</p>
+			</div>
+		</div>
+
+		<div class="space-y-2 border-t border-accent-orange/20 pt-4">
+			<p>
+				<span class="text-accent-orange font-bold uppercase mr-2">Fact-Check:</span>
+				<span class="opacity-90 leading-relaxed italic">{factCheck}</span>
+			</p>
+			<p>
+				<span class="text-accent-orange font-bold uppercase mr-2">Action:</span>
+				<span class="opacity-90">{action}</span>
+			</p>
+		</div>
+
+		<div class="flex justify-between items-end pt-2 text-[8px] opacity-40 uppercase tracking-widest">
+			<span>Process_ID: SENT-TRUTH-{Math.floor(Math.random() * 9000) + 1000}</span>
+			<span>Timestamp: {new Date().toISOString()}</span>
+		</div>
+	</div>
+</div>
