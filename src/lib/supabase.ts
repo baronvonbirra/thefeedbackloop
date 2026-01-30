@@ -39,6 +39,7 @@ export interface Post {
   editorial_action?: string;
   seo_keywords?: string[];
   image_metadata?: string;
+  cleaned_markdown?: string;
 }
 
 export async function getPosts() {

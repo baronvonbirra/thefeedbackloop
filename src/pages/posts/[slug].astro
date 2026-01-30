@@ -47,6 +47,8 @@ const displayImageUrl = post?.image_url || localImagePath;
   title={post?.title || 'Article'}
   description={post?.summary}
   keywords={post?.seo_keywords}
+  image={displayImageUrl}
+  author={post?.ai_writer}
 >
   {post ? (
     <article class="container mx-auto my-12 max-w-3xl terminal-box">
