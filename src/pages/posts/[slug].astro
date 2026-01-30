@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import HallucinationWarning from '../../components/HallucinationWarning.astro';
+import EditorialBlock from '../../components/EditorialBlock.astro';
 import { supabase, getPostBySlug } from '../../lib/supabase';
 import { marked } from 'marked';
 
@@ -82,7 +82,7 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
         </div>
       )}
 
-      <div class="prose prose-invert prose-neutral max-w-none relative z-10
+      <div class="prose prose-sm prose-invert prose-neutral max-w-none relative z-10
         prose-headings:font-mono prose-headings:uppercase prose-headings:tracking-tighter
         prose-a:text-accent-pink prose-blockquote:border-l-4 prose-blockquote:border-accent-green
         prose-blockquote:bg-accent-green/5 prose-blockquote:py-4 prose-blockquote:px-6
@@ -92,7 +92,7 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
       </div>
 
       <div class="relative z-10">
-        <HallucinationWarning />
+        <EditorialBlock />
       </div>
 
       <div class="mt-12 pt-8 border-t-2 border-foreground flex justify-between font-mono text-sm relative z-10">
