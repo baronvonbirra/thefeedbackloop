@@ -1,12 +1,18 @@
 ---
 import type { Post } from '../lib/supabase';
 import { stripMarkdown } from '../lib/utils';
+import VisualUplink from './VisualUplink.astro';
 
 interface Props {
 	post: Post;
 }
 
 const { post } = Astro.props;
+
+const localImagePath = `${import.meta.env.BASE_URL}/images/posts/${post.slug}.jpg`.replace(/\/+/g, '/');
+// If image_url starts with http, it's external. If it's missing or just a filename, we can try to use it.
+// For now, we'll favor the local path if it exists (by convention), otherwise fallback to DB's image_url.
+const displayImageUrl = post.image_url || localImagePath;
 const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
 	year: 'numeric',
 	month: 'short',
@@ -19,19 +25,13 @@ const displaySummary = post.summary || (post.content ? stripMarkdown(post.conten
 <article class="terminal-box group hover:border-accent-pink transition-colors">
 	<div class="scanline"></div>
 
-	{post.image_url ? (
-		<div class="aspect-video overflow-hidden border border-foreground/30 bg-neutral-900 relative z-10 mb-4">
-			<img
-				src={post.image_url}
-				alt={post.title}
-				class="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-500"
-			/>
-		</div>
-	) : (
-		<div class="aspect-video border border-foreground/30 bg-neutral-900 flex items-center justify-center font-mono text-xs text-neutral-500 relative z-10 mb-4">
-			[NO_IMAGE_AVAILABLE]
-		</div>
-	)}
+	<div class="mb-4 relative z-10">
+		<VisualUplink
+			imageUrl={displayImageUrl}
+			alt={post.title}
+			metadata={post.image_metadata}
+		/>
+	</div>
 
 	<div class="flex flex-col gap-2 relative z-10">
 		<time class="font-mono text-sm text-accent-green">{formattedDate}</time>
