@@ -24,6 +24,11 @@ const finalKeywords = keywords ? [...defaultKeywords, ...keywords].join(', ') : 
 		<link rel="icon" type="image/png" href={`${import.meta.env.BASE_URL}/favicon.png`.replace(/\/+/g, '/')} />
 		<meta name="generator" content={Astro.generator} />
 
+		<!-- Google Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
 		<!-- SEO Meta Tags -->
 		<meta name="description" content={finalDescription} />
 		<meta name="keywords" content={finalKeywords} />

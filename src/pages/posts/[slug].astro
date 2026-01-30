@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import EditorialBlock from '../../components/EditorialBlock.astro';
+import VisualUplink from '../../components/VisualUplink.astro';
 import { supabase, getPostBySlug } from '../../lib/supabase';
 import { parseMarkdown } from '../../lib/utils';
 
@@ -40,6 +41,9 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
 	month: 'long',
 	day: 'numeric',
 }) : '';
+
+const localImagePath = post ? `${import.meta.env.BASE_URL}/images/posts/${post.slug}.jpg`.replace(/\/+/g, '/') : '';
+const displayImageUrl = post?.image_url || localImagePath;
 ---
 
 <Layout
@@ -58,7 +62,7 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
           <time>{formattedDate}</time>
         </div>
 
-        <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight font-mono">
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
           {post.title}
         </h1>
 
@@ -82,19 +86,16 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
         </div>
       </header>
 
-      {post.image_url && (
-        <div class="mb-12 border-2 border-foreground bg-neutral-900 relative z-10">
-          <img
-            src={post.image_url}
-            alt={post.title}
-            class="w-full h-auto grayscale contrast-125"
-          />
-        </div>
-      )}
+      <VisualUplink
+        imageUrl={displayImageUrl}
+        alt={post.title}
+        metadata={post.image_metadata}
+        className="mb-12 relative z-10"
+      />
 
       <div class="prose prose-invert prose-neutral max-w-none relative z-10
         text-[13px] leading-normal tracking-tight
-        prose-headings:font-mono prose-headings:uppercase prose-headings:tracking-tighter
+        prose-headings:uppercase prose-headings:tracking-tighter
         prose-a:text-accent-pink prose-blockquote:border-l-4 prose-blockquote:border-accent-green
         prose-blockquote:bg-accent-green/5 prose-blockquote:py-4 prose-blockquote:px-6
         prose-blockquote:font-mono prose-blockquote:text-xs

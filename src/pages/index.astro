@@ -30,7 +30,7 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 					<div class="terminal-box mb-8 hover:bg-accent-green/5 transition-colors">
 						<div class="scanline"></div>
 						<span class="bg-accent-pink text-white px-3 py-1 font-mono text-sm uppercase mb-4 inline-block relative z-10">Breaking News</span>
-						<h1 class="text-4xl md:text-6xl font-bold mb-4 font-mono relative z-10">
+						<h1 class="text-4xl md:text-6xl font-bold mb-4 relative z-10">
 							<a href={`${import.meta.env.BASE_URL}/posts/${latestPost.slug}`.replace(/\/+/g, '/')} class="hover:text-accent-pink transition-colors">
 								{latestPost.title}
 							</a>

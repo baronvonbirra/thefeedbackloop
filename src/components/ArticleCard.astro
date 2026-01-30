@@ -1,12 +1,18 @@
 ---
 import type { Post } from '../lib/supabase';
 import { stripMarkdown } from '../lib/utils';
+import VisualUplink from './VisualUplink.astro';
 
 interface Props {
 	post: Post;
 }
 
 const { post } = Astro.props;
+
+const localImagePath = `${import.meta.env.BASE_URL}/images/posts/${post.slug}.jpg`.replace(/\/+/g, '/');
+// If image_url starts with http, it's external. If it's missing or just a filename, we can try to use it.
+// For now, we'll favor the local path if it exists (by convention), otherwise fallback to DB's image_url.
+const displayImageUrl = post.image_url || localImagePath;
 const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
 	year: 'numeric',
 	month: 'short',
@@ -16,28 +22,26 @@ const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
 const displaySummary = post.summary || (post.content ? stripMarkdown(post.content).slice(0, 150) + '...' : '');
 ---
 
-<article class="border-2 border-foreground p-4 flex flex-col gap-4 hover:shadow-[8px_8px_0px_rgba(255,0,255,0.5)] transition-all group">
-	{post.image_url ? (
-		<div class="aspect-video overflow-hidden border-2 border-foreground bg-neutral-900">
-			<img
-				src={post.image_url}
-				alt={post.title}
-				class="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-500"
-			/>
-		</div>
-	) : (
-		<div class="aspect-video border-2 border-foreground bg-neutral-900 flex items-center justify-center font-mono text-xs text-neutral-500">
-			[NO_IMAGE_AVAILABLE]
-		</div>
-	)}
-	<div class="flex flex-col gap-2">
+<article class="terminal-box group hover:border-accent-pink transition-colors">
+	<div class="scanline"></div>
+
+	<div class="mb-4 relative z-10">
+		<VisualUplink
+			imageUrl={displayImageUrl}
+			alt={post.title}
+			metadata={post.image_metadata}
+		/>
+	</div>
+
+	<div class="flex flex-col gap-2 relative z-10">
 		<time class="font-mono text-sm text-accent-green">{formattedDate}</time>
-		<h2 class="text-lg font-bold leading-tight group-hover:text-accent-pink font-mono">
+		<h2 class="text-xl font-bold leading-tight group-hover:text-accent-pink">
 			<a href={`${import.meta.env.BASE_URL}/posts/${post.slug}`.replace(/\/+/g, '/')}>{post.title}</a>
 		</h2>
-		<p class="text-sm line-clamp-3 italic opacity-80">{displaySummary}</p>
+		<p class="text-sm line-clamp-3 italic opacity-80 font-mono leading-relaxed">{displaySummary}</p>
 	</div>
-	<div class="mt-auto pt-4 border-t border-foreground/30 flex flex-wrap gap-2 font-mono text-[10px] uppercase">
+
+	<div class="mt-4 pt-4 border-t border-foreground/30 flex flex-wrap gap-2 font-mono text-[10px] uppercase relative z-10">
 		<span class="bg-foreground text-background px-2 py-0.5">[WRITER: {post.ai_writer}]</span>
 		<span class="border border-foreground px-2 py-0.5">[EDITOR: {post.ai_editor}]</span>
 	</div>

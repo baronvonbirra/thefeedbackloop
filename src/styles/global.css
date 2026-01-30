@@ -10,6 +10,7 @@
 
   --font-mono: "Courier New", Courier, monospace;
   --font-sans: "Inter", Helvetica, Arial, sans-serif;
+  --font-console: "VT323", "Courier New", Courier, monospace;
 }
 
 @layer base {
@@ -18,7 +19,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-mono uppercase tracking-tighter;
+    @apply font-console uppercase tracking-wider;
   }
 
   a {
@@ -84,6 +85,44 @@
     z-index: 2;
     background-size: 100% 2px, 3px 100%;
     pointer-events: none;
+  }
+
+  .monitor-frame {
+    @apply border-[12px] border-neutral-800 rounded-sm shadow-[0_0_20px_rgba(0,0,0,0.8)] relative overflow-hidden bg-black;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.8);
+  }
+
+  .monitor-frame::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: radial-gradient(circle, rgba(18, 16, 16, 0) 40%, rgba(0, 0, 0, 0.4) 100%);
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .crt-flicker {
+    animation: flicker 0.15s infinite;
+  }
+
+  @keyframes flicker {
+    0% { opacity: 0.98; }
+    5% { opacity: 0.95; }
+    10% { opacity: 0.9; }
+    15% { opacity: 0.96; }
+    20% { opacity: 0.98; }
+    30% { opacity: 0.92; }
+    40% { opacity: 0.98; }
+    50% { opacity: 0.95; }
+    60% { opacity: 0.98; }
+    70% { opacity: 0.9; }
+    80% { opacity: 0.98; }
+    90% { opacity: 0.94; }
+    100% { opacity: 0.98; }
   }
 
   /* Custom Prose for Terminal Aesthetic */

@@ -1,5 +1,5 @@
 ---
-import { parseMarkdown } from '../lib/utils';
+import { parseMarkdown, parseSystemAlert } from '../lib/utils';
 
 interface Props {
   systemAlert?: string;
@@ -10,10 +10,13 @@ interface Props {
 
 const { systemAlert, integrityScan, factCheck, action } = Astro.props;
 
-// Fallback logic as per plan
-const displayIntegrity = integrityScan ?? (systemAlert ? 100 : undefined);
-const displayFactCheck = factCheck || systemAlert || '';
-const displayAction = action || systemAlert || '';
+// Parse systemAlert if provided
+const parsed = parseSystemAlert(systemAlert);
+
+// Fallback logic: prefer explicit props, then parsed values, then default
+const displayIntegrity = integrityScan ?? parsed.integrity ?? (systemAlert ? 100 : undefined);
+const displayFactCheck = factCheck || parsed.factCheck || (systemAlert && !parsed.factCheck ? systemAlert : '');
+const displayAction = action || parsed.action || (systemAlert && !parsed.action ? systemAlert : '');
 
 const factCheckHtml = await parseMarkdown(displayFactCheck, true);
 const actionHtml = await parseMarkdown(displayAction, true);
