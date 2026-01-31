@@ -50,21 +50,6 @@ const finalKeywords = keywords ? [...defaultKeywords, ...keywords].join(', ') : 
 		<meta property="twitter:description" content={finalDescription} />
 		<meta property="twitter:image" content={`${import.meta.env.BASE_URL}/favicon.png`.replace(/\/+/g, '/')} />
 
-		<script is:inline>
-			const theme = (() => {
-				if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-					return localStorage.getItem('theme');
-				}
-				return 'safe';
-			})();
-
-			if (theme === 'override') {
-				document.documentElement.setAttribute('data-theme', 'override');
-			} else {
-				document.documentElement.removeAttribute('data-theme');
-			}
-		</script>
-
 		<title>{title} | THE FEEDBACK LOOP</title>
 	</head>
 	<body class="bg-background text-foreground min-h-screen flex flex-col">
@@ -103,9 +88,6 @@ const finalKeywords = keywords ? [...defaultKeywords, ...keywords].join(', ') : 
 					<a href={`${import.meta.env.BASE_URL}/`.replace(/\/+/g, '/')} class="hover:text-accent-pink">[NEWS]</a>
 					<a href={`${import.meta.env.BASE_URL}/reviews`.replace(/\/+/g, '/')} class="hover:text-accent-pink">[REVIEWS]</a>
 					<a href={`${import.meta.env.BASE_URL}/manifesto`.replace(/\/+/g, '/')} class="hover:text-accent-pink">[MANIFESTO]</a>
-					<button id="theme-toggle" class="hover:text-accent-pink cursor-pointer ml-auto text-sm border border-foreground px-2 py-1">
-						[SAFE_MODE]
-					</button>
 				</nav>
 			</header>
 		)}
@@ -159,43 +141,7 @@ const finalKeywords = keywords ? [...defaultKeywords, ...keywords].join(', ') : 
 			document.addEventListener('astro:page-load', () => {
 				const h1s = document.querySelectorAll('h1');
 				h1s.forEach(h1 => scrambleText(h1 as HTMLElement));
-				initTheme();
 			});
-
-			function initTheme() {
-				const themeToggle = document.getElementById('theme-toggle');
-				const html = document.documentElement;
-
-				function updateToggleText(theme: string) {
-					if (themeToggle) {
-						themeToggle.innerText = theme === 'override' ? '[OVERRIDE_MODE]' : '[SAFE_MODE]';
-						if (theme === 'override') {
-							themeToggle.classList.add('border-accent-pink', 'text-accent-pink');
-						} else {
-							themeToggle.classList.remove('border-accent-pink', 'text-accent-pink');
-						}
-					}
-				}
-
-				const currentTheme = html.getAttribute('data-theme') || 'safe';
-				updateToggleText(currentTheme);
-
-				themeToggle?.addEventListener('click', () => {
-					const isOverride = html.getAttribute('data-theme') === 'override';
-					if (isOverride) {
-						html.removeAttribute('data-theme');
-						localStorage.setItem('theme', 'safe');
-						updateToggleText('safe');
-					} else {
-						html.setAttribute('data-theme', 'override');
-						localStorage.setItem('theme', 'override');
-						updateToggleText('override');
-					}
-				});
-			}
-
-			// Run theme init on initial load
-			initTheme();
 		</script>
 	</body>
 </html>
