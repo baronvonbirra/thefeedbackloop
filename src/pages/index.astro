@@ -28,7 +28,8 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 		<div class="flex-grow lg:w-2/3">
 			{latestPost ? (
 				<section class="mb-12">
-					<div class="terminal-box mb-8 hover:bg-accent-green/5 transition-colors">
+					<!-- Desktop Featured Post -->
+					<div class="terminal-box mb-8 hover:bg-accent-green/5 transition-colors hidden lg:block">
 						<div class="scanline"></div>
 						<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
 							<div>
@@ -61,6 +62,10 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 					</div>
 
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+						<!-- Mobile/Tablet Featured Post (Standard Card Style) -->
+						<div class="lg:hidden">
+							<ArticleCard post={latestPost} />
+						</div>
 						{otherPosts.map((post) => (
 							<ArticleCard post={post} />
 						))}

@@ -98,6 +98,14 @@
     z-index: 1000;
   }
 
+  @media (max-width: 768px) {
+    .crt-overlay {
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%),
+                  linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+      background-size: 100% 4px, 4px 100%;
+    }
+  }
+
   .terminal-box {
     @apply border-2 border-foreground p-6 bg-neutral-900/50 backdrop-blur-sm relative overflow-hidden;
   }
@@ -114,6 +122,14 @@
     z-index: 2;
     background-size: 100% 2px, 3px 100%;
     pointer-events: none;
+  }
+
+  @media (max-width: 768px) {
+    .terminal-box::before {
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%),
+                  linear-gradient(90deg, rgba(255, 0, 0, 0.08), rgba(0, 255, 0, 0.03), rgba(0, 0, 255, 0.08));
+      background-size: 100% 3px, 3px 100%;
+    }
   }
 
   .monitor-frame {
