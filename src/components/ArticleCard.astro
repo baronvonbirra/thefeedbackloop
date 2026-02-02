@@ -20,9 +20,11 @@ const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
 });
 
 const displaySummary = post.summary || (post.content ? stripMarkdown(post.content).slice(0, 150) + '...' : '');
+
+const timestampLabel = post.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post.ai_writer === 'PATCH' ? 'SIGNAL_FOUND' : '';
 ---
 
-<article class="terminal-box group hover:border-accent-pink transition-colors">
+<article class="terminal-box group hover:border-accent transition-colors">
 	<div class="scanline"></div>
 
 	<div class="mb-4 relative z-10">
@@ -34,8 +36,11 @@ const displaySummary = post.summary || (post.content ? stripMarkdown(post.conten
 	</div>
 
 	<div class="flex flex-col gap-2 relative z-10">
-		<time class="font-mono text-sm text-accent-green">{formattedDate}</time>
-		<h2 class="text-xl font-bold leading-tight group-hover:text-accent-pink">
+		<div class="flex items-center gap-2 font-mono text-sm text-accent-green">
+			{timestampLabel && <span>{timestampLabel}:</span>}
+			<time>{formattedDate}</time>
+		</div>
+		<h2 class="text-xl font-bold leading-tight group-hover:text-accent">
 			<a href={`${import.meta.env.BASE_URL}/posts/${post.slug}`.replace(/\/+/g, '/')}>{post.title}</a>
 		</h2>
 		<p class="text-sm line-clamp-3 italic opacity-80 font-mono leading-relaxed">{displaySummary}</p>

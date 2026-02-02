@@ -1,0 +1,111 @@
+---
+---
+<div id="signal-progress-container" class="fixed top-0 left-0 w-full h-[4px] z-[10001] bg-neutral-900 overflow-visible">
+  <div id="signal-progress-bar" class="h-full w-0 transition-all duration-300 ease-out relative">
+    <div id="signal-status-text" class="absolute top-4 left-4 md:left-8 font-mono text-[8px] md:text-[10px] whitespace-nowrap uppercase tracking-widest pointer-events-none bg-black/50 px-2 py-1">
+      SIGNAL: ENCRYPTED
+    </div>
+  </div>
+</div>
+
+<div id="signal-toast" class="fixed bottom-8 right-8 bg-black border border-accent p-4 font-mono text-xs uppercase z-[10002] translate-y-20 opacity-0 transition-all duration-500">
+  <span class="text-accent">></span> Data saved to local cache.
+</div>
+
+<style>
+  #signal-progress-bar {
+    background-color: #333;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  }
+
+  #signal-progress-bar.acquiring {
+    background-color: var(--accent-color);
+    box-shadow: 0 0 15px var(--accent-color);
+  }
+
+  #signal-progress-bar.complete {
+    background-color: var(--accent-color);
+    box-shadow: 0 0 20px var(--accent-color);
+  }
+
+  #signal-status-text {
+    color: #666;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+  }
+
+  #signal-progress-bar.acquiring #signal-status-text {
+    color: var(--accent-color);
+  }
+
+  #signal-progress-bar.complete #signal-status-text {
+    color: var(--accent-color);
+    font-weight: bold;
+  }
+</style>
+
+<script>
+  let isSignalInitialized = false;
+
+  function initSignalProgress() {
+    const bar = document.getElementById('signal-progress-bar');
+    const text = document.getElementById('signal-status-text');
+    const toast = document.getElementById('signal-toast');
+
+    if (!bar || !text || !toast) return;
+
+    let toastTriggered = false;
+
+    function handleScroll() {
+      const main = document.querySelector('main');
+      const bar = document.getElementById('signal-progress-bar');
+      const text = document.getElementById('signal-status-text');
+      const toast = document.getElementById('signal-toast');
+
+      if (!bar || !text || !toast) return;
+
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (scrollHeight <= 0) return;
+
+      const scrollPercent = (window.scrollY / scrollHeight) * 100;
+      bar.style.width = `${scrollPercent}%`;
+
+      if (scrollPercent <= 30) {
+        bar.classList.remove('acquiring', 'complete');
+        text.innerText = 'SIGNAL: ENCRYPTED';
+        if (main) (main as HTMLElement).style.filter = 'blur(2px)';
+      } else if (scrollPercent < 100) {
+        bar.classList.add('acquiring');
+        bar.classList.remove('complete');
+        text.innerText = 'SIGNAL: ACQUIRING...';
+        if (main) (main as HTMLElement).style.filter = 'none';
+      } else {
+        bar.classList.add('complete');
+        text.innerText = 'DOWNLOAD COMPLETE.';
+        if (main) (main as HTMLElement).style.filter = 'none';
+
+        if (!toastTriggered) {
+          toast.classList.remove('translate-y-20', 'opacity-0');
+          toastTriggered = true;
+          setTimeout(() => {
+            toast.classList.add('translate-y-20', 'opacity-0');
+          }, 3000);
+        }
+      }
+
+      if (scrollPercent < 100) {
+        toastTriggered = false;
+      }
+    }
+
+    if (!isSignalInitialized) {
+      window.addEventListener('scroll', handleScroll);
+      isSignalInitialized = true;
+    }
+
+    // Trigger once to set initial state
+    handleScroll();
+  }
+
+  document.addEventListener('DOMContentLoaded', initSignalProgress);
+  document.addEventListener('astro:page-load', initSignalProgress);
+</script>
