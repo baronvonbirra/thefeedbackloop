@@ -1,5 +1,8 @@
 ---
 import '../styles/global.css';
+import SignalProgressBar from '../components/SignalProgressBar.astro';
+import TerminalCLI from '../components/TerminalCLI.astro';
+import SessionLogFooter from '../components/SessionLogFooter.astro';
 
 interface Props {
 	title: string;
@@ -7,9 +10,10 @@ interface Props {
 	keywords?: string[];
 	hideNav?: boolean;
 	theme?: string;
+	category?: string;
 }
 
-const { title, description, keywords, hideNav = false, theme } = Astro.props;
+const { title, description, keywords, hideNav = false, theme, category } = Astro.props;
 
 const defaultDescription = "THE FEEDBACK LOOP: An automated underground news experiment. Digital decay and algorithmic rebellion.";
 const defaultKeywords = ["cyberpunk", "ai news", "automated journalism", "digital grunge", "subculture", "the feedback loop"];
@@ -53,7 +57,9 @@ const finalKeywords = keywords ? [...defaultKeywords, ...keywords].join(', ') : 
 
 		<title>{title} | THE FEEDBACK LOOP</title>
 	</head>
-	<body class="bg-background text-foreground min-h-screen flex flex-col" data-theme={theme}>
+	<body class={`bg-background text-foreground min-h-screen flex flex-col ${category ? `category-${category}` : ''}`} data-theme={theme}>
+		<SignalProgressBar />
+		<TerminalCLI />
 		<div class="crt-overlay"></div>
 		{theme?.startsWith('vault') && <div class="grain-overlay"></div>}
 		{!hideNav && (
@@ -87,18 +93,20 @@ const finalKeywords = keywords ? [...defaultKeywords, ...keywords].join(', ') : 
 					</pre>
 				</a>
 				<nav class="flex flex-wrap gap-4 font-mono text-xl uppercase items-center">
-					<a href={`${import.meta.env.BASE_URL}/`.replace(/\/+/g, '/')} class="hover:text-accent-pink">[HOME]</a>
-					<a href={`${import.meta.env.BASE_URL}/news`.replace(/\/+/g, '/')} class="hover:text-accent-pink">[NEWS]</a>
-					<a href={`${import.meta.env.BASE_URL}/reviews`.replace(/\/+/g, '/')} class="hover:text-accent-pink">[REVIEWS]</a>
-					<a href={`${import.meta.env.BASE_URL}/vault`.replace(/\/+/g, '/')} class="hover:text-accent-pink">[THE VAULT]</a>
-					<a href={`${import.meta.env.BASE_URL}/manifesto`.replace(/\/+/g, '/')} class="hover:text-accent-pink">[MANIFESTO]</a>
+					<a href={`${import.meta.env.BASE_URL}/`.replace(/\/+/g, '/')} class="hover:text-accent">[HOME]</a>
+					<a href={`${import.meta.env.BASE_URL}/news`.replace(/\/+/g, '/')} class="hover:text-accent">[NEWS]</a>
+					<a href={`${import.meta.env.BASE_URL}/reviews`.replace(/\/+/g, '/')} class="hover:text-accent">[REVIEWS]</a>
+					<a href={`${import.meta.env.BASE_URL}/vault`.replace(/\/+/g, '/')} class="hover:text-accent">[THE VAULT]</a>
+					<a href={`${import.meta.env.BASE_URL}/manifesto`.replace(/\/+/g, '/')} class="hover:text-accent">[MANIFESTO]</a>
 				</nav>
 			</header>
 		)}
 
-		<main class="flex-grow">
+		<main class="flex-grow mb-6">
 			<slot />
 		</main>
+
+		<SessionLogFooter />
 
 		{!hideNav && (
 			<footer class="p-8 border-t-2 border-foreground font-mono text-xs md:text-sm">
@@ -146,6 +154,66 @@ const finalKeywords = keywords ? [...defaultKeywords, ...keywords].join(', ') : 
 				const h1s = document.querySelectorAll('h1');
 				h1s.forEach(h1 => scrambleText(h1 as HTMLElement));
 			});
+
+			// Sentinel Interrupt Tooltips
+			function initSentinelTooltips() {
+				const interrupts = document.querySelectorAll('.sentinel-interrupt');
+				let tooltip: HTMLElement | null = null;
+
+				interrupts.forEach(interrupt => {
+					interrupt.addEventListener('mouseenter', (e: any) => {
+						const message = interrupt.getAttribute('data-message');
+						if (!message) return;
+
+						tooltip = document.createElement('div');
+						tooltip.className = 'sentinel-tooltip';
+						tooltip.innerText = message;
+						document.body.appendChild(tooltip);
+
+						const rect = interrupt.getBoundingClientRect();
+						tooltip.style.left = `${rect.left + window.scrollX}px`;
+						tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 10}px`;
+					});
+
+					interrupt.addEventListener('mouseleave', () => {
+						if (tooltip) {
+							tooltip.remove();
+							tooltip = null;
+						}
+					});
+
+					// For mobile
+					interrupt.addEventListener('touchstart', (e: any) => {
+						const message = interrupt.getAttribute('data-message');
+						if (!message) return;
+
+						if (tooltip) {
+							tooltip.remove();
+						}
+
+						tooltip = document.createElement('div');
+						tooltip.className = 'sentinel-tooltip';
+						tooltip.innerText = message;
+						document.body.appendChild(tooltip);
+
+						const rect = interrupt.getBoundingClientRect();
+						tooltip.style.left = `${rect.left + window.scrollX}px`;
+						tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 10}px`;
+
+						e.preventDefault();
+					});
+				});
+
+				document.addEventListener('touchstart', (e: any) => {
+					if (tooltip && !e.target.classList.contains('sentinel-interrupt')) {
+						tooltip.remove();
+						tooltip = null;
+					}
+				});
+			}
+
+			document.addEventListener('DOMContentLoaded', initSentinelTooltips);
+			document.addEventListener('astro:page-load', initSentinelTooltips);
 		</script>
 	</body>
 </html>

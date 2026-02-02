@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import EditorialBlock from '../../components/EditorialBlock.astro';
 import VisualUplink from '../../components/VisualUplink.astro';
+import VisualDecay from '../../components/VisualDecay.astro';
 import { getPosts, getPostBySlug } from '../../lib/supabase';
 import { parseMarkdown } from '../../lib/utils';
 
@@ -23,10 +24,16 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 
 let post = null;
+let relatedPosts = [];
 try {
   post = await getPostBySlug(slug);
+  if (post) {
+    relatedPosts = (await getPosts(post.category))
+      .filter(p => p.slug !== slug)
+      .slice(0, 3);
+  }
 } catch (e) {
-  console.error('Failed to fetch post', e);
+  console.error('Failed to fetch post or related posts', e);
 }
 
 const contentHtml = await parseMarkdown(post?.content);
@@ -51,6 +58,7 @@ const timestampLabel = post?.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post?.a
   description={post?.summary}
   keywords={post?.seo_keywords}
   theme={theme}
+  category={post?.category}
 >
   {post ? (
     <article class="container mx-auto my-12 max-w-3xl terminal-box">
@@ -68,18 +76,18 @@ const timestampLabel = post?.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post?.a
           {post.title}
         </h1>
 
-        <div class="text-base italic font-mono border-l-4 border-accent-pink pl-4 mb-8 text-foreground/90 leading-relaxed">
+        <div class="text-base italic font-mono border-l-4 border-accent pl-4 mb-8 text-foreground/90 leading-relaxed">
           <Fragment set:html={summaryHtml} />
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4 font-mono text-[10px] uppercase">
           <div class="border border-foreground/30 p-2">
             <span class="block opacity-50 mb-1">Writer Model</span>
-            <span class="text-accent-pink">{post.ai_writer}</span>
+            <span class="text-accent">{post.ai_writer}</span>
           </div>
           <div class="border border-foreground/30 p-2">
             <span class="block opacity-50 mb-1">Editor Model</span>
-            <span class="text-accent-pink">{post.ai_editor}</span>
+            <span class="text-accent">{post.ai_editor}</span>
           </div>
           <div class="border border-foreground/30 p-2 col-span-2 md:col-span-1">
             <span class="block opacity-50 mb-1">Status</span>
@@ -95,16 +103,18 @@ const timestampLabel = post?.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post?.a
         className="mb-12 relative z-10"
       />
 
-      <div class="prose prose-invert prose-neutral max-w-none relative z-10
-        text-[13px] leading-normal tracking-tight
-        prose-headings:uppercase prose-headings:tracking-tighter
-        prose-a:text-accent-pink prose-blockquote:border-l-4 prose-blockquote:border-accent-green
-        prose-blockquote:bg-accent-green/5 prose-blockquote:py-4 prose-blockquote:px-6
-        prose-blockquote:font-mono prose-blockquote:text-xs
-        prose-pre:border prose-pre:border-foreground/30 prose-pre:bg-neutral-900
-        prose-p:mb-4 prose-p:mt-0">
-        <Fragment set:html={contentHtml} />
-      </div>
+      <VisualDecay category={post.category}>
+        <div class="prose prose-invert prose-neutral max-w-none relative z-10
+          text-[13px] leading-normal tracking-tight
+          prose-headings:uppercase prose-headings:tracking-tighter
+          prose-a:text-accent prose-blockquote:border-l-4 prose-blockquote:border-accent-green
+          prose-blockquote:bg-accent-green/5 prose-blockquote:py-4 prose-blockquote:px-6
+          prose-blockquote:font-mono prose-blockquote:text-xs
+          prose-pre:border prose-pre:border-foreground/30 prose-pre:bg-neutral-900
+          prose-p:mb-4 prose-p:mt-0">
+          <Fragment set:html={contentHtml} />
+        </div>
+      </VisualDecay>
 
       {(post.system_alert || post.integrity_scan !== undefined || post.fact_check || post.editorial_action) && (
         <div class="relative z-10">
@@ -125,9 +135,42 @@ const timestampLabel = post?.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post?.a
       )}
 
       <div class="mt-12 pt-8 border-t-2 border-foreground flex justify-between font-mono text-sm relative z-10">
-        <a href={`${import.meta.env.BASE_URL}/`.replace(/\/+/g, '/')} class="hover:text-accent-pink decoration-2 underline-offset-4 underline">← BACK_TO_FEED</a>
+        <a href={`${import.meta.env.BASE_URL}/`.replace(/\/+/g, '/')} class="hover:text-accent decoration-2 underline-offset-4 underline">← BACK_TO_FEED</a>
         <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="hover:text-accent-green">TOP↑</button>
       </div>
+
+      <!-- Related Posts / Interference Patterns -->
+      {relatedPosts.length > 0 && (
+        <section class="mt-16 pt-8 border-t-2 border-dashed border-foreground/30 relative z-10">
+          <h3 class="text-xl font-bold mb-8 font-mono flex items-center gap-2">
+            <span class="w-2 h-2 bg-accent animate-ping"></span>
+            DETECTED SIGNAL INTERFERENCE
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {relatedPosts.map((rp) => {
+              const rpImagePath = `${import.meta.env.BASE_URL}/images/posts/${rp.slug}.png`.replace(/\/+/g, '/');
+              const rpImageUrl = rp.image_url || rpImagePath;
+              return (
+                <a href={`${import.meta.env.BASE_URL}/posts/${rp.slug}`.replace(/\/+/g, '/')} class="group block relative overflow-hidden border border-foreground/20 hover:border-accent transition-colors bg-neutral-900">
+                  <div class="radar-sweep"></div>
+                  <div class="aspect-video overflow-hidden opacity-50 group-hover:opacity-100 transition-opacity relative">
+                    <img src={rpImageUrl} alt="" class="w-full h-full object-cover grayscale group-hover:grayscale-0" />
+                    <div class="absolute inset-0 bg-accent/20 mix-blend-overlay"></div>
+                  </div>
+                  <div class="p-4 relative z-10">
+                    <span class="text-[10px] font-mono text-accent block mb-2">INCOMING_TRANSMISSION...</span>
+                    <h4 class="font-bold text-sm leading-tight group-hover:text-accent transition-colors">{rp.title}</h4>
+                    <div class="mt-4 flex items-center justify-between text-[9px] font-mono opacity-50">
+                      <span>{new Date(rp.created_at).toLocaleDateString()}</span>
+                      <span>VIEW_DECRYPTED →</span>
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      )}
     </article>
   ) : (
     <div class="container mx-auto px-4 py-20 text-center font-mono">
