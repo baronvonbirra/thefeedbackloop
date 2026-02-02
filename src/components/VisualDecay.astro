@@ -1,0 +1,154 @@
+---
+interface Props {
+  category?: string;
+}
+
+const { category } = Astro.props;
+
+const isR3CORD = category === 'deep-trace';
+const isPATCH = category === 'system-files';
+---
+
+<div class={`visual-decay ${isR3CORD ? 'bit-rot-archive' : ''} ${isPATCH ? 'bit-rot-scavenged' : ''}`}>
+  {isR3CORD && (
+    <div class="archive-overlays">
+      <div class="archive-scanlines"></div>
+      <div class="archive-grain"></div>
+    </div>
+  )}
+  <div class="decay-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .visual-decay {
+    position: relative;
+  }
+
+  .bit-rot-archive .archive-overlays {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+  }
+
+  .archive-scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      rgba(18, 16, 16, 0) 50%,
+      rgba(0, 255, 65, 0.05) 50%
+    );
+    background-size: 100% 4px;
+    z-index: 6;
+  }
+
+  .archive-grain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.1;
+    z-index: 7;
+  }
+
+  .bit-rot-scavenged .decay-content {
+    filter: contrast(150%) sepia(100%) hue-rotate(-30deg);
+  }
+
+  /* Glitch effect for PATCH */
+  .bit-rot-scavenged.glitch-active .decay-content {
+    animation: scavenged-glitch 0.2s infinite;
+  }
+
+  @keyframes scavenged-glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-5px, 5px); }
+    40% { transform: translate(-5px, -5px); }
+    60% { transform: translate(5px, 5px); }
+    80% { transform: translate(5px, -5px); }
+    100% { transform: translate(0); }
+  }
+</style>
+
+<script>
+  // Store intervals globally to clear them on re-initialization
+  (window as any)._decayIntervals = (window as any)._decayIntervals || [];
+
+  function initDecay() {
+    // Clear existing intervals
+    (window as any)._decayIntervals.forEach((id: number) => clearInterval(id));
+    (window as any)._decayIntervals = [];
+
+    const containers = document.querySelectorAll('.visual-decay');
+
+    containers.forEach(container => {
+      const isPATCH = container.classList.contains('bit-rot-scavenged');
+      const content = container.querySelector('.decay-content');
+      if (!content) return;
+
+      // Find all text nodes within paragraphs to avoid breaking HTML tags
+      const paragraphs = content.querySelectorAll('p');
+
+      function getRandomTextNode(root: Node): Text | null {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+        const nodes: Text[] = [];
+        let node;
+        while(node = walker.nextNode()) {
+          if (node.textContent?.trim()) {
+            nodes.push(node as Text);
+          }
+        }
+        return nodes.length > 0 ? nodes[Math.floor(Math.random() * nodes.length)] : null;
+      }
+
+      // Random character swap every 3 seconds
+      const intervalId = setInterval(() => {
+        if (paragraphs.length === 0) return;
+
+        const p = paragraphs[Math.floor(Math.random() * paragraphs.length)];
+        const textNode = getRandomTextNode(p);
+        if (!textNode || !textNode.textContent) return;
+
+        const originalText = textNode.textContent;
+        const charIndex = Math.floor(Math.random() * originalText.length);
+        const originalChar = originalText[charIndex];
+        if (originalChar === ' ' || originalChar === '\n') return;
+
+        const glitchChars = '3?01!@#$%^&*';
+        const newChar = glitchChars[Math.floor(Math.random() * glitchChars.length)];
+
+        const textArray = originalText.split('');
+        textArray[charIndex] = newChar;
+        textNode.textContent = textArray.join('');
+
+        // Apply visual glitch class to container if PATCH
+        if (isPATCH) {
+          container.classList.add('glitch-active');
+        }
+
+        setTimeout(() => {
+          textNode.textContent = originalText;
+          if (isPATCH) {
+            container.classList.remove('glitch-active');
+          }
+        }, 200);
+      }, 3000);
+
+      (window as any)._decayIntervals.push(intervalId);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initDecay);
+  document.addEventListener('astro:page-load', initDecay);
+</script>

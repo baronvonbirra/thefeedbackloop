@@ -20,7 +20,7 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 						 import.meta.env.PUBLIC_SUPABASE_URL === 'https://your-project-id.supabase.co';
 ---
 
-<Layout title="The Vault" theme={vaultTheme}>
+<Layout title="The Vault" theme={vaultTheme} category={latestPost?.category}>
 	<div class="container mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8">
 		<!-- Main Content -->
 		<div class="flex-grow lg:w-2/3">

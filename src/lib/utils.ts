@@ -19,7 +19,11 @@ export const stripMarkdown = (md: string) => {
  */
 export const parseMarkdown = async (content: string | undefined, inline = false) => {
   if (!content) return '';
-  const processed = content.replace(/\\n/g, '\n');
+  let processed = content.replace(/\\n/g, '\n');
+
+  // Handle Sentinel Interrupts: [[SENTINEL: "message"]]
+  processed = processed.replace(/\[\[SENTINEL:\s*"(.*?)"\]\]/g, '<span class="sentinel-interrupt" data-message="$1"></span>');
+
   return inline ? marked.parseInline(processed) : await marked.parse(processed);
 };
 

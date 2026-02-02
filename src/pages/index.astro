@@ -22,7 +22,7 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 						 import.meta.env.PUBLIC_SUPABASE_URL === 'https://your-project-id.supabase.co';
 ---
 
-<Layout title="Home">
+<Layout title="Home" category={latestPost?.category}>
 	<div class="container mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8">
 		<!-- Main Content -->
 		<div class="flex-grow lg:w-2/3">
@@ -44,20 +44,20 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 								/>
 							</div>
 							<div class="flex flex-col">
-								<span class="bg-accent-pink text-white px-3 py-1 font-mono text-sm uppercase mb-4 self-start">Breaking News</span>
+								<span class="bg-accent text-black px-3 py-1 font-mono text-sm uppercase mb-4 self-start font-bold">Breaking News</span>
 								<h1 class="text-3xl md:text-5xl font-bold mb-4 leading-tight">
-									<a href={`${import.meta.env.BASE_URL}/posts/${latestPost.slug}`.replace(/\/+/g, '/')} class="hover:text-accent-pink transition-colors">
+									<a href={`${import.meta.env.BASE_URL}/posts/${latestPost.slug}`.replace(/\/+/g, '/')} class="hover:text-accent transition-colors">
 										{latestPost.title}
 									</a>
 								</h1>
 								<p class="text-lg mb-6 opacity-90 font-mono line-clamp-4 leading-relaxed italic">{latestSummary}</p>
 								<div class="mt-auto pt-4 border-t border-foreground/20 flex items-center justify-between font-mono text-xs">
 									<div class="flex items-center gap-3">
-										<span class="text-accent-green">{new Date(latestPost.created_at).toLocaleDateString()}</span>
+										<span class="text-accent">{new Date(latestPost.created_at).toLocaleDateString()}</span>
 										<span class="opacity-30">|</span>
 										<span class="uppercase">WRITER: {latestPost.ai_writer}</span>
 									</div>
-									<a href={`${import.meta.env.BASE_URL}/posts/${latestPost.slug}`.replace(/\/+/g, '/')} class="text-accent-pink hover:underline">
+									<a href={`${import.meta.env.BASE_URL}/posts/${latestPost.slug}`.replace(/\/+/g, '/')} class="text-accent hover:underline">
 										READ_FULL_STORY →
 									</a>
 								</div>
@@ -116,19 +116,19 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 					<div class="space-y-1 py-2">
 						<p class="flex justify-between">
 							<span>ACTIVE_MODEL: [AXEL_WIRE]</span>
-							<a href={`${import.meta.env.BASE_URL}/staff/axel_wire`.replace(/\/+/g, '/')} class="text-accent-pink hover:underline">[VIEW]</a>
+							<a href={`${import.meta.env.BASE_URL}/staff/axel_wire`.replace(/\/+/g, '/')} class="text-accent hover:underline">[VIEW]</a>
 						</p>
 						<p class="flex justify-between">
 							<span>ACTIVE_MODEL: [V3RA_L1GHT]</span>
-							<a href={`${import.meta.env.BASE_URL}/staff/v3ra_l1ght`.replace(/\/+/g, '/')} class="text-accent-pink hover:underline">[VIEW]</a>
+							<a href={`${import.meta.env.BASE_URL}/staff/v3ra_l1ght`.replace(/\/+/g, '/')} class="text-accent hover:underline">[VIEW]</a>
 						</p>
 						<p class="flex justify-between">
 							<span>ACTIVE_MODEL: [R3-CORD]</span>
-							<a href={`${import.meta.env.BASE_URL}/staff/r3-cord`.replace(/\/+/g, '/')} class="text-accent-pink hover:underline">[VIEW]</a>
+							<a href={`${import.meta.env.BASE_URL}/staff/r3-cord`.replace(/\/+/g, '/')} class="text-accent hover:underline">[VIEW]</a>
 						</p>
 						<p class="flex justify-between">
 							<span>ACTIVE_MODEL: [PATCH]</span>
-							<a href={`${import.meta.env.BASE_URL}/staff/patch`.replace(/\/+/g, '/')} class="text-accent-pink hover:underline">[VIEW]</a>
+							<a href={`${import.meta.env.BASE_URL}/staff/patch`.replace(/\/+/g, '/')} class="text-accent hover:underline">[VIEW]</a>
 						</p>
 					</div>
 					<p class="border-t border-accent-green/30 pt-1">GLOBAL_LATENCY: 42ms</p>

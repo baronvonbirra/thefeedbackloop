@@ -1,0 +1,59 @@
+---
+---
+<div id="session-log-footer" class="fixed bottom-0 left-0 w-full bg-black text-white font-mono text-[8px] md:text-[10px] p-1 border-t border-neutral-800 z-[9998] flex items-center gap-2 md:gap-4 overflow-hidden whitespace-nowrap">
+  <div id="session-log-content" class="flex gap-2 md:gap-4">
+    <span class="opacity-50">> USER_IP: [MASKED] :: CONNECTED</span>
+  </div>
+  <span class="blinking-cursor">_</span>
+</div>
+
+<style>
+  .blinking-cursor {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+  }
+</style>
+
+<script>
+  function updateSessionLog(action: string) {
+    let history = JSON.parse(sessionStorage.getItem('terminal_history') || '[]');
+    history.push(action);
+    if (history.length > 3) {
+      history = history.slice(-3);
+    }
+    sessionStorage.setItem('terminal_history', JSON.stringify(history));
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const container = document.getElementById('session-log-content');
+    if (!container) return;
+
+    let history = JSON.parse(sessionStorage.getItem('terminal_history') || '[]');
+    if (history.length === 0) {
+      history = ['USER_IP: [MASKED] :: CONNECTED'];
+    }
+
+    // On very small screens, only show the last 1 or 2 items
+    const displayHistory = window.innerWidth < 480 ? history.slice(-1) : history;
+
+    container.innerHTML = displayHistory.map(h => `<span class="opacity-80">> ${h}</span>`).join('<span class="opacity-30">::</span>');
+  }
+
+  // Track page navigation
+  const currentPath = window.location.pathname;
+  const pageTitle = document.title.split('|')[0].trim();
+  updateSessionLog(`ACCESSING_NODE: ${currentPath} [${pageTitle}]`);
+
+  // Listen for custom events if needed (e.g. from CLI)
+  window.addEventListener('terminal-command', (e: any) => {
+    updateSessionLog(`EXECUTING_CMD: ${e.detail.command}`);
+  });
+
+  document.addEventListener('DOMContentLoaded', renderHistory);
+  document.addEventListener('astro:page-load', renderHistory);
+</script>
