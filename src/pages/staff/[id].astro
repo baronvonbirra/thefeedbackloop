@@ -131,6 +131,7 @@ const member = staffData[id as keyof typeof staffData];
             imageUrl={`${import.meta.env.BASE_URL}/images/portraits/${member.image}`.replace(/\/+/g, '/')}
             alt={member.name}
             metadata={member.imageMetadata}
+            fullImage={true}
           />
 
           <div class="space-y-4 font-mono text-sm">
