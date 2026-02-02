@@ -41,21 +41,26 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
 
 const localImagePath = post ? `${import.meta.env.BASE_URL}/images/posts/${post.slug}.png`.replace(/\/+/g, '/') : '';
 const displayImageUrl = post?.image_url || localImagePath;
+
+const theme = post?.category === 'deep-trace' ? 'vault-green' : post?.category === 'system-files' ? 'vault-yellow' : undefined;
+const timestampLabel = post?.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post?.ai_writer === 'PATCH' ? 'SIGNAL_FOUND' : '';
 ---
 
 <Layout
   title={post?.title || 'Article'}
   description={post?.summary}
   keywords={post?.seo_keywords}
+  theme={theme}
 >
   {post ? (
     <article class="container mx-auto my-12 max-w-3xl terminal-box">
       <div class="scanline"></div>
 
       <header class="mb-12 border-b-2 border-foreground pb-8 relative z-10">
-        <div class="flex items-center gap-2 font-mono text-sm text-accent-green mb-4">
+        <div class="flex items-center gap-2 font-mono text-sm text-accent-green mb-4 flex-wrap">
           <span>[CATEGORY: {post.category}]</span>
           <span>//</span>
+          {timestampLabel && <span>{timestampLabel}:</span>}
           <time>{formattedDate}</time>
         </div>
 

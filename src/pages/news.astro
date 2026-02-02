@@ -7,7 +7,7 @@ import { stripMarkdown } from '../lib/utils';
 
 let posts = [];
 try {
-	posts = await getPosts();
+	posts = await getPosts('news');
 } catch (e) {
 	console.error('Failed to fetch posts', e);
 }
@@ -22,12 +22,12 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 						 import.meta.env.PUBLIC_SUPABASE_URL === 'https://your-project-id.supabase.co';
 ---
 
-<Layout title="Home">
+<Layout title="News">
 	<div class="container mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8">
 		<!-- Main Content -->
 		<div class="flex-grow lg:w-2/3">
 			<h1 class="text-4xl font-bold mb-8 font-mono uppercase border-b-2 border-foreground pb-4">
-				THE MASTER LOOP
+				NEWS
 			</h1>
 
 			{latestPost ? (
@@ -77,11 +77,11 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 				</section>
 			) : (
 				<div class="border-2 border-dashed border-foreground p-12 text-center font-mono">
-					<p class="opacity-50 mb-4">[SYSTEM_LOG: NO_PUBLISHED_POSTS_FOUND]</p>
+					<p class="opacity-50 mb-4">[SYSTEM_LOG: NO_NEWS_POSTS_FOUND]</p>
 					<div class="bg-accent-pink/10 p-4 text-xs text-left inline-block border border-accent-pink/30">
 						<p class="text-accent-pink font-bold mb-2">[DEBUG_INFO]</p>
 						<ul class="space-y-1 opacity-80">
-							<li>> Check if 'status' column is set to 'published' in Supabase.</li>
+							<li>> Check if 'status' column is set to 'published' and category is 'news' in Supabase.</li>
 							<li>> Connection URL: {import.meta.env.PUBLIC_SUPABASE_URL || 'NOT_SET'}</li>
 							{isConfigMissing && <li class="text-accent-pink">> WARNING: Supabase URL/Key may be missing or using placeholders!</li>}
 						</ul>
@@ -132,20 +132,6 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 						</p>
 					</div>
 					<p class="border-t border-accent-green/30 pt-1">GLOBAL_LATENCY: 42ms</p>
-				</div>
-
-				<div class="mt-8">
-					<h3 class="text-xl font-bold mb-4 font-mono uppercase">[AUDIO_FEED]</h3>
-					<iframe
-						style="border-radius:12px"
-						src="https://open.spotify.com/embed/playlist/4AGyN4LWzSqQXK1laupEaI?utm_source=generator"
-						width="100%"
-						height="152"
-						frameBorder="0"
-						allowfullscreen=""
-						allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-						loading="lazy"
-					></iframe>
 				</div>
 			</div>
 		</aside>

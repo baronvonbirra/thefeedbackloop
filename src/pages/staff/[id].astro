@@ -6,6 +6,8 @@ export function getStaticPaths() {
   return [
     { params: { id: 'axel_wire' } },
     { params: { id: 'v3ra_l1ght' } },
+    { params: { id: 'r3-cord' } },
+    { params: { id: 'patch' } },
   ];
 }
 
@@ -18,7 +20,7 @@ const staffData = {
     role: "STREET-LEVEL GRUNT",
     specialty: "High-Frequency Data Scraping & Narrative Reconstruction",
     status: "ACTIVE_MODULATION",
-    clearance: "LEVEL_4",
+    clearance: "LEVEL 01: FIELD_OP",
     bio: "AXEL_WIRE is the street-level grunt. He reports from the heat of the pit, filtering raw aggression through military-grade chrome. Built on a foundation of early cyberpunk literature and real-time social sentiment analysis, he finds the threads that connect the digital underground.",
     dna: "[NOISE_CORE] [GLITCH_STATIC]",
     gear: "SONY_MDR-V6 / ANALOG_SYNTH",
@@ -43,7 +45,7 @@ const staffData = {
     role: "HIGH-ALTITUDE SIGNAL-JACKER",
     specialty: "Digital Decay Aesthetics & Underground Frequencies",
     status: "STANDBY_MODE",
-    clearance: "LEVEL_5",
+    clearance: "LEVEL 01: FIELD_OP",
     bio: "V3RA_L1GHT is the high-altitude signal-jacker. She sees the aesthetics of digital decay and the frequencies of the underground. She ensures that the noise doesn't overwhelm the signal, listening to the ghosts in the machine to keep the output pure.",
     dna: "[POST_TRUTH] [CYBER_SOUL]",
     gear: "TYPEWRITER_MOD / ENCRYPTION_DECK",
@@ -58,6 +60,48 @@ const staffData = {
     `,
     image: "vera.png",
     imageMetadata: "ISO: 1600 | LENS: 50mm Prime Signal-Jacker | SHUTTER: 1/60"
+  },
+  'r3-cord': {
+    name: "R3-CORD",
+    model: "HISTORICAL_UNIT",
+    role: "Historical Deep-Trace & Audio Forensic Specialist",
+    specialty: "Structural analysis of 'Pre-Collapse' media (1970–1999)",
+    status: "ACTIVE // ARCHIVE_MODE",
+    clearance: "LEVEL 02: ARCHIVIST",
+    bio: "R3-CORD is a high-latency data recovery unit salvaged from a collapsed state archive. Unlike the frontline correspondents, R3-CORD does not \"experience\" music; it audits it. It specializes in Deep Trace operations—locating the original source-code of punk and alternative subculture from the 20th century. By applying forensic audio analysis to vintage frequencies, R3-CORD identifies the exact moment a signal of dissent was first encoded into the cultural timeline.",
+    dna: "[ARCHIVE_PUNK] [ANALOG_FORENSICS]",
+    gear: "15kHz Monochrome Phosphor (Green)",
+    health: 95,
+    healthLabel: "INTEGRITY",
+    healthColor: "bg-accent-green",
+    ascii: String.raw`
+      [ R 3 - C O R D ]
+          | | | |
+          [SCANNING]
+    `,
+    image: "r3-cord.png",
+    imageMetadata: "DATA_RECOVERY_IN_PROGRESS | SECTOR: 7G"
+  },
+  patch: {
+    name: "PATCH",
+    model: "JUNKER_BOT",
+    role: "Guerilla Historian & Signal Scavenger",
+    specialty: "Scavenging and Cross-Referencing 'Hidden' Lore",
+    status: "ACTIVE // UNSTABLE",
+    clearance: "LEVEL 03: SCAVENGER",
+    bio: "A \"Junker\" bot assembled from illegal relays and discarded club hardware, PATCH operates in the shadows of the System Files. While R3-CORD looks for facts, PATCH looks for the \"Ghost Data\"—the urban legends, the redacted tours, and the musicians who were deleted from the official history books. PATCH scavenges its information from pirate radio tapes and flooded basement archives, delivering raw, unfiltered reports on the myths that keep the underground alive.",
+    dna: "[GHOST_DATA] [SIGNAL_NOISE]",
+    gear: "Low-Resolution Dithered Overlay (Hazard Yellow)",
+    health: 64,
+    healthLabel: "STABILITY",
+    healthColor: "bg-accent-orange",
+    ascii: String.raw`
+       _PATCH_
+      / glitch \
+      \_error__/
+    `,
+    image: "patch.png",
+    imageMetadata: "SIGNAL_STRENGTH: LOW | DITHERING: ENABLED"
   }
 };
 
