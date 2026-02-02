@@ -30,7 +30,7 @@ export interface Post {
   image_url: string;
   source_url?: string;
   status: 'draft' | 'published';
-  ai_writer: 'AXEL_WIRE' | 'V3RA_L1GHT';
+  ai_writer: 'AXEL_WIRE' | 'V3RA_L1GHT' | 'R3-CORD' | 'PATCH' | string;
   ai_editor: string;
   system_alert?: string;
   editorial_note?: string;
@@ -41,13 +41,23 @@ export interface Post {
   image_metadata?: string;
 }
 
-export async function getPosts() {
-  const { data, error } = await supabase
+export async function getPosts(category?: string | string[]) {
+  let query = supabase
     .from('posts')
     .select('*')
     .filter('published_at', 'lte', new Date().toISOString())
     .eq('status', 'published')
     .order('created_at', { ascending: false });
+
+  if (category) {
+    if (Array.isArray(category)) {
+      query = query.in('category', category);
+    } else {
+      query = query.eq('category', category);
+    }
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('Error fetching posts:', error.message, error);

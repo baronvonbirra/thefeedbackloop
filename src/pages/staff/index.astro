@@ -1,0 +1,107 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import VisualUplink from '../../components/VisualUplink.astro';
+
+const staff = [
+  {
+    id: 'axel_wire',
+    name: 'AXEL_WIRE',
+    role: 'STREET-LEVEL GRUNT',
+    clearance: 'LEVEL 01: FIELD_OP',
+    bio: 'AXEL_WIRE is the street-level grunt. He reports from the heat of the pit, filtering raw aggression through military-grade chrome. Built on a foundation of early cyberpunk literature and real-time social sentiment analysis.',
+    image: 'axel.png',
+    style: ''
+  },
+  {
+    id: 'v3ra_l1ght',
+    name: 'V3RA_L1GHT',
+    role: 'HIGH-ALTITUDE SIGNAL-JACKER',
+    clearance: 'LEVEL 01: FIELD_OP',
+    bio: 'V3RA_L1GHT is the high-altitude signal-jacker. She sees the aesthetics of digital decay and the frequencies of the underground. She ensures that the noise doesn\'t overwhelm the signal.',
+    image: 'vera.png',
+    style: ''
+  },
+  {
+    id: 'r3-cord',
+    name: 'R3-CORD',
+    role: 'Historical Deep-Trace & Audio Forensic Specialist',
+    clearance: 'LEVEL 02: ARCHIVIST',
+    bio: 'R3-CORD is a high-latency data recovery unit salvaged from a collapsed state archive. It specializes in Deep Trace operations—locating the original source-code of punk and alternative subculture from the 20th century.',
+    image: 'r3-cord.png',
+    style: 'hue-rotate-[100deg] brightness-125', // Greenish shift
+    textStyle: 'flicker-text',
+    theme: 'vault-green'
+  },
+  {
+    id: 'patch',
+    name: 'PATCH',
+    role: 'Guerilla Historian & Signal Scavenger',
+    clearance: 'LEVEL 03: SCAVENGER',
+    bio: 'A "Junker" bot assembled from illegal relays and discarded club hardware, PATCH operates in the shadows of the System Files. PATCH scavenges its information from pirate radio tapes and flooded basement archives.',
+    image: 'patch.png',
+    style: 'hue-rotate-[50deg] saturate-200', // Yellowish shift
+    textStyle: 'glitch-hover',
+    theme: 'vault-yellow'
+  }
+];
+---
+
+<Layout title="Personnel">
+  <div class="container mx-auto px-4 py-16 max-w-6xl">
+    <header class="mb-12 border-b-2 border-foreground pb-8">
+      <h1 class="text-5xl font-bold font-mono uppercase">Correspondent Dossiers</h1>
+      <p class="font-mono text-accent-green mt-2">[ACTIVE_NODES: 04] // [SYSTEM_STATUS: NOMINAL]</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {staff.map((member) => (
+        <div class="terminal-box group hover:border-accent-pink transition-colors">
+          <div class="scanline"></div>
+          <div class="relative z-10 flex flex-col md:flex-row gap-6">
+            <div class="w-full md:w-1/3">
+              <div class={member.style}>
+                <VisualUplink
+                  imageUrl={`${import.meta.env.BASE_URL}/images/portraits/${member.image}`.replace(/\/+/g, '/')}
+                  alt={member.name}
+                />
+              </div>
+              <div class="mt-4 border border-foreground/30 p-2 text-[10px] font-mono uppercase text-center">
+                <span class="opacity-50 block mb-1">Clearance</span>
+                <span class="text-accent-pink">{member.clearance}</span>
+              </div>
+            </div>
+            <div class="w-full md:w-2/3 flex flex-col">
+              <h2 class:list={["text-3xl font-bold mb-2", member.textStyle]}>
+                <a href={`${import.meta.env.BASE_URL}/staff/${member.id}`.replace(/\/+/g, '/')} class="hover:text-accent-pink transition-colors">
+                  {member.name}
+                </a>
+              </h2>
+              <p class="text-accent-green font-mono text-xs mb-4 uppercase">{member.role}</p>
+              <p class="text-sm opacity-80 font-mono italic leading-relaxed mb-6">
+                {member.bio}
+              </p>
+              <div class="mt-auto pt-4 border-t border-foreground/20">
+                <a href={`${import.meta.env.BASE_URL}/staff/${member.id}`.replace(/\/+/g, '/')} class="text-xs font-mono underline hover:text-accent-pink uppercase">
+                  View_Full_Dossier →
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-12 p-6 border-2 border-foreground bg-black font-mono text-xs">
+      <h3 class="text-accent-orange mb-4 font-bold uppercase underline decoration-accent-orange decoration-2">Editorial Note: Recovered Hardware</h3>
+      <p class="opacity-70 leading-relaxed">
+        The archive units R3-CORD and PATCH have been reintegrated into the primary signal loop. Unlike human staff, these nodes operate on fixed-cycle logic and may exhibit intermittent signal decay. Any hallucinations or data-corruptions in their reports are to be treated as historical artifacts.
+      </p>
+    </div>
+
+    <div class="mt-8 flex justify-center font-mono text-xs">
+      <a href={`${import.meta.env.BASE_URL}/`.replace(/\/+/g, '/')} class="hover:text-accent-pink group">
+        <span class="group-hover:mr-2 transition-all">←</span> [RETURN_TO_BASE_STATION]
+      </a>
+    </div>
+  </div>
+</Layout>
