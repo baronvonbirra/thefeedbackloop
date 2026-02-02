@@ -27,27 +27,29 @@ const timestampLabel = post.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post.ai_
 <article class="terminal-box group hover:border-accent transition-colors">
 	<div class="scanline"></div>
 
-	<div class="mb-4 relative z-10">
-		<VisualUplink
-			imageUrl={displayImageUrl}
-			alt={post.title}
-			metadata={post.image_metadata}
-		/>
-	</div>
-
-	<div class="flex flex-col gap-2 relative z-10">
-		<div class="flex items-center gap-2 font-mono text-sm text-accent-green">
-			{timestampLabel && <span>{timestampLabel}:</span>}
-			<time>{formattedDate}</time>
+	<div class="relative z-20 h-full flex flex-col">
+		<div class="mb-4">
+			<VisualUplink
+				imageUrl={displayImageUrl}
+				alt={post.title}
+				metadata={post.image_metadata}
+			/>
 		</div>
-		<h2 class="text-xl font-bold leading-tight group-hover:text-accent">
-			<a href={`${import.meta.env.BASE_URL}/posts/${post.slug}`.replace(/\/+/g, '/')}>{post.title}</a>
-		</h2>
-		<p class="text-sm line-clamp-3 italic opacity-80 font-mono leading-relaxed">{displaySummary}</p>
-	</div>
 
-	<div class="mt-4 pt-4 border-t border-foreground/30 flex flex-wrap gap-2 font-mono text-[10px] uppercase relative z-10">
-		<span class="bg-foreground text-background px-2 py-0.5">[WRITER: {post.ai_writer}]</span>
-		<span class="border border-foreground px-2 py-0.5">[EDITOR: {post.ai_editor}]</span>
+		<div class="flex flex-col gap-2">
+			<div class="flex items-center gap-2 font-mono text-sm text-accent-green">
+				{timestampLabel && <span>{timestampLabel}:</span>}
+				<time>{formattedDate}</time>
+			</div>
+			<h2 class="text-xl font-bold leading-tight group-hover:text-accent">
+				<a href={`${import.meta.env.BASE_URL}/posts/${post.slug}`.replace(/\/+/g, '/')} class="after:absolute after:inset-0 after:z-50">{post.title}</a>
+			</h2>
+			<p class="text-sm line-clamp-3 italic opacity-80 font-mono leading-relaxed">{displaySummary}</p>
+		</div>
+
+		<div class="mt-4 pt-4 border-t border-foreground/30 flex flex-wrap gap-2 font-mono text-[10px] uppercase">
+			<span class="bg-foreground text-background px-2 py-0.5">[WRITER: {post.ai_writer}]</span>
+			<span class="border border-foreground px-2 py-0.5">[EDITOR: {post.ai_editor}]</span>
+		</div>
 	</div>
 </article>

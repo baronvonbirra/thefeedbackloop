@@ -72,7 +72,7 @@
       if (scrollPercent <= 30) {
         bar.classList.remove('acquiring', 'complete');
         text.innerText = 'SIGNAL: ENCRYPTED';
-        if (main) (main as HTMLElement).style.filter = 'blur(2px)';
+        if (main) (main as HTMLElement).style.filter = 'none';
       } else if (scrollPercent < 100) {
         bar.classList.add('acquiring');
         bar.classList.remove('complete');
