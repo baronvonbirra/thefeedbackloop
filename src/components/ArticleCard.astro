@@ -5,9 +5,10 @@ import VisualUplink from './VisualUplink.astro';
 
 interface Props {
 	post: Post;
+	fullImage?: boolean;
 }
 
-const { post } = Astro.props;
+const { post, fullImage = false } = Astro.props;
 
 const localImagePath = `${import.meta.env.BASE_URL}/images/posts/${post.slug}.png`.replace(/\/+/g, '/');
 // If image_url starts with http, it's external. If it's missing or just a filename, we can try to use it.
@@ -33,6 +34,7 @@ const timestampLabel = post.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post.ai_
 				imageUrl={displayImageUrl}
 				alt={post.title}
 				metadata={post.image_metadata}
+				fullImage={fullImage}
 			/>
 		</div>
 
@@ -42,7 +44,7 @@ const timestampLabel = post.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post.ai_
 				<time>{formattedDate}</time>
 			</div>
 			<h2 class="text-xl font-bold leading-tight group-hover:text-accent">
-				<a href={`${import.meta.env.BASE_URL}/posts/${post.slug}`.replace(/\/+/g, '/')} class="after:absolute after:inset-0 after:z-50">{post.title}</a>
+				<a href={`${import.meta.env.BASE_URL}/posts/${post.slug}`.replace(/\/+/g, '/')} class="after:absolute after:inset-[-1.5rem] after:z-50">{post.title}</a>
 			</h2>
 			<p class="text-sm line-clamp-3 italic opacity-80 font-mono leading-relaxed">{displaySummary}</p>
 		</div>

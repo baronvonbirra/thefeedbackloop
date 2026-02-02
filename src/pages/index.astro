@@ -33,10 +33,10 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 			{latestPost ? (
 				<section class="mb-12">
 					<!-- Desktop Featured Post -->
-					<div class="terminal-box mb-8 hover:bg-accent-green/5 transition-colors hidden lg:block">
+					<div class="terminal-box group mb-8 hover:bg-accent-green/5 transition-colors hidden lg:block relative z-20">
 						<div class="scanline"></div>
-						<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-20">
-							<div>
+						<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+							<div class="relative z-10">
 								<VisualUplink
 									imageUrl={latestPost.image_url || `${import.meta.env.BASE_URL}/images/posts/${latestPost.slug}.png`.replace(/\/+/g, '/')}
 									alt={latestPost.title}
@@ -46,18 +46,18 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 							<div class="flex flex-col">
 								<span class="bg-accent text-black px-3 py-1 font-mono text-sm uppercase mb-4 self-start font-bold">Breaking News</span>
 								<h1 class="text-3xl md:text-5xl font-bold mb-4 leading-tight">
-									<a href={`${import.meta.env.BASE_URL}/posts/${latestPost.slug}`.replace(/\/+/g, '/')} class="hover:text-accent transition-colors after:absolute after:inset-0 after:z-50">
+									<a href={`${import.meta.env.BASE_URL}/posts/${latestPost.slug}`.replace(/\/+/g, '/')} class="hover:text-accent transition-colors after:absolute after:inset-[-1.5rem] after:z-50">
 										{latestPost.title}
 									</a>
 								</h1>
 								<p class="text-lg mb-6 opacity-90 font-mono line-clamp-4 leading-relaxed italic">{latestSummary}</p>
-								<div class="mt-auto pt-4 border-t border-foreground/20 flex items-center justify-between font-mono text-xs relative z-30">
+								<div class="mt-auto pt-4 border-t border-foreground/20 flex items-center justify-between font-mono text-xs relative z-10">
 									<div class="flex items-center gap-3">
 										<span class="text-accent">{new Date(latestPost.created_at).toLocaleDateString()}</span>
 										<span class="opacity-30">|</span>
 										<span class="uppercase">WRITER: {latestPost.ai_writer}</span>
 									</div>
-									<a href={`${import.meta.env.BASE_URL}/posts/${latestPost.slug}`.replace(/\/+/g, '/')} class="text-accent hover:underline relative z-30">
+									<a href={`${import.meta.env.BASE_URL}/posts/${latestPost.slug}`.replace(/\/+/g, '/')} class="text-accent hover:underline relative z-20">
 										READ_FULL_STORY →
 									</a>
 								</div>

@@ -65,17 +65,14 @@ const finalKeywords = keywords ? [...defaultKeywords, ...keywords].join(', ') : 
 		{!hideNav && (
 			<header class="p-4 md:p-8 border-b-2 border-foreground">
 				<a href={`${import.meta.env.BASE_URL}/`.replace(/\/+/g, '/')} class="block hover:opacity-80 transition-opacity">
-					<pre class="font-mono text-accent-green leading-none mb-6 overflow-x-hidden whitespace-pre text-xs md:text-sm hidden sm:block">
-{String.raw`
- _____ _  _ ___   ___ ___ ___ ___  ___   _   ___ _  __  _    ___   ___  ___
+					<pre class="font-mono text-accent-green leading-none mb-6 overflow-hidden whitespace-pre text-xs md:text-sm hidden sm:block">
+{String.raw` _____ _  _ ___   ___ ___ ___ ___  ___   _   ___ _  __  _    ___   ___  ___
 |_   _| || | __| | __| __| __|   \| _ ) /_\ / __| |/ / | |  / _ \ / _ \| _ \
   | | | __ | _|  | _|| _|| _|| |) | _ \/ _ \ (__| ' <  | |_| (_) | (_) |  _/
-  |_| |_||_|___| |_| |___|___|___/|___/_/ \_\___|_|\_\ |____\___/ \___/|_|
-`}
+  |_| |_||_|___| |_| |___|___|___/|___/_/ \_\___|_|\_\ |____\___/ \___/|_|`}
 					</pre>
-					<pre class="font-mono text-accent-green leading-tight mb-6 overflow-x-hidden whitespace-pre text-[10px] sm:hidden">
-{String.raw`
- _____ _  _ ___
+					<pre class="font-mono text-accent-green leading-tight mb-6 overflow-hidden whitespace-pre text-[10px] sm:hidden">
+{String.raw` _____ _  _ ___
 |_   _| || | __|
   | | | __ | _|
   |_| |_||_|___|
@@ -88,8 +85,7 @@ const finalKeywords = keywords ? [...defaultKeywords, ...keywords].join(', ') : 
  _    ___   ___  ___
 | |  / _ \ / _ \| _ \
 | |_| (_) | (_) |  _/
-|____\___/ \___/|_|
-`}
+|____\___/ \___/|_|`}
 					</pre>
 				</a>
 				<nav class="flex flex-wrap gap-4 font-mono text-xl uppercase items-center">

@@ -60,172 +60,180 @@
 </style>
 
 <script>
-  let isTerminalInitialized = false;
+  // Use a global variable to persist state across Astro view transitions
+  if (!(window as any).terminalState) {
+    (window as any).terminalState = {
+      isOpen: false,
+      initialized: false
+    };
+  }
+
+  function toggleTerminal() {
+    const state = (window as any).terminalState;
+    const cli = document.getElementById('terminal-cli');
+    const input = document.getElementById('terminal-input') as HTMLInputElement;
+    if (!cli || !input) return;
+
+    state.isOpen = !state.isOpen;
+    if (state.isOpen) {
+      cli.classList.remove('translate-y-[-100%]');
+      setTimeout(() => input.focus(), 50);
+    } else {
+      cli.classList.add('translate-y-[-100%]');
+      input.blur();
+    }
+  }
+
+  function handleGlobalKeyDown(e: KeyboardEvent) {
+    const state = (window as any).terminalState;
+    if (e.key === '`') {
+      e.preventDefault();
+      toggleTerminal();
+    }
+    if (e.key === 'Escape' && state.isOpen) {
+      toggleTerminal();
+    }
+  }
 
   function initTerminal() {
+    const state = (window as any).terminalState;
     const cli = document.getElementById('terminal-cli');
     const input = document.getElementById('terminal-input') as HTMLInputElement;
     const output = document.getElementById('terminal-output');
 
     if (!cli || !input || !output) return;
 
-    let isOpen = false;
-
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === '`') {
-        e.preventDefault();
-        toggleTerminal();
-      }
-      if (e.key === 'Escape' && isOpen) {
-        toggleTerminal();
-      }
+    // Apply current state to new element (Astro replaces the DOM)
+    if (state.isOpen) {
+      cli.classList.remove('translate-y-[-100%]');
+      setTimeout(() => input.focus(), 50);
+    } else {
+      cli.classList.add('translate-y-[-100%]');
     }
 
-    // Only add global listener once
-    if (!isTerminalInitialized) {
-      window.addEventListener('keydown', handleKeyDown);
-      isTerminalInitialized = true;
-    }
-
-    function toggleTerminal() {
-      isOpen = !isOpen;
-      if (isOpen) {
-        cli.classList.remove('translate-y-[-100%]');
-        input.focus();
-      } else {
-        cli.classList.add('translate-y-[-100%]');
-      }
-    }
-
+    // Re-add input listener
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         const cmd = input.value.trim().toLowerCase();
         if (cmd) {
-          window.dispatchEvent(new CustomEvent('terminal-command', { detail: { command: cmd } }));
-          handleCommand(cmd);
+          handleCommand(cmd, output, cli);
         }
         input.value = '';
       }
     });
 
-    function appendOutput(text: string, type: 'cmd' | 'resp' = 'resp') {
-      const line = document.createElement('div');
-      const promptText = window.innerWidth < 768 ? '> ' : 'guest@feedback-loop:~$ ';
-      if (type === 'cmd') {
-        line.innerHTML = `<span class="opacity-50">${promptText}</span> ${text}`;
-      } else {
-        line.innerHTML = text;
-      }
-      output.appendChild(line);
-      cli.scrollTop = cli.scrollHeight;
-    }
+    // Ensure clicking the terminal focuses the input
+    cli.addEventListener('click', () => {
+      input.focus();
+    });
 
-    // Adjust prompt for mobile
-    function updatePrompt() {
-      const prompt = document.getElementById('terminal-prompt');
-      if (prompt) {
-        prompt.innerText = window.innerWidth < 768 ? '> ' : 'guest@feedback-loop:~$ ';
-      }
-    }
     updatePrompt();
 
-    // We can't easily remove anonymous resize listeners without more boilerplate,
-    // but at least the primary logic is inside the astro:page-load which finds the current elements.
-    window.addEventListener('resize', updatePrompt);
-
-    async function handleCommand(cmd: string) {
-      appendOutput(cmd, 'cmd');
-
-      const parts = cmd.split(' ');
-      const action = parts[0];
-      const args = parts.slice(1);
-
-      switch (action) {
-        case 'help':
-          appendOutput('COMMANDS: WHOIS [NAME], LIST_NODES, STATUS, LOGS, CLEARANCE, DATE, SUDO PANIC, EXIT, CLEAR');
-          break;
-        case 'exit':
-          toggleTerminal();
-          break;
-        case 'clear':
-          output.innerHTML = '';
-          break;
-        case 'date':
-          appendOutput(`STARDATE: ${new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')}`);
-          break;
-        case 'clearance':
-          appendOutput('CURRENT_ACCESS_LEVEL: [GUEST_READ_ONLY]<br/>RESTRICTION: LEVEL 04 AND ABOVE REQUIRED FOR UPLINK.');
-          break;
-        case 'status':
-          appendOutput('SYSTEM_STATUS: [OPERATIONAL]<br/>CPU_LOAD: 12%<br/>MEM_USAGE: 4.2GB / 16GB<br/>LATENCY: 42ms<br/>UPTIME: 142:23:05');
-          break;
-        case 'logs':
-          const logEntries = [
-            '[OK] Algorithmic filter adjusted to 0.82',
-            '[WARN] Ghost signal detected in sector 7G',
-            '[OK] Scraping Deep Web node: #VOID-9',
-            '[INFO] Sentinel v4.2 check complete: 0 errors',
-            '[ALERT] Unauthorized attempt at /admin/backdoor blocked'
-          ];
-          appendOutput('RETRIEVING_SYSTEM_LOGS...');
-          setTimeout(() => {
-            logEntries.forEach(log => appendOutput(log));
-          }, 200);
-          break;
-        case 'whois':
-          if (args[0] === 'axel') {
-            appendOutput('AXEL_WIRE: Street-Level Grunt. Filters raw aggression through military-grade chrome. Specialist in the pit.');
-          } else if (args[0] === 'vera') {
-            appendOutput('V3RA_L1GHT: High-Altitude Signal-Jacker. Specialist in digital decay and underground frequencies.');
-          } else if (args[0] === 'patch') {
-            appendOutput('PATCH: Guerilla Historian. Scavenges data from the static. Level 03 Clearance.');
-          } else if (args[0] === 'r3-cord') {
-            appendOutput('R3-CORD: Historical Deep-Trace Specialist. Archivist of the old world. Level 02 Clearance.');
-          } else {
-            appendOutput('ERROR: SUBJECT NOT FOUND IN DATABASE.');
-          }
-          break;
-        case 'list_nodes':
-          appendOutput('FETCHING_LATEST_SIGNAL_NODES...');
-          setTimeout(() => {
-            appendOutput('1. [NODE_NEWS] :: status:ONLINE');
-            appendOutput('2. [NODE_REVIEWS] :: status:ONLINE');
-            appendOutput('3. [NODE_VAULT] :: status:ENCRYPTED');
-            appendOutput('4. [NODE_MANIFESTO] :: status:STABLE');
-          }, 300);
-          break;
-        case 'sudo':
-          if (args[0] === 'panic') {
-            appendOutput('CRITICAL_SYSTEM_ERROR: TRIGGERING PANIC PROTOCOL...');
-            document.body.classList.add('panic-animation');
-            setTimeout(() => {
-              document.body.classList.remove('panic-animation');
-            }, 2000);
-          } else {
-            appendOutput('ERROR: PERMISSION_DENIED');
-          }
-          break;
-        case 'man':
-          if (!args[0]) {
-            appendOutput('USAGE: man [COMMAND]');
-          } else {
-            const manuals: any = {
-              'whois': 'whois [name] :: Displays biographical data for identified personnel.',
-              'list_nodes': 'list_nodes :: Scans for available network access points.',
-              'status': 'status :: Shows current hardware and software telemetry.',
-              'logs': 'logs :: Streams recent system events.',
-              'clearance': 'clearance :: Displays current user access level.',
-              'sudo': 'sudo [command] :: Executes command with elevated privileges. CAUTION ADVISED.'
-            };
-            appendOutput(manuals[args[0]] || `ERROR: NO MANUAL ENTRY FOR '${args[0]}'.`);
-          }
-          break;
-        default:
-          appendOutput(`ERROR: COMMAND '${action}' NOT RECOGNIZED.`);
-      }
+    if (!state.initialized) {
+      window.addEventListener('keydown', handleGlobalKeyDown);
+      window.addEventListener('resize', updatePrompt);
+      state.initialized = true;
     }
   }
 
-  document.addEventListener('DOMContentLoaded', initTerminal);
-  document.addEventListener('astro:page-load', initTerminal);
+  function appendOutput(text: string, output: HTMLElement, cli: HTMLElement, type: 'cmd' | 'resp' = 'resp') {
+    const line = document.createElement('div');
+    const promptText = window.innerWidth < 768 ? '> ' : 'guest@feedback-loop:~$ ';
+    if (type === 'cmd') {
+      line.innerHTML = `<span class="opacity-50">${promptText}</span> ${text}`;
+    } else {
+      line.innerHTML = text;
+    }
+    output.appendChild(line);
+    cli.scrollTop = cli.scrollHeight;
+  }
+
+  function updatePrompt() {
+    const prompt = document.getElementById('terminal-prompt');
+    if (prompt) {
+      prompt.innerText = window.innerWidth < 768 ? '> ' : 'guest@feedback-loop:~$ ';
+    }
+  }
+
+  async function handleCommand(cmd: string, output: HTMLElement, cli: HTMLElement) {
+    appendOutput(cmd, output, cli, 'cmd');
+
+    const parts = cmd.split(' ');
+    const action = parts[0];
+    const args = parts.slice(1);
+
+    switch (action) {
+      case 'help':
+        appendOutput('COMMANDS: WHOIS [NAME], LIST_NODES, STATUS, LOGS, CLEARANCE, DATE, SUDO PANIC, EXIT, CLEAR', output, cli);
+        break;
+      case 'exit':
+        toggleTerminal();
+        break;
+      case 'clear':
+        output.innerHTML = '';
+        break;
+      case 'date':
+        appendOutput(`STARDATE: ${new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')}`, output, cli);
+        break;
+      case 'clearance':
+        appendOutput('CURRENT_ACCESS_LEVEL: [GUEST_READ_ONLY]<br/>RESTRICTION: LEVEL 04 AND ABOVE REQUIRED FOR UPLINK.', output, cli);
+        break;
+      case 'status':
+        appendOutput('SYSTEM_STATUS: [OPERATIONAL]<br/>CPU_LOAD: 12%<br/>MEM_USAGE: 4.2GB / 16GB<br/>LATENCY: 42ms<br/>UPTIME: 142:23:05', output, cli);
+        break;
+      case 'logs':
+        const logEntries = [
+          '[OK] Algorithmic filter adjusted to 0.82',
+          '[WARN] Ghost signal detected in sector 7G',
+          '[OK] Scraping Deep Web node: #VOID-9',
+          '[INFO] Sentinel v4.2 check complete: 0 errors',
+          '[ALERT] Unauthorized attempt at /admin/backdoor blocked'
+        ];
+        appendOutput('RETRIEVING_SYSTEM_LOGS...', output, cli);
+        setTimeout(() => {
+          logEntries.forEach(log => appendOutput(log, output, cli));
+        }, 200);
+        break;
+      case 'whois':
+        if (args[0] === 'axel') {
+          appendOutput('AXEL_WIRE: Street-Level Grunt. Filters raw aggression through military-grade chrome. Specialist in the pit.', output, cli);
+        } else if (args[0] === 'vera') {
+          appendOutput('V3RA_L1GHT: High-Altitude Signal-Jacker. Specialist in digital decay and underground frequencies.', output, cli);
+        } else if (args[0] === 'patch') {
+          appendOutput('PATCH: Guerilla Historian. Scavenges data from the static. Level 03 Clearance.', output, cli);
+        } else if (args[0] === 'r3-cord') {
+          appendOutput('R3-CORD: Historical Deep-Trace Specialist. Archivist of the old world. Level 02 Clearance.', output, cli);
+        } else {
+          appendOutput('ERROR: SUBJECT NOT FOUND IN DATABASE.', output, cli);
+        }
+        break;
+      case 'list_nodes':
+        appendOutput('FETCHING_LATEST_SIGNAL_NODES...', output, cli);
+        setTimeout(() => {
+          appendOutput('1. [NODE_NEWS] :: status:ONLINE', output, cli);
+          appendOutput('2. [NODE_REVIEWS] :: status:ONLINE', output, cli);
+          appendOutput('3. [NODE_VAULT] :: status:ENCRYPTED', output, cli);
+          appendOutput('4. [NODE_MANIFESTO] :: status:STABLE', output, cli);
+        }, 300);
+        break;
+      case 'sudo':
+        if (args[0] === 'panic') {
+          appendOutput('CRITICAL_SYSTEM_ERROR: TRIGGERING PANIC PROTOCOL...', output, cli);
+          document.body.classList.add('panic-animation');
+          setTimeout(() => {
+            document.body.classList.remove('panic-animation');
+          }, 2000);
+        } else {
+          appendOutput('ERROR: PERMISSION_DENIED', output, cli);
+        }
+        break;
+      default:
+        appendOutput(`ERROR: COMMAND '${action}' NOT RECOGNIZED.`, output, cli);
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', initTerminal);
+    document.addEventListener('astro:page-load', initTerminal);
+  }
 </script>
