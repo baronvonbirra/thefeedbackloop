@@ -15,8 +15,12 @@ const parsed = parseSystemAlert(systemAlert);
 
 // Fallback logic: prefer explicit props, then parsed values, then default
 const displayIntegrity = integrityScan ?? parsed.integrity ?? (systemAlert ? 100 : undefined);
-const displayFactCheck = factCheck || parsed.factCheck || (systemAlert && !parsed.factCheck ? systemAlert : '');
-const displayAction = action || parsed.action || (systemAlert && !parsed.action ? systemAlert : '');
+
+// If we have parsed any specific field from systemAlert, we should avoid showing the whole thing as fallback
+const hasParsedFields = parsed.integrity !== undefined || parsed.factCheck !== undefined || parsed.action !== undefined;
+
+const displayFactCheck = factCheck || parsed.factCheck || (!hasParsedFields && systemAlert ? systemAlert : '');
+const displayAction = action || parsed.action || '';
 
 const factCheckHtml = await parseMarkdown(displayFactCheck, true);
 const actionHtml = await parseMarkdown(displayAction, true);

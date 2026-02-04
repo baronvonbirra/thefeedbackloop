@@ -33,18 +33,50 @@ export const parseMarkdown = async (content: string | undefined, inline = false)
 export function parseSystemAlert(alert: string | undefined) {
   if (!alert) return { integrity: undefined, factCheck: undefined, action: undefined };
 
-  // Improved regex to handle both multiline and bracketed formats
-  const integrityMatch = alert.match(/INTEGRITY_SCAN:\s*(\d+)/i);
+  // 1. Remove the header prefix if present: [SYSTEM ALERT // SENTINEL v4.2] or [SYSTEM ALERT]
+  let content = alert.replace(/^\[SYSTEM ALERT(?:\s*\/\/\s*SENTINEL v[\d.]+)?\]\s*/i, '').trim();
 
-  // Lookahead to stop at next field marker or closing brackets/end of string
-  const lookahead = /(?=\s*(?:ACTION:|FACT-CHECK:|INTEGRITY_SCAN:|\]\s*\[|\]\s*$|$))/si;
+  // 2. Extract Integrity Scan (handle space or underscore, and decimals)
+  const integrityMatch = content.match(/INTEGRITY[\s_]SCAN:\s*(\d+(?:\.\d+)?%?)/i);
+  let integrity: number | undefined = undefined;
+  if (integrityMatch) {
+    integrity = parseFloat(integrityMatch[1]);
+    // Remove the integrity scan part from content
+    content = content.replace(integrityMatch[0], '').trim();
+    // Clean up potential leading punctuation/space
+    content = content.replace(/^[.\s,]+/, '').trim();
+  }
 
-  const factCheckMatch = alert.match(new RegExp(`FACT-CHECK:\\s*(.*?)${lookahead.source}`, 'si'));
-  const actionMatch = alert.match(new RegExp(`ACTION:\\s*(.*?)${lookahead.source}`, 'si'));
+  // 3. Extract Fact-Check
+  // Look for FACT-CHECK: and capture everything until the next marker or end of string
+  const nextMarkerLookahead = /(?=(?:ACTION:|NOTE:|INTEGRITY[\s_]SCAN:|\]\s*\[|$))/i;
 
-  return {
-    integrity: integrityMatch ? parseInt(integrityMatch[1], 10) : undefined,
-    factCheck: factCheckMatch ? factCheckMatch[1].trim() : undefined,
-    action: actionMatch ? actionMatch[1].trim() : undefined
-  };
+  const factCheckMatch = content.match(new RegExp(`FACT-CHECK:\\s*(.*?)${nextMarkerLookahead.source}`, 'si'));
+  let factCheck: string | undefined = undefined;
+  if (factCheckMatch) {
+    factCheck = factCheckMatch[1].trim();
+    content = content.replace(factCheckMatch[0], '').trim();
+  }
+
+  // 4. Extract Action or Note
+  const actionMatch = content.match(/(?:ACTION|NOTE):\s*(.*)/si);
+  let action: string | undefined = undefined;
+  if (actionMatch) {
+    action = actionMatch[1].trim();
+    content = content.replace(actionMatch[0], '').trim();
+  }
+
+  // 5. Fallback: Any remaining content becomes Action
+  if (content.length > 0) {
+    const remaining = content.trim().replace(/^[.\s,]+|[.\s,]+$/g, '');
+    if (remaining.length > 0) {
+      if (!action) {
+        action = content.trim();
+      } else {
+        action = action + " " + content.trim();
+      }
+    }
+  }
+
+  return { integrity, factCheck, action };
 }
