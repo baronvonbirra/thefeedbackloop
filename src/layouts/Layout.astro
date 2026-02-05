@@ -3,6 +3,7 @@ import '../styles/global.css';
 import SignalProgressBar from '../components/SignalProgressBar.astro';
 import TerminalCLI from '../components/TerminalCLI.astro';
 import SessionLogFooter from '../components/SessionLogFooter.astro';
+import SearchModule from '../components/SearchModule.astro';
 
 interface Props {
 	title: string;
@@ -58,6 +59,46 @@ const finalKeywords = keywords ? [...defaultKeywords, ...keywords].join(', ') : 
 		<title>{title} | THE FEEDBACK LOOP</title>
 	</head>
 	<body class={`bg-background text-foreground min-h-screen flex flex-col ${category ? `category-${category}` : ''}`} data-theme={theme}>
+		<div id="matrix-rain-container" class="fixed inset-0 z-[15000] pointer-events-none hidden">
+			<canvas id="matrix-rain-canvas"></canvas>
+		</div>
+
+		<div id="sentinel-token-modal" class="fixed inset-0 z-[16000] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+			<div class="terminal-box max-w-md w-full border-accent-pink shadow-[0_0_20px_rgba(255,0,255,0.5)]">
+				<div class="scanline"></div>
+				<div class="relative z-10 text-center">
+					<h2 class="text-2xl font-bold text-accent-pink mb-4 animate-pulse">!! ACCESS GRANTED !!</h2>
+					<p class="font-mono mb-4 text-xs opacity-80 uppercase tracking-widest">SENTINEL ACCESS TOKEN ACQUIRED:</p>
+					<div class="bg-black border border-accent-pink p-2 font-mono text-lg tracking-widest text-white mb-6 shadow-[inset_0_0_10px_rgba(255,0,255,0.2)]">
+						SNTNL-X92-K0N4M1
+					</div>
+
+					<div id="token-form-container">
+						<p class="text-[10px] opacity-70 mb-4 uppercase leading-tight">Identify a subculture signal for analysis (Band, Topic, Artist):</p>
+						<form id="token-form" class="space-y-4">
+							<input
+								type="text"
+								id="token-suggestion"
+								placeholder="SIGNAL_IDENTIFIER..."
+								required
+								class="w-full bg-black border border-accent-pink/30 p-2 font-mono text-xs focus:border-accent-pink outline-none text-accent-pink"
+							/>
+							<button type="submit" class="w-full py-2 bg-accent-pink text-black font-bold uppercase text-xs hover:bg-white transition-colors cursor-pointer">
+								UPLOAD_TO_SENTINEL
+							</button>
+						</form>
+					</div>
+					<div id="token-success" class="hidden py-4 text-accent-green font-mono text-xs">
+						> SIGNAL UPLOADED. DATA MERGED INTO SYSTEM CORE.
+					</div>
+
+					<button id="close-token-modal" class="mt-8 px-6 py-2 border border-foreground/30 text-foreground font-mono text-[10px] uppercase hover:bg-white hover:text-black transition-colors cursor-pointer">
+						EXIT_PROTOCOL
+					</button>
+				</div>
+			</div>
+		</div>
+
 		<SignalProgressBar />
 		<TerminalCLI />
 		<div class="crt-overlay"></div>
@@ -88,12 +129,17 @@ const finalKeywords = keywords ? [...defaultKeywords, ...keywords].join(', ') : 
 |____\___/ \___/|_|`}
 					</pre>
 				</a>
-				<nav class="flex flex-wrap gap-4 font-mono text-xl uppercase items-center">
-					<a href={`${import.meta.env.BASE_URL}/`.replace(/\/+/g, '/')} class="hover:text-accent">[HOME]</a>
-					<a href={`${import.meta.env.BASE_URL}/news`.replace(/\/+/g, '/')} class="hover:text-accent">[NEWS]</a>
-					<a href={`${import.meta.env.BASE_URL}/reviews`.replace(/\/+/g, '/')} class="hover:text-accent">[REVIEWS]</a>
-					<a href={`${import.meta.env.BASE_URL}/vault`.replace(/\/+/g, '/')} class="hover:text-accent">[THE VAULT]</a>
-					<a href={`${import.meta.env.BASE_URL}/manifesto`.replace(/\/+/g, '/')} class="hover:text-accent">[MANIFESTO]</a>
+				<nav class="flex flex-wrap gap-4 font-mono text-xl uppercase items-center justify-between">
+					<div class="flex flex-wrap gap-4 items-center">
+						<a href={`${import.meta.env.BASE_URL}/`.replace(/\/+/g, '/')} class="hover:text-accent">[HOME]</a>
+						<a href={`${import.meta.env.BASE_URL}/news`.replace(/\/+/g, '/')} class="hover:text-accent">[NEWS]</a>
+						<a href={`${import.meta.env.BASE_URL}/reviews`.replace(/\/+/g, '/')} class="hover:text-accent">[REVIEWS]</a>
+						<a href={`${import.meta.env.BASE_URL}/vault`.replace(/\/+/g, '/')} class="hover:text-accent">[THE VAULT]</a>
+						<a href={`${import.meta.env.BASE_URL}/manifesto`.replace(/\/+/g, '/')} class="hover:text-accent">[MANIFESTO]</a>
+					</div>
+					<div class="ml-auto">
+						<SearchModule />
+					</div>
 				</nav>
 			</header>
 		)}
@@ -210,6 +256,118 @@ const finalKeywords = keywords ? [...defaultKeywords, ...keywords].join(', ') : 
 
 			document.addEventListener('DOMContentLoaded', initSentinelTooltips);
 			document.addEventListener('astro:page-load', initSentinelTooltips);
+
+			// Konami Code Protocol
+			let konamiIndex = 0;
+			const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+
+			function initKonami() {
+				window.addEventListener('keydown', (e) => {
+					if (e.key === konamiCode[konamiIndex]) {
+						konamiIndex++;
+						if (konamiIndex === konamiCode.length) {
+							triggerKonamiProtocol();
+							konamiIndex = 0;
+						}
+					} else {
+						konamiIndex = 0;
+					}
+				});
+			}
+
+			function triggerKonamiProtocol() {
+				const container = document.getElementById('matrix-rain-container');
+				const canvas = document.getElementById('matrix-rain-canvas') as HTMLCanvasElement;
+				const modal = document.getElementById('sentinel-token-modal');
+				const closeBtn = document.getElementById('close-token-modal');
+
+				if (!container || !canvas || !modal || !closeBtn) return;
+
+				// Start Matrix Rain
+				container.classList.remove('hidden');
+				startMatrixRain(canvas);
+
+				// Show Token after a short delay
+				setTimeout(() => {
+					modal.classList.remove('hidden');
+				}, 2000);
+
+				// Cleanup
+				setTimeout(() => {
+					container.classList.add('hidden');
+				}, 7000);
+
+				const form = document.getElementById('token-form') as HTMLFormElement;
+				const formContainer = document.getElementById('token-form-container');
+				const successMsg = document.getElementById('token-success');
+
+				if (form && formContainer && successMsg) {
+					form.addEventListener('submit', async (e) => {
+						e.preventDefault();
+						const suggestion = (document.getElementById('token-suggestion') as HTMLInputElement).value;
+
+						// Real Supabase logic would be:
+						// await supabase.from('suggestions').insert([{ suggestion, date: new Date().toISOString() }])
+						console.log('Sending suggestion to Supabase...', suggestion);
+
+						formContainer.classList.add('hidden');
+						successMsg.classList.remove('hidden');
+					});
+				}
+
+				closeBtn.addEventListener('click', () => {
+					modal.classList.add('hidden');
+					// Reset form for next time
+					if (formContainer) formContainer.classList.remove('hidden');
+					if (successMsg) successMsg.classList.add('hidden');
+					if (form) form.reset();
+				});
+			}
+
+			function startMatrixRain(canvas: HTMLCanvasElement) {
+				const ctx = canvas.getContext('2d');
+				if (!ctx) return;
+
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+
+				const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズヅブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
+				const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+				const nums = '0123456789';
+				const alphabet = katakana + latin + nums;
+
+				const fontSize = 16;
+				const columns = canvas.width / fontSize;
+
+				const rainDrops: number[] = [];
+				for (let x = 0; x < columns; x++) {
+					rainDrops[x] = 1;
+				}
+
+				const draw = () => {
+					ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+					ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+					ctx.fillStyle = '#0F0';
+					ctx.font = fontSize + 'px monospace';
+
+					for (let i = 0; i < rainDrops.length; i++) {
+						const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+						ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+
+						if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+							rainDrops[i] = 0;
+						}
+						rainDrops[i]++;
+					}
+				};
+
+				const interval = setInterval(draw, 30);
+				setTimeout(() => clearInterval(interval), 7000);
+			}
+
+			document.addEventListener('DOMContentLoaded', initKonami);
+			document.addEventListener('astro:page-load', initKonami);
 		</script>
 	</body>
 </html>

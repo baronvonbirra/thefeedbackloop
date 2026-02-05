@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import EditorialBlock from '../../components/EditorialBlock.astro';
 import VisualUplink from '../../components/VisualUplink.astro';
 import VisualDecay from '../../components/VisualDecay.astro';
+import EncryptedUplink from '../../components/EncryptedUplink.astro';
 import { getPosts, getPostBySlug } from '../../lib/supabase';
 import { parseMarkdown } from '../../lib/utils';
 
@@ -134,6 +135,10 @@ const timestampLabel = post?.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post?.a
           <Fragment set:html={editorialNoteHtml} />
         </footer>
       )}
+
+      <div class="relative z-10">
+        <EncryptedUplink />
+      </div>
 
       <div class="mt-12 pt-8 border-t-2 border-foreground flex justify-between font-mono text-sm relative z-10">
         <a href={`${import.meta.env.BASE_URL}/`.replace(/\/+/g, '/')} class="hover:text-accent decoration-2 underline-offset-4 underline">← BACK_TO_FEED</a>

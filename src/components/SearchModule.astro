@@ -1,0 +1,120 @@
+---
+---
+<div class="search-container relative font-mono">
+  <div class="flex items-center border border-accent-green bg-black px-2 py-1">
+    <span class="text-accent-green mr-1">></span>
+    <input
+      type="text"
+      id="search-input"
+      placeholder="QUERY_DATABASE..."
+      class="bg-transparent border-none outline-none text-accent-green placeholder:text-accent-green/50 w-32 md:w-48 text-xs md:text-sm"
+      autocomplete="off"
+    />
+    <span id="search-cursor" class="text-accent-green animate-pulse">_</span>
+  </div>
+
+  <div id="search-error" class="hidden absolute top-full right-0 mt-2 bg-black border border-accent-pink p-2 text-[10px] text-accent-pink z-[100] whitespace-nowrap">
+    ERROR 404: NO MATCHING ARTIFACTS FOUND IN SECTOR
+  </div>
+</div>
+
+<style>
+  #search-input:focus + #search-cursor {
+    display: inline;
+  }
+
+  mark {
+    background: yellow;
+    color: black;
+  }
+</style>
+
+<script>
+  function initSearch() {
+    const input = document.getElementById('search-input') as HTMLInputElement;
+    const errorMsg = document.getElementById('search-error');
+    if (!input) return;
+
+    input.addEventListener('input', () => {
+      const query = input.value.toLowerCase().trim();
+      const articles = document.querySelectorAll('article');
+      let foundAny = false;
+
+      if (query === '') {
+        articles.forEach(article => {
+          (article as HTMLElement).style.display = '';
+          removeHighlight(article);
+        });
+        if (errorMsg) errorMsg.classList.add('hidden');
+        return;
+      }
+
+      articles.forEach(article => {
+        const text = article.innerText.toLowerCase();
+        if (text.includes(query)) {
+          (article as HTMLElement).style.display = '';
+          applyHighlight(article, query);
+          foundAny = true;
+        } else {
+          (article as HTMLElement).style.display = 'none';
+        }
+      });
+
+      if (errorMsg) {
+        if (!foundAny && query !== '') {
+          errorMsg.classList.remove('hidden');
+        } else {
+          errorMsg.classList.add('hidden');
+        }
+      }
+    });
+  }
+
+  function applyHighlight(root: HTMLElement, query: string) {
+    removeHighlight(root);
+    if (!query) return;
+
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    const nodes = [];
+    let node;
+    while (node = walker.nextNode()) {
+      if (node.parentElement?.closest('script, style, noscript, .radar-sweep, .scanline')) continue;
+      nodes.push(node);
+    }
+
+    nodes.forEach(textNode => {
+      const content = textNode.textContent || '';
+      const lowerContent = content.toLowerCase();
+      if (lowerContent.includes(query)) {
+        const span = document.createElement('span');
+        let lastIdx = 0;
+        let idx = lowerContent.indexOf(query);
+
+        while (idx !== -1) {
+          span.appendChild(document.createTextNode(content.substring(lastIdx, idx)));
+          const mark = document.createElement('mark');
+          mark.textContent = content.substring(idx, idx + query.length);
+          span.appendChild(mark);
+          lastIdx = idx + query.length;
+          idx = lowerContent.indexOf(query, lastIdx);
+        }
+        span.appendChild(document.createTextNode(content.substring(lastIdx)));
+        textNode.replaceWith(span);
+      }
+    });
+  }
+
+  function removeHighlight(root: HTMLElement) {
+    const marks = root.querySelectorAll('mark');
+    marks.forEach(mark => {
+      const parent = mark.parentNode;
+      if (parent) {
+        mark.replaceWith(...mark.childNodes);
+        parent.normalize();
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initSearch);
+  document.addEventListener('astro:page-load', initSearch);
+</script>
