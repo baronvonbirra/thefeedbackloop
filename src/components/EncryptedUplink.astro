@@ -49,6 +49,8 @@
 </div>
 
 <script>
+  import { submitUplinkMessage } from '../lib/supabase';
+
   function initUplink() {
     const form = document.getElementById('uplink-form') as HTMLFormElement;
     const container = document.getElementById('uplink-form-container');
@@ -62,28 +64,26 @@
       const agentId = (document.getElementById('agent-id') as HTMLInputElement).value;
       const dataPacket = (document.getElementById('data-packet') as HTMLTextAreaElement).value;
 
-      // In a real scenario, we'd send data to a serverless function here
-      // Example: fetch('/api/uplink', { method: 'POST', body: JSON.stringify({ agentId, dataPacket }) })
       try {
-        // Mocking the backend call
         console.log('Sending data to Sentinel...', { agentId, dataPacket });
-        // await new Promise(resolve => setTimeout(resolve, 1000));
+        await submitUplinkMessage({ agent_id: agentId, data_packet: dataPacket });
+
+        container.classList.add('hidden');
+        success.classList.remove('hidden');
+
+        // Optional: Add some "processing" delay feel
+        const lines = success.querySelectorAll('p');
+        lines.forEach((line, i) => {
+          (line as HTMLElement).style.opacity = '0';
+          setTimeout(() => {
+            (line as HTMLElement).style.opacity = '1';
+            (line as HTMLElement).classList.add('animate-pulse');
+          }, i * 1000);
+        });
       } catch (err) {
         console.error('Uplink failed', err);
+        alert('CRITICAL_ERROR: UPLINK_FAILURE. CHECK_CONSOLES.');
       }
-
-      container.classList.add('hidden');
-      success.classList.remove('hidden');
-
-      // Optional: Add some "processing" delay feel
-      const lines = success.querySelectorAll('p');
-      lines.forEach((line, i) => {
-        (line as HTMLElement).style.opacity = '0';
-        setTimeout(() => {
-          (line as HTMLElement).style.opacity = '1';
-          (line as HTMLElement).classList.add('animate-pulse');
-        }, i * 1000);
-      });
     });
   }
 

@@ -17,6 +17,13 @@ if (!supabaseUrl || !supabaseKey) {
 
 export const supabase = createClient(finalUrl, finalKey);
 
+export interface UplinkMessage {
+  id?: number;
+  created_at?: string;
+  agent_id: string;
+  data_packet: string;
+}
+
 export interface Post {
   id: number;
   created_at: string;
@@ -82,4 +89,17 @@ export async function getPostBySlug(slug: string) {
   }
 
   return data as Post;
+}
+
+export async function submitUplinkMessage(message: Omit<UplinkMessage, 'id' | 'created_at'>) {
+  const { data, error } = await supabase
+    .from('uplink_messages')
+    .insert([message]);
+
+  if (error) {
+    console.error('Error submitting uplink message:', error.message, error);
+    throw error;
+  }
+
+  return data;
 }
