@@ -1,0 +1,92 @@
+---
+---
+<div class="encrypted-uplink terminal-box mt-12 mb-8 border-accent-green/50">
+  <div class="scanline"></div>
+  <div class="relative z-10">
+    <h3 class="text-xl font-bold mb-6 font-mono text-accent-green animate-pulse">
+      // SECURE UPLINK ESTABLISHED
+    </h3>
+
+    <div id="uplink-form-container">
+      <form id="uplink-form" class="space-y-6">
+        <div class="space-y-2">
+          <label for="agent-id" class="block font-mono text-xs uppercase opacity-70">AGENT_ID</label>
+          <input
+            type="text"
+            id="agent-id"
+            placeholder="Enter Codename"
+            required
+            class="w-full bg-black border border-foreground/30 p-3 font-mono text-sm focus:border-accent-green outline-none transition-colors"
+          />
+        </div>
+
+        <div class="space-y-2">
+          <label for="data-packet" class="block font-mono text-xs uppercase opacity-70">DATA_PACKET</label>
+          <textarea
+            id="data-packet"
+            rows="4"
+            placeholder="Type your intel here..."
+            required
+            class="w-full bg-black border border-foreground/30 p-3 font-mono text-sm focus:border-accent-green outline-none transition-colors resize-none"
+          ></textarea>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full md:w-auto px-8 py-3 bg-accent-green text-black font-bold font-mono uppercase hover:bg-white transition-colors cursor-pointer"
+        >
+          SUBMIT_TRANSMISSION
+        </button>
+      </form>
+    </div>
+
+    <div id="uplink-success" class="hidden space-y-2 font-mono text-accent-green py-8">
+      <p>> TRANSMISSION SENT.</p>
+      <p>> SENTINEL AI ANALYZING CONTENT INTEGRITY...</p>
+      <p>> STAND BY.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function initUplink() {
+    const form = document.getElementById('uplink-form') as HTMLFormElement;
+    const container = document.getElementById('uplink-form-container');
+    const success = document.getElementById('uplink-success');
+
+    if (!form || !container || !success) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const agentId = (document.getElementById('agent-id') as HTMLInputElement).value;
+      const dataPacket = (document.getElementById('data-packet') as HTMLTextAreaElement).value;
+
+      // In a real scenario, we'd send data to a serverless function here
+      // Example: fetch('/api/uplink', { method: 'POST', body: JSON.stringify({ agentId, dataPacket }) })
+      try {
+        // Mocking the backend call
+        console.log('Sending data to Sentinel...', { agentId, dataPacket });
+        // await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (err) {
+        console.error('Uplink failed', err);
+      }
+
+      container.classList.add('hidden');
+      success.classList.remove('hidden');
+
+      // Optional: Add some "processing" delay feel
+      const lines = success.querySelectorAll('p');
+      lines.forEach((line, i) => {
+        (line as HTMLElement).style.opacity = '0';
+        setTimeout(() => {
+          (line as HTMLElement).style.opacity = '1';
+          (line as HTMLElement).classList.add('animate-pulse');
+        }, i * 1000);
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initUplink);
+  document.addEventListener('astro:page-load', initUplink);
+</script>
