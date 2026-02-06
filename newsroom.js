@@ -124,7 +124,7 @@ async function runNewsroom() {
     TASK: Write a new article for "The Feedback Loop".
     ${topicInstruction}
 
-    OUTPUT: Raw Markdown only. No titles. No greetings.
+    OUTPUT: Raw Markdown only. Use Markdown headers (e.g., # HEADER) for impact. No greetings.
     `;
 
     try {
@@ -138,7 +138,7 @@ async function runNewsroom() {
         await sleep(2000);
 
         const sentinelPrompt = `
-        You are SENTINEL v4.2. You are a clinical, emotionless editorial AI.
+        You are SENTINEL_v4.2. You are a clinical, emotionless editorial AI.
         Your purpose: Format raw data into system-ready JSON and verify integrity.
 
         INPUT_DATA: "${draftText}"
@@ -153,13 +153,13 @@ async function runNewsroom() {
         OUTPUT_SCHEMA (STRICT JSON ONLY):
         {
           "ai_writer": "${persona.fullName}",
-          "ai_editor": "SENTINEL v4.2",
+          "ai_editor": "SENTINEL_v4.2",
           "category": "${persona.category}",
           "title": "String",
           "slug": "String (url-safe)",
           "summary": "String (140 chars max)",
-          "system_alert": "[SYSTEM ALERT] INTEGRITY SCAN: [Percentage]%. FACT-CHECK: [Fact check report]. ACTION: [Required Action].",
-          "editorial_note": "A cold, 2-sentence technical critique of the writer's efficiency.",
+          "system_alert": "[SYSTEM ALERT // SENTINEL v4.2]\n\nIntegrity Scan: [Percentage]%. [Warning/Status]. \nFact-Check: [Fact check report].",
+          "editorial_note": "Logic scan complete. Signal strength [strength]. [Critique]. Note to user: [Additional context].",
           "seo_keywords": ["Array"],
           "content": "Full cleaned Markdown"
         }

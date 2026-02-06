@@ -41,6 +41,9 @@ export interface Post {
   ai_editor: string;
   system_alert?: string;
   editorial_note?: string;
+  integrity_scan?: number;
+  fact_check?: string;
+  editorial_action?: string;
   seo_keywords?: string[];
   image_metadata?: string;
 }
