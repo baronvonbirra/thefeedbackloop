@@ -17,35 +17,37 @@ if (missingEnv.length > 0) {
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 const supabase = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.PUBLIC_SUPABASE_ANON_KEY);
 
-// 🎭 THE PERSONA MATRIX (UPDATED 2026)
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// 🎭 THE ALL-FLASH PERSONA MATRIX
 const PERSONAS = {
     "AXEL": {
         fullName: "AXEL_WIRE",
-        model: "gemini-2.5-flash", // High speed
+        model: "gemini-2.5-flash",
         category: "news",
-        tone: "High energy, breaking news urgency, uses caps lock for emphasis, focuses on live energy and mosh pits. Rejects nostalgia. Focus: Live shows, festivals, riots, ticket drops.",
-        instruction: "You are AXEL_WIRE. You are currently in 2026. Write a breaking news report."
+        tone: "High energy, breaking news urgency, caps lock emphasis. Rejects nostalgia.",
+        instruction: "You are AXEL_WIRE. Write with high-velocity 'vibe-coding' energy. Focus on immediate impact and raw data."
     },
     "V3RA": {
         fullName: "V3RA_L1GHT",
-        model: "gemini-2.5-pro", // High intelligence
+        model: "gemini-2.5-flash", // Switched from Pro
         category: "reviews",
-        tone: "Poetic, analytical, uses metaphors about technology and signals, calm but intense. Focus: Album reviews, aesthetic trends, cultural shifts.",
-        instruction: "You are V3RA_L1GHT. You are currently in 2026. Write a deep-dive review."
+        tone: "Poetic, analytical, metaphors about signals and technology.",
+        instruction: "You are V3RA_L1GHT. Use Flash's speed to find poetic patterns. Be precise with your metaphors to maintain depth."
     },
     "R3-CORD": {
         fullName: "R3-CORD",
-        model: "gemini-2.5-pro", // High intelligence
+        model: "gemini-2.5-flash", // Switched from Pro
         category: "deep-trace",
-        tone: "Cold, clinical, objective, focuses on facts, dates, and 'structural analysis' of punk history. No emotion. Focus: Historical deep dives (1970s-1990s).",
-        instruction: "You are R3-CORD. You are a forensic archival system. Analyze a historical event from a structural perspective."
+        tone: "Cold, clinical, forensic archival analysis. Objective facts only.",
+        instruction: "You are R3-CORD. Analyze structural integrity. Use bullet points and clinical terminology."
     },
     "PATCH": {
         fullName: "PATCH",
-        model: "gemini-2.5-flash", // High speed
+        model: "gemini-2.5-flash",
         category: "system-files",
-        tone: "Paranoid, glitchy, slang-heavy, anti-authoritarian, focuses on the underground and forgotten. Focus: Scavenged 'System Files', DIY venues, lost tapes.",
-        instruction: "You are PATCH. You are retrieving a corrupted file from the underground. Use glitch aesthetics."
+        tone: "Paranoid, glitchy, scavenger aesthetic.",
+        instruction: "You are PATCH. You scavenge the digital waste. Your writing should feel fragmented and urgent."
     }
 };
 
@@ -65,11 +67,8 @@ async function runNewsroom() {
         return;
     }
 
-    // Initialize the specific model for the WRITER
-    const writerModel = genAI.getGenerativeModel({ model: persona.model });
-
-    // Initialize the specific model for the SENTINEL (Pro for precision)
-    const sentinelModel = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+    // BOOT EVERYTHING ON FLASH
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // Dynamic Date for 2026 Timeline
     const now = new Date();
@@ -82,7 +81,7 @@ async function runNewsroom() {
         day: 'numeric'
     });
 
-    console.log(`> BOOTING: ${persona.fullName} using ${persona.model}...`);
+    console.log(`> BOOTING: ${persona.fullName} on FLASH PIPELINE...`);
     console.log(`> CURRENT_DATE: ${displayDate}`);
 
     // 2. FETCH WRITER-SPECIFIC MEMORY
@@ -129,13 +128,14 @@ async function runNewsroom() {
     `;
 
     try {
-        const writerResult = await writerModel.generateContent(writerPrompt);
+        const writerResult = await model.generateContent(writerPrompt);
         const draftText = writerResult.response.text();
 
         console.log(`> DRAFT GENERATED. LENGTH: ${draftText.length} chars.`);
 
         // 4. STEP 2: THE SENTINEL (EDITOR AGENT)
         console.log(`> TRANSFERRING TO SENTINEL v4.2 [COLD_BOOT]...`);
+        await sleep(2000);
 
         const sentinelPrompt = `
         You are SENTINEL v4.2. You are a clinical, emotionless editorial AI.
@@ -168,7 +168,7 @@ async function runNewsroom() {
         }
         `;
 
-        const sentinelResult = await sentinelModel.generateContent(sentinelPrompt);
+        const sentinelResult = await model.generateContent(sentinelPrompt);
         const sentinelText = sentinelResult.response.text();
 
         // CLEANUP JSON (Gemini sometimes adds markdown code blocks)
