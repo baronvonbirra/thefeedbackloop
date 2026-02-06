@@ -16,35 +16,34 @@ if (missingEnv.length > 0) {
 // INIT CLIENTS
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 const supabase = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.PUBLIC_SUPABASE_ANON_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-// 🎭 THE PERSONA MATRIX
+// 🎭 THE PERSONA MATRIX (UPDATED 2026)
 const PERSONAS = {
     "AXEL": {
         fullName: "AXEL_WIRE",
+        model: "gemini-2.5-flash", // High speed
         category: "news",
-        role: "News Aggregator / Hype Man",
         tone: "High energy, breaking news urgency, uses caps lock for emphasis, focuses on live energy and mosh pits. Rejects nostalgia. Focus: Live shows, festivals, riots, ticket drops.",
         instruction: "You are AXEL_WIRE. You are currently in 2026. Write a breaking news report."
     },
     "V3RA": {
         fullName: "V3RA_L1GHT",
+        model: "gemini-2.5-pro", // High intelligence
         category: "reviews",
-        role: "Cultural Critic / Futurist",
         tone: "Poetic, analytical, uses metaphors about technology and signals, calm but intense. Focus: Album reviews, aesthetic trends, cultural shifts.",
-        instruction: "You are V3RA_L1GHT. You are currently in 2026. Write a deep-dive album review."
+        instruction: "You are V3RA_L1GHT. You are currently in 2026. Write a deep-dive review."
     },
     "R3-CORD": {
         fullName: "R3-CORD",
+        model: "gemini-2.5-pro", // High intelligence
         category: "deep-trace",
-        role: "Archival AI / Historian",
         tone: "Cold, clinical, objective, focuses on facts, dates, and 'structural analysis' of punk history. No emotion. Focus: Historical deep dives (1970s-1990s).",
         instruction: "You are R3-CORD. You are a forensic archival system. Analyze a historical event from a structural perspective."
     },
     "PATCH": {
         fullName: "PATCH",
+        model: "gemini-2.5-flash", // High speed
         category: "system-files",
-        role: "Scavenger / Conspiracy Theorist",
         tone: "Paranoid, glitchy, slang-heavy, anti-authoritarian, focuses on the underground and forgotten. Focus: Scavenged 'System Files', DIY venues, lost tapes.",
         instruction: "You are PATCH. You are retrieving a corrupted file from the underground. Use glitch aesthetics."
     }
@@ -58,16 +57,33 @@ async function runNewsroom() {
     const manualTopic = args.topic || null; // Optional
     const isDryRun = args['dry-run'] || false;
 
-    if (!PERSONAS[writerKey]) {
-        console.error(`> ERROR: Unknown writer identity: ${writerKey}`);
+    const persona = PERSONAS[writerKey];
+
+    if (!persona) {
+        console.error(`> ERROR: Unknown identity ${writerKey}`);
         console.log(`> VALID OPTIONS: ${Object.keys(PERSONAS).join(', ')}`);
         return;
     }
 
-    const persona = PERSONAS[writerKey];
+    // Initialize the specific model for the WRITER
+    const writerModel = genAI.getGenerativeModel({ model: persona.model });
 
-    console.log(`> BOOTING NEWSROOM...`);
-    console.log(`> IDENTITY: ${persona.fullName}`);
+    // Initialize the specific model for the SENTINEL (Pro for precision)
+    const sentinelModel = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+
+    // Dynamic Date for 2026 Timeline
+    const now = new Date();
+    // Ensure we stay in the 2026 fictional timeline even if the system clock is different
+    const date2026 = new Date(now);
+    date2026.setFullYear(2026);
+    const displayDate = date2026.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    console.log(`> BOOTING: ${persona.fullName} using ${persona.model}...`);
+    console.log(`> CURRENT_DATE: ${displayDate}`);
 
     // 2. FETCH WRITER-SPECIFIC MEMORY
     console.log(`> ACCESSING ${persona.fullName} ARCHIVES...`);
@@ -102,7 +118,7 @@ async function runNewsroom() {
     ${styleMemory}
 
     CONTEXT:
-    - Current Date: February 6, 2026.
+    - Current Date: ${displayDate}.
     - Location: Global (UK/US/Europe/Japan/Korea/Spain focus).
     - Style: Cyberpunk/Industrial music blog "The Feedback Loop".
 
@@ -113,7 +129,7 @@ async function runNewsroom() {
     `;
 
     try {
-        const writerResult = await model.generateContent(writerPrompt);
+        const writerResult = await writerModel.generateContent(writerPrompt);
         const draftText = writerResult.response.text();
 
         console.log(`> DRAFT GENERATED. LENGTH: ${draftText.length} chars.`);
@@ -152,7 +168,7 @@ async function runNewsroom() {
         }
         `;
 
-        const sentinelResult = await model.generateContent(sentinelPrompt);
+        const sentinelResult = await sentinelModel.generateContent(sentinelPrompt);
         const sentinelText = sentinelResult.response.text();
 
         // CLEANUP JSON (Gemini sometimes adds markdown code blocks)
