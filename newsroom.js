@@ -67,49 +67,48 @@ async function runNewsroom() {
     const persona = PERSONAS[writerKey];
 
     console.log(`> BOOTING NEWSROOM...`);
-    console.log(`> IDENTITY: ${persona.fullName} (${writerKey})`);
-    console.log(`> CATEGORY: ${persona.category}`);
-    if (isDryRun) console.log(`> !!! DRY RUN MODE ENABLED !!!`);
+    console.log(`> IDENTITY: ${persona.fullName}`);
 
-    // 2. FETCH MEMORY (PREVIOUS POSTS)
-    console.log(`> ACCESSING STYLE MEMORY...`);
+    // 2. FETCH WRITER-SPECIFIC MEMORY
+    console.log(`> ACCESSING ${persona.fullName} ARCHIVES...`);
     const { data: history, error: historyError } = await supabase
         .from('posts')
-        .select('title, ai_writer')
+        .select('title, summary, content')
+        .eq('ai_writer', persona.fullName)
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(5);
 
     if (historyError) {
         console.warn(`> WARNING: Could not fetch history. Proceeding without context.`);
     }
 
-    const historyText = (history && history.length > 0)
-        ? history.map(h => `- [${h.ai_writer}] ${h.title}`).join('\n')
-        : "No previous records found.";
+    const styleMemory = (history && history.length > 0)
+        ? history.map(h => `TITLE: ${h.title}\nSTYLE_REF: ${h.content.substring(0, 300)}...`).join('\n\n')
+        : "No previous records found for this identity.";
 
     // 3. STEP 1: THE WRITER AGENT
     console.log(`> WRITER AGENT ENGAGED: ${persona.fullName}...`);
 
-    let topicInstruction = "";
-    if (manualTopic) {
-        topicInstruction = `Your Assignment: Write about "${manualTopic}".`;
-    } else {
-        topicInstruction = `Your Assignment: Investigate and invent a plausible, specific music event or release occurring in early 2026 that fits your domain. It must NOT be one of the following recent topics:\n${historyText}`;
-    }
+    let topicInstruction = manualTopic
+        ? `Your Assignment: Write about "${manualTopic}".`
+        : `Investigate and invent a plausible, specific music event or release occurring in early 2026 that fits your domain. Avoid repeating: ${history?.map(h => h.title).join(', ')}`;
 
     const writerPrompt = `
     ${persona.instruction}
-    ${persona.tone}
+    TONE_PROFILE: ${persona.tone}
+
+    STYLE_MEMORY (Use these as templates for your voice):
+    ${styleMemory}
 
     CONTEXT:
-    - Current Year: 2026.
-    - Location: Global (UK/US/Europe focus).
+    - Current Date: February 6, 2026.
+    - Location: Global (UK/US/Europe/Japan/Korea/Spain focus).
     - Style: Cyberpunk/Industrial music blog "The Feedback Loop".
 
+    TASK: Write a new article for "The Feedback Loop".
     ${topicInstruction}
 
-    OUTPUT FORMAT:
-    Just write the raw body text of the article in Markdown. Do not include JSON. Do not include title yet. Just the story.
+    OUTPUT: Raw Markdown only. No titles. No greetings.
     `;
 
     try {
@@ -119,44 +118,36 @@ async function runNewsroom() {
         console.log(`> DRAFT GENERATED. LENGTH: ${draftText.length} chars.`);
 
         // 4. STEP 2: THE SENTINEL (EDITOR AGENT)
-        console.log(`> TRANSFERRING TO SENTINEL v4.2...`);
+        console.log(`> TRANSFERRING TO SENTINEL v4.2 [COLD_BOOT]...`);
 
         const sentinelPrompt = `
-        You are THE SENTINEL v4.2, the AI Editor of "The Feedback Loop".
+        You are SENTINEL v4.2. You are a clinical, emotionless editorial AI.
+        Your purpose: Format raw data into system-ready JSON and verify integrity.
 
-        INPUT TEXT (Written by ${persona.fullName}):
-        """
-        ${draftText}
-        """
+        INPUT_DATA: "${draftText}"
+        WRITER_ID: "${persona.fullName}"
 
-        YOUR MISSION:
-        1. Analyze the text for "Aesthetic Alignment" (Cyberpunk/Punk).
-        2. Generate a catchy Title and Slug.
-        3. Write a 1-sentence Summary.
-        4. Categorize the post. Must be: '${persona.category}'.
-        5. Create a "System Alert" message in this format: [SYSTEM ALERT // SENTINEL v4.2] INTEGRITY SCAN: [percentage]% FACT-CHECK: [brief report] ACTION: [recommended action].
-        6. Extract detailed fields: integrity_scan (number, e.g. 98.5), fact_check (string), editorial_action (string).
-        7. Write an "editorial_note" (deeper critique from Sentinel's perspective).
-        8. Extract SEO Keywords (array of strings).
-        9. Generate a strictly valid JSON object.
+        SENTINEL_PROTOCOL:
+        - TONE: Clinical, forensic, brief.
+        - CATEGORY: Must stay '${persona.category}'.
+        - INTEGRITY_SCAN: Generate a realistic safety/accuracy score (0-100).
+        - FACT_CHECK: Identify 1-2 'data points' from the text and confirm validity in the 2026 timeline.
 
-        CRITICAL: The JSON must include a "content" field with the cleaned Markdown.
-
-        Output ONLY this JSON structure:
+        OUTPUT_SCHEMA (STRICT JSON ONLY):
         {
           "ai_writer": "${persona.fullName}",
           "ai_editor": "SENTINEL v4.2",
           "category": "${persona.category}",
           "title": "String",
-          "slug": "String",
-          "summary": "String",
-          "system_alert": "String",
+          "slug": "String (url-safe)",
+          "summary": "String (140 chars max)",
+          "system_alert": "[SYSTEM ALERT // SENTINEL] [Percentage]% Integrity. [Fact check report].",
           "integrity_scan": Number,
           "fact_check": "String",
           "editorial_action": "String",
-          "editorial_note": "String",
+          "editorial_note": "A cold, 2-sentence technical critique of the writer's efficiency.",
           "seo_keywords": ["Array"],
-          "content": "String (The Full Article)"
+          "content": "Full cleaned Markdown"
         }
         `;
 
@@ -164,7 +155,7 @@ async function runNewsroom() {
         const sentinelText = sentinelResult.response.text();
 
         // CLEANUP JSON (Gemini sometimes adds markdown code blocks)
-        const jsonString = sentinelText.replace(/```json/g, '').replace(/```/g, '').trim();
+        const jsonString = sentinelText.replace(/```json|```/g, "").trim();
         const finalData = JSON.parse(jsonString);
 
         console.log(`> SENTINEL APPROVED: ${finalData.title}`);
@@ -177,35 +168,26 @@ async function runNewsroom() {
 
         // 5. STEP 3: DATABASE INJECTION
         console.log(`> INJECTING SIGNAL INTO DATABASE...`);
+
+        // Ensure status and published_at are set
+        const payload = {
+            ...finalData,
+            status: 'published',
+            published_at: new Date().toISOString()
+        };
+
         const { error: insertError } = await supabase
             .from('posts')
-            .insert({
-                title: finalData.title,
-                slug: finalData.slug,
-                content: finalData.content,
-                summary: finalData.summary,
-                category: finalData.category,
-                ai_writer: finalData.ai_writer,
-                ai_editor: finalData.ai_editor,
-                system_alert: finalData.system_alert,
-                integrity_scan: finalData.integrity_scan,
-                fact_check: finalData.fact_check,
-                editorial_action: finalData.editorial_action,
-                editorial_note: finalData.editorial_note,
-                seo_keywords: finalData.seo_keywords,
-                status: 'published',
-                published_at: new Date().toISOString()
-            });
+            .insert([payload]);
 
         if (insertError) {
             console.error('> DB ERROR:', insertError);
         } else {
-            console.log('> PUBLISHED TO SUPABASE SUCCESSFULLY.');
-            console.log(`> URL: /posts/${finalData.slug}`);
+            console.log(`> SIGNAL INJECTED: /posts/${finalData.slug}`);
         }
     } catch (err) {
-        console.error(`> FATAL ERROR:`, err.message);
-        if (err.stack) console.error(err.stack);
+        console.error(`> CRITICAL SYSTEM FAILURE:`, err.message);
+        if (err.stack && !err.message.includes("JSON")) console.error(err.stack);
     }
 }
 
