@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import minimist from 'minimist';
 
 // VALIDATE ENV
-const REQUIRED_ENV = ['GOOGLE_API_KEY', 'SUPABASE_URL', 'SUPABASE_KEY'];
+const REQUIRED_ENV = ['GOOGLE_API_KEY', 'PUBLIC_SUPABASE_URL', 'PUBLIC_SUPABASE_ANON_KEY'];
 const missingEnv = REQUIRED_ENV.filter(key => !process.env[key]);
 
 if (missingEnv.length > 0) {
@@ -15,7 +15,7 @@ if (missingEnv.length > 0) {
 
 // INIT CLIENTS
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const supabase = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.PUBLIC_SUPABASE_ANON_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 // 🎭 THE PERSONA MATRIX
