@@ -82,8 +82,9 @@ async function runNewsroom() {
         console.warn(`> WARNING: Could not fetch history. Proceeding without context.`);
     }
 
+    // Feeding the whole article as context per user request
     const styleMemory = (history && history.length > 0)
-        ? history.map(h => `TITLE: ${h.title}\nSTYLE_REF: ${h.content.substring(0, 300)}...`).join('\n\n')
+        ? history.map(h => `TITLE: ${h.title}\nSTYLE_REF:\n${h.content}`).join('\n\n---\n\n')
         : "No previous records found for this identity.";
 
     // 3. STEP 1: THE WRITER AGENT
@@ -97,7 +98,7 @@ async function runNewsroom() {
     ${persona.instruction}
     TONE_PROFILE: ${persona.tone}
 
-    STYLE_MEMORY (Use these as templates for your voice):
+    STYLE_MEMORY (Use these as templates for your voice, pay attention to how articles are closed):
     ${styleMemory}
 
     CONTEXT:
@@ -169,11 +170,14 @@ async function runNewsroom() {
         // 5. STEP 3: DATABASE INJECTION
         console.log(`> INJECTING SIGNAL INTO DATABASE...`);
 
-        // Ensure status and published_at are set
+        // Set published_at to 7 days in the future
+        const publishDate = new Date();
+        publishDate.setDate(publishDate.getDate() + 7);
+
         const payload = {
             ...finalData,
             status: 'published',
-            published_at: new Date().toISOString()
+            published_at: publishDate.toISOString()
         };
 
         const { error: insertError } = await supabase
@@ -184,6 +188,7 @@ async function runNewsroom() {
             console.error('> DB ERROR:', insertError);
         } else {
             console.log(`> SIGNAL INJECTED: /posts/${finalData.slug}`);
+            console.log(`> SCHEDULED FOR: ${publishDate.toISOString()}`);
         }
     } catch (err) {
         console.error(`> CRITICAL SYSTEM FAILURE:`, err.message);
