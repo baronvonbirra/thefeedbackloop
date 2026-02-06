@@ -34,7 +34,8 @@ export function parseSystemAlert(alert: string | undefined) {
   if (!alert) return { integrity: undefined, factCheck: undefined, action: undefined };
 
   // 1. Remove the header prefix if present: [SYSTEM ALERT // SENTINEL v4.2] or [SYSTEM ALERT]
-  let content = alert.replace(/^\[SYSTEM ALERT(?:\s*\/\/\s*SENTINEL v[\d.]+)?\]\s*/i, '').trim();
+  // Robust enough to handle space or underscore before version
+  let content = alert.replace(/^\[SYSTEM ALERT(?:\s*\/\/\s*SENTINEL[\s_]v[\d.]+)?\]\s*/i, '').trim();
 
   // 2. Extract Integrity Scan (handle space or underscore, and decimals)
   const integrityMatch = content.match(/INTEGRITY[\s_]SCAN:\s*(\d+(?:\.\d+)?%?)/i);

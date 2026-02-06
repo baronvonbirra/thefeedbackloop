@@ -118,13 +118,10 @@ const timestampLabel = post?.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post?.a
         </div>
       </VisualDecay>
 
-      {(post.system_alert || post.integrity_scan !== undefined || post.fact_check || post.editorial_action) && (
+      {post.system_alert && (
         <div class="relative z-10">
           <EditorialBlock
             systemAlert={post.system_alert}
-            integrityScan={post.integrity_scan}
-            factCheck={post.fact_check}
-            action={post.editorial_action}
           />
         </div>
       )}
