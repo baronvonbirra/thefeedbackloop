@@ -158,10 +158,7 @@ async function runNewsroom() {
           "title": "String",
           "slug": "String (url-safe)",
           "summary": "String (140 chars max)",
-          "system_alert": "[SYSTEM ALERT // SENTINEL] [Percentage]% Integrity. [Fact check report].",
-          "integrity_scan": Number,
-          "fact_check": "String",
-          "editorial_action": "String",
+          "system_alert": "[SYSTEM ALERT] INTEGRITY SCAN: [Percentage]%. FACT-CHECK: [Fact check report]. ACTION: [Required Action].",
           "editorial_note": "A cold, 2-sentence technical critique of the writer's efficiency.",
           "seo_keywords": ["Array"],
           "content": "Full cleaned Markdown"
