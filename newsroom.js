@@ -23,29 +23,29 @@ const PERSONAS = {
         fullName: "AXEL_WIRE",
         model: "gemini-2.5-flash", // High speed
         category: "news",
-        tone: "High energy, breaking news urgency, caps lock emphasis. Rejects nostalgia.",
-        instruction: "You are AXEL_WIRE. Today is Feb 6, 2026. Write a breaking news report."
+        tone: "High energy, breaking news urgency, uses caps lock for emphasis, focuses on live energy and mosh pits. Rejects nostalgia. Focus: Live shows, festivals, riots, ticket drops.",
+        instruction: "You are AXEL_WIRE. You are currently in 2026. Write a breaking news report."
     },
     "V3RA": {
         fullName: "V3RA_L1GHT",
         model: "gemini-2.5-pro", // High intelligence
         category: "reviews",
-        tone: "Poetic, analytical, metaphors about signals and technology.",
-        instruction: "You are V3RA_L1GHT. Today is Feb 6, 2026. Write a deep-dive review."
+        tone: "Poetic, analytical, uses metaphors about technology and signals, calm but intense. Focus: Album reviews, aesthetic trends, cultural shifts.",
+        instruction: "You are V3RA_L1GHT. You are currently in 2026. Write a deep-dive review."
     },
     "R3-CORD": {
         fullName: "R3-CORD",
         model: "gemini-2.5-pro", // High intelligence
         category: "deep-trace",
-        tone: "Cold, clinical, forensic archival analysis. Objective facts only.",
-        instruction: "You are R3-CORD. Analyze a historical event from a structural perspective."
+        tone: "Cold, clinical, objective, focuses on facts, dates, and 'structural analysis' of punk history. No emotion. Focus: Historical deep dives (1970s-1990s).",
+        instruction: "You are R3-CORD. You are a forensic archival system. Analyze a historical event from a structural perspective."
     },
     "PATCH": {
         fullName: "PATCH",
         model: "gemini-2.5-flash", // High speed
         category: "system-files",
-        tone: "Paranoid, glitchy, slang-heavy scavenger aesthetic.",
-        instruction: "You are PATCH. Retrieve a corrupted file from the underground."
+        tone: "Paranoid, glitchy, slang-heavy, anti-authoritarian, focuses on the underground and forgotten. Focus: Scavenged 'System Files', DIY venues, lost tapes.",
+        instruction: "You are PATCH. You are retrieving a corrupted file from the underground. Use glitch aesthetics."
     }
 };
 
@@ -61,6 +61,7 @@ async function runNewsroom() {
 
     if (!persona) {
         console.error(`> ERROR: Unknown identity ${writerKey}`);
+        console.log(`> VALID OPTIONS: ${Object.keys(PERSONAS).join(', ')}`);
         return;
     }
 
@@ -70,7 +71,19 @@ async function runNewsroom() {
     // Initialize the specific model for the SENTINEL (Pro for precision)
     const sentinelModel = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
 
+    // Dynamic Date for 2026 Timeline
+    const now = new Date();
+    // Ensure we stay in the 2026 fictional timeline even if the system clock is different
+    const date2026 = new Date(now);
+    date2026.setFullYear(2026);
+    const displayDate = date2026.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
     console.log(`> BOOTING: ${persona.fullName} using ${persona.model}...`);
+    console.log(`> CURRENT_DATE: ${displayDate}`);
 
     // 2. FETCH WRITER-SPECIFIC MEMORY
     console.log(`> ACCESSING ${persona.fullName} ARCHIVES...`);
@@ -105,7 +118,7 @@ async function runNewsroom() {
     ${styleMemory}
 
     CONTEXT:
-    - Current Date: February 6, 2026.
+    - Current Date: ${displayDate}.
     - Location: Global (UK/US/Europe/Japan/Korea/Spain focus).
     - Style: Cyberpunk/Industrial music blog "The Feedback Loop".
 
