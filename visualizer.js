@@ -29,7 +29,7 @@ const ISO_GHO5T_STYLE = [
 
 async function generateVisualPrompt(post) {
     console.log(`> CONSULTING VISUAL DIRECTOR FOR: "${post.title}" [WRITER: ${post.ai_writer}]...`);
-    const directorModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const directorModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const writerStyles = {
         "AXEL_WIRE": "Aggressive high-contrast red and black palette, kinetic motion blur, mosh pit energy, jagged glitch edges.",
@@ -69,17 +69,21 @@ async function generateAndUploadImage(post) {
         const customPrompt = await generateVisualPrompt(post);
         console.log(`> ISO_GHO5T DIRECTOR CHOSE: ${customPrompt}`);
 
-        const encodedPrompt = encodeURIComponent(customPrompt);
-        const generationUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}`;
+        console.log(`> SENDING SIGNAL TO GENERATOR NODES [MODEL: gemini-2.5-flash-image]...`);
 
-        console.log(`> SENDING SIGNAL TO GENERATOR NODES...`);
+        // 4. GENERATE IMAGE VIA GEMINI API
+        const imageModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash-image" });
+        const result = await imageModel.generateContent(customPrompt);
 
-        // 4. FETCH RAW IMAGE DATA
-        const response = await fetch(generationUrl);
-        if (!response.ok) throw new Error(`Generation failed: ${response.statusText}`);
+        const response = await result.response;
+        const candidate = response.candidates?.[0];
+        const imagePart = candidate?.content?.parts?.find(p => p.inlineData);
 
-        const arrayBuffer = await response.arrayBuffer();
-        const fileBuffer = Buffer.from(arrayBuffer);
+        if (!imagePart || !imagePart.inlineData) {
+            throw new Error("No image data returned from Gemini API");
+        }
+
+        const fileBuffer = Buffer.from(imagePart.inlineData.data, 'base64');
         console.log(`> ASSET RETRIEVED. SIZE: ${fileBuffer.length} bytes.`);
 
         // 5. UPLOAD TO SUPABASE STORAGE
