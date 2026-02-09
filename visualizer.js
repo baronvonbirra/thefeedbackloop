@@ -4,9 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // 1. SETUP CLIENTS
-// Use names consistent with the project's environment variables.
 const supabaseUrl = process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-// Preferred: Service Role Key for uploads. Fallback: Anon Key.
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.PUBLIC_SUPABASE_ANON_KEY;
 const googleApiKey = process.env.GOOGLE_API_KEY;
 
@@ -31,10 +29,8 @@ const ISO_GHO5T_STYLE = [
 
 async function generateVisualPrompt(post) {
     console.log(`> CONSULTING VISUAL DIRECTOR FOR: "${post.title}" [WRITER: ${post.ai_writer}]...`);
-    // We use the text model to 'direct' the image model
     const directorModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    // 🎨 WRITER-SPECIFIC AESTHETIC OVERRIDES
     const writerStyles = {
         "AXEL_WIRE": "Aggressive high-contrast red and black palette, kinetic motion blur, mosh pit energy, jagged glitch edges.",
         "V3RA_L1GHT": "Ethereal Miami-sunset palette (cyan, hot pink, deep purple), fluid data streams, bokeh light artifacts, clean pixel geometry.",
@@ -67,38 +63,13 @@ async function generateVisualPrompt(post) {
     }
 }
 
-async function runVisualizer() {
-    console.log("> BOOTING ISO_GHO5T VISUAL PROTOCOL [V3: WRITER MAPPING]...");
-
-    // 2. FIND TARGET: Get the newest post that DOES NOT have an image yet.
-    const { data: posts, error } = await supabase
-        .from('posts')
-        .select('id, title, summary, slug, ai_writer')
-        .is('image_url', null)
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-    if (error) {
-        console.error("> DB ERROR:", error.message);
-        return;
-    }
-
-    if (!posts || posts.length === 0) {
-        console.log("> SYSTEM SCAN COMPLETE: No visualizations pending. Sleep mode.");
-        return;
-    }
-
-    const post = posts[0];
-    console.log(`> TARGET ACQUIRED: "${post.title}"`);
-
+async function generateAndUploadImage(post) {
     try {
         // 3. CONSTRUCT THE PROMPT VIA DIRECTOR
         const customPrompt = await generateVisualPrompt(post);
         console.log(`> ISO_GHO5T DIRECTOR CHOSE: ${customPrompt}`);
 
         const encodedPrompt = encodeURIComponent(customPrompt);
-
-        // Use Pollinations.ai (Fast, free, good for this aesthetic)
         const generationUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}`;
 
         console.log(`> SENDING SIGNAL TO GENERATOR NODES...`);
@@ -145,13 +116,46 @@ async function runVisualizer() {
 
         if (updateError) throw updateError;
 
-        console.log("> PROTOCOL COMPLETE. VISUALIZATION ACTIVE.");
-
+        console.log(`> PROTOCOL COMPLETE FOR "${post.title}". VISUALIZATION ACTIVE.`);
     } catch (err) {
-        // SAFETY MATCH: Log error but don't crash.
-        // We don't update image_url so it will be retried.
-        console.error(`> CRITICAL FAILURE IN ISO_GHO5T:`, err.message);
+        console.error(`> FAILURE IN ISO_GHO5T FOR "${post.title}":`, err.message);
     }
+}
+
+async function runVisualizer() {
+    console.log("> BOOTING ISO_GHO5T VISUAL PROTOCOL [V4: BATCH PROCESSING]...");
+
+    // 2. FIND TARGETS: Get up to 3 posts that DO NOT have an image yet.
+    const { data: posts, error } = await supabase
+        .from('posts')
+        .select('id, title, summary, slug, ai_writer')
+        .is('image_url', null)
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+    if (error) {
+        console.error("> DB ERROR:", error.message);
+        return;
+    }
+
+    if (!posts || posts.length === 0) {
+        console.log("> SYSTEM SCAN COMPLETE: No visualizations pending. Sleep mode.");
+        return;
+    }
+
+    console.log(`> BATCH ACQUIRED: ${posts.length} targets found.`);
+
+    for (const post of posts) {
+        console.log(`> INITIATING GENERATION SEQUENCE FOR: "${post.title}"`);
+        await generateAndUploadImage(post);
+
+        if (posts.indexOf(post) < posts.length - 1) {
+            console.log("> COOLING DOWN GENERATOR NODES (5s)...");
+            await new Promise(res => setTimeout(res, 5000));
+        }
+    }
+
+    console.log("> ALL BATCH PROTOCOLS EXECUTED.");
 }
 
 runVisualizer();
