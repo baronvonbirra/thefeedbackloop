@@ -41,3 +41,13 @@ jobs:
 
           # 3. Run the script with the selected writer
           node newsroom.js --writer=$selected_writer
+
+      - name: Run ISO_GHO5T Visualizer
+        env:
+          # We only need Supabase keys for this step
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          # Note: If you have a separate SUPABASE_SERVICE_ROLE_KEY secret, use that here instead of SUPABASE_KEY for better permission handling.
+        run: |
+          echo "Starting visual artifact generation..."
+          node visualizer.js
