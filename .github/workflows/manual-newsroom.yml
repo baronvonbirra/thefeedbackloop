@@ -28,6 +28,7 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
           PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
           if [ -n "${{ github.event.inputs.writer }}" ]; then
             node newsroom.js --writer=${{ github.event.inputs.writer }}
