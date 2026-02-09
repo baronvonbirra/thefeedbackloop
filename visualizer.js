@@ -16,7 +16,7 @@ if (!supabaseUrl || !supabaseServiceKey || !googleApiKey) {
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 const genAI = new GoogleGenerativeAI(googleApiKey);
 
-// 🎨 ISO_GHO5T STYLE MATRIX
+// 🎨 ISO_GHO5T STYLE MATRIX (Global defaults)
 const ISO_GHO5T_STYLE = [
     "cyberpunk aesthetic",
     "32-bit pixel art",
@@ -24,28 +24,36 @@ const ISO_GHO5T_STYLE = [
     "digital glitch artifacts",
     "low-fidelity surveillance footage aesthetic",
     "data corruption overlays",
-    "heavy grain and noise",
-    "restricted neon palette (green, purple, cyan, deep black)"
+    "heavy grain and noise"
 ].join(", ");
 
 async function generateVisualPrompt(post) {
-    console.log(`> CONSULTING VISUAL DIRECTOR FOR: "${post.title}"...`);
+    console.log(`> CONSULTING VISUAL DIRECTOR FOR: "${post.title}" [WRITER: ${post.ai_writer}]...`);
     // We use the text model to 'direct' the image model
     const directorModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
+    // 🎨 WRITER-SPECIFIC AESTHETIC OVERRIDES
+    const writerStyles = {
+        "AXEL_WIRE": "Aggressive high-contrast red and black palette, kinetic motion blur, mosh pit energy, jagged glitch edges.",
+        "V3RA_L1GHT": "Ethereal Miami-sunset palette (cyan, hot pink, deep purple), fluid data streams, bokeh light artifacts, clean pixel geometry.",
+        "R3-CORD": "Desaturated monochromatic B&W, archival film grain, brutalist architecture, clinical technical diagrams, high-static distortion.",
+        "PATCH": "Night-vision green tint, heavy digital noise, CCTV surveillance aesthetic, fragmented 'lost' data, low-res scavenging vibe."
+    };
+
+    const specificStyle = writerStyles[post.ai_writer] || "Standard cyberpunk neon palette (green, purple, cyan, deep black).";
+
     const directorPrompt = `
-      You are the Visual Director for the ISO_GHO5T system.
-      Read this article summary: "${post.summary}"
+      Act as ISO_GHO5T, the Visual Director.
+      Subject: "${post.summary}"
+      Writer Style: "${specificStyle}"
 
-      Create a highly descriptive, 1-sentence visual prompt for an image generator.
-      Focus on a single striking subject related to the summary.
+      CORE ISO_GHO5T RULES (MANDATORY):
+      - ${ISO_GHO5T_STYLE}
+      - CRT monitor scanlines and slight curvature.
+      - Subtle glitch artifacts.
+      - Never show faces clearly; focus on atmosphere, tech, and environment.
 
-      CRITICAL AESTHETIC RULES:
-      - Style: ${ISO_GHO5T_STYLE}.
-      - Lighting: Harsh neon, high contrast shadows.
-      - Mood: Cold, mechanical, or chaotic punk.
-
-      Example Output: "A pixel-art close up of a circuit board dripping with glowing purple neon liquid, CRT distortion."
+      OUTPUT: A single 1-sentence prompt for a generative model.
     `;
 
     try {
@@ -53,17 +61,17 @@ async function generateVisualPrompt(post) {
         return result.response.text().trim();
     } catch (err) {
         console.warn(`> DIRECTOR FAILED: ${err.message}. Falling back to default prompt.`);
-        return `${post.summary}. STYLE: ${ISO_GHO5T_STYLE}`;
+        return `${post.summary}. STYLE: ${ISO_GHO5T_STYLE}, ${specificStyle}`;
     }
 }
 
 async function runVisualizer() {
-    console.log("> BOOTING ISO_GHO5T VISUAL PROTOCOL [V2: DIRECTOR MODE]...");
+    console.log("> BOOTING ISO_GHO5T VISUAL PROTOCOL [V3: WRITER MAPPING]...");
 
     // 2. FIND TARGET: Get the newest post that DOES NOT have an image yet.
     const { data: posts, error } = await supabase
         .from('posts')
-        .select('id, title, summary, slug')
+        .select('id, title, summary, slug, ai_writer') // Added ai_writer
         .is('image_url', null)
         .order('created_at', { ascending: false })
         .limit(1);
