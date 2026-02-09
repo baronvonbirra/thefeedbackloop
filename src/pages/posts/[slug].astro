@@ -47,8 +47,7 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
 	day: 'numeric',
 }) : '';
 
-const localImagePath = post ? `${import.meta.env.BASE_URL}/images/posts/${post.slug}.png`.replace(/\/+/g, '/') : '';
-const displayImageUrl = post?.image_url || localImagePath;
+const displayImageUrl = post?.image_url || 'https://image.pollinations.ai/prompt/static%20noise%20CRT%20screen%20glitch%20cyberpunk%20aesthetic?width=800&height=600&nologo=true';
 
 const theme = post?.category === 'deep-trace' ? 'vault-green' : post?.category === 'system-files' ? 'vault-yellow' : undefined;
 const timestampLabel = post?.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post?.ai_writer === 'PATCH' ? 'SIGNAL_FOUND' : '';
@@ -151,8 +150,7 @@ const timestampLabel = post?.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post?.a
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {relatedPosts.map((rp) => {
-              const rpImagePath = `${import.meta.env.BASE_URL}/images/posts/${rp.slug}.png`.replace(/\/+/g, '/');
-              const rpImageUrl = rp.image_url || rpImagePath;
+              const rpImageUrl = rp.image_url || 'https://image.pollinations.ai/prompt/static%20noise%20CRT%20screen%20glitch%20cyberpunk%20aesthetic?width=400&height=300&nologo=true';
               return (
                 <a href={`${import.meta.env.BASE_URL}/posts/${rp.slug}`.replace(/\/+/g, '/')} class="group block relative overflow-hidden border border-foreground/20 hover:border-accent transition-colors bg-neutral-900">
                   <div class="radar-sweep"></div>

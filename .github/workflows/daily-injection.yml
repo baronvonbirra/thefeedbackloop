@@ -1,43 +1,79 @@
-name: Daily Content Injection
+name: "Daily Content & Visual Injection"
 
 on:
   schedule:
-    # Runs at 09:00 UTC every day
-    - cron: '0 9 * * *'
-  # Allows you to run this manually from the Actions tab for testing
+    - cron: '0 8 * * *' # 08:00 UTC Daily
   workflow_dispatch:
+    inputs:
+      run_mode:
+        description: 'Choose Execution Mode'
+        required: true
+        default: 'full_loop'
+        type: choice
+        options:
+          - full_loop
+          - writer_only
+          - visualizer_only
 
 jobs:
-  inject-content:
+  automation:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install Dependencies
         run: npm ci
 
+      # --- STEP 1: THE NEWSROOM (Writer) ---
+      # Runs on schedule OR when full_loop/writer_only is selected
       - name: Run Newsroom Script
+        if: |
+          github.event_name == 'schedule' ||
+          github.event.inputs.run_mode == 'full_loop' ||
+          github.event.inputs.run_mode == 'writer_only'
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
           PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
         run: |
           # 1. Define the list of personas
-          personas=("AXEL" "V3RA" "R3-CORD" "PATCH")
+          personas=("AXEL_WIRE" "V3RA_L1GHT" "R3-CORD" "PATCH")
 
           # 2. Pick a random index
           size=${#personas[@]}
           index=$(($RANDOM % $size))
           selected_writer=${personas[$index]}
 
-          echo "Selected Persona for Today: $selected_writer"
+          echo "Selected Persona: $selected_writer"
 
           # 3. Run the script with the selected writer
           node newsroom.js --writer=$selected_writer
+
+      # --- THE 60-SECOND COOL DOWN ---
+      # Runs on schedule OR when full_loop is selected
+      - name: Wait for Database Sync
+        if: |
+          github.event_name == 'schedule' ||
+          github.event.inputs.run_mode == 'full_loop'
+        run: sleep 60s
+        shell: bash
+
+      # --- STEP 2: ISO_GHO5T (Visualizer) ---
+      # Runs on schedule OR when full_loop/visualizer_only is selected
+      - name: Run ISO_GHO5T Visualizer
+        if: |
+          github.event_name == 'schedule' ||
+          github.event.inputs.run_mode == 'full_loop' ||
+          github.event.inputs.run_mode == 'visualizer_only'
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: node visualizer.js

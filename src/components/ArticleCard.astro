@@ -10,10 +10,8 @@ interface Props {
 
 const { post, fullImage = false } = Astro.props;
 
-const localImagePath = `${import.meta.env.BASE_URL}/images/posts/${post.slug}.png`.replace(/\/+/g, '/');
-// If image_url starts with http, it's external. If it's missing or just a filename, we can try to use it.
-// For now, we'll favor the local path if it exists (by convention), otherwise fallback to DB's image_url.
-const displayImageUrl = post.image_url || localImagePath;
+// Use the image_url from Supabase. Fallback to a thematic placeholder if missing.
+const displayImageUrl = post.image_url || 'https://image.pollinations.ai/prompt/static%20noise%20CRT%20screen%20glitch%20cyberpunk%20aesthetic?width=600&height=400&nologo=true';
 const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
 	year: 'numeric',
 	month: 'short',
