@@ -8,6 +8,11 @@
     <span class="blinking-cursor">_</span>
   </div>
 
+  <div class="flex items-center gap-2 md:gap-4 border-x border-neutral-800 px-2 md:px-4 mx-2">
+    <button id="log-prev" class="opacity-50 hover:opacity-100 disabled:opacity-10 cursor-pointer font-bold">[PREV]</button>
+    <button id="log-next" class="opacity-50 hover:opacity-100 disabled:opacity-10 cursor-pointer font-bold">[NEXT]</button>
+  </div>
+
   <div class="flex items-center gap-4 opacity-70">
     <span class="hidden sm:inline">UPTIME: <span id="uptime-counter">000d 00h 00m 00s</span></span>
     <span class="hidden md:inline text-accent-orange">GLOBAL_THREAT_LEVEL: ELEVATED</span>
@@ -27,18 +32,24 @@
 </style>
 
 <script>
+  let pageIndex = 0;
+  const pageSize = 5;
+
   function updateSessionLog(action: string) {
     let history = JSON.parse(sessionStorage.getItem('terminal_history') || '[]');
     history.push(action);
-    if (history.length > 3) {
-      history = history.slice(-3);
+    if (history.length > 50) {
+      history = history.slice(-50);
     }
     sessionStorage.setItem('terminal_history', JSON.stringify(history));
+    pageIndex = 0; // Reset to latest
     renderHistory();
   }
 
   function renderHistory() {
     const container = document.getElementById('session-log-content');
+    const prevBtn = document.getElementById('log-prev') as HTMLButtonElement;
+    const nextBtn = document.getElementById('log-next') as HTMLButtonElement;
     if (!container) return;
 
     let history = JSON.parse(sessionStorage.getItem('terminal_history') || '[]');
@@ -46,10 +57,41 @@
       history = ['USER_IP: [MASKED] :: CONNECTED'];
     }
 
-    // On very small screens, only show the last 1 or 2 items
-    const displayHistory = window.innerWidth < 480 ? history.slice(-1) : history;
+    const totalItems = history.length;
+    const maxPages = Math.ceil(totalItems / pageSize);
+
+    if (prevBtn) prevBtn.disabled = pageIndex >= maxPages - 1;
+    if (nextBtn) nextBtn.disabled = pageIndex <= 0;
+
+    const end = totalItems - (pageIndex * pageSize);
+    const start = Math.max(0, end - pageSize);
+
+    let displayHistory = history.slice(start, end);
+
+    if (window.innerWidth < 480) {
+      displayHistory = displayHistory.slice(-1);
+    }
 
     container.innerHTML = displayHistory.map(h => `<span class="opacity-80">> ${h}</span>`).join('<span class="opacity-30">::</span>');
+  }
+
+  // Event Listeners for Pagination
+  function setupPagination() {
+    document.getElementById('log-prev')?.addEventListener('click', () => {
+      const history = JSON.parse(sessionStorage.getItem('terminal_history') || '[]');
+      const maxPages = Math.ceil(history.length / pageSize);
+      if (pageIndex < maxPages - 1) {
+        pageIndex++;
+        renderHistory();
+      }
+    });
+
+    document.getElementById('log-next')?.addEventListener('click', () => {
+      if (pageIndex > 0) {
+        pageIndex--;
+        renderHistory();
+      }
+    });
   }
 
   // Telemetry Logic
@@ -108,9 +150,11 @@
     renderHistory();
     fetchIP();
     startUptime();
+    setupPagination();
   });
   document.addEventListener('astro:page-load', () => {
     renderHistory();
     startUptime();
+    setupPagination();
   });
 </script>

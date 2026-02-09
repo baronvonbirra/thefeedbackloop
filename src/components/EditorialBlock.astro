@@ -6,9 +6,10 @@ interface Props {
   integrityScan?: number;
   factCheck?: string;
   action?: string;
+  analysis?: string;
 }
 
-const { systemAlert, integrityScan, factCheck, action } = Astro.props;
+const { systemAlert, integrityScan, factCheck, action, analysis } = Astro.props;
 
 // Parse systemAlert if provided
 const parsed = parseSystemAlert(systemAlert);
@@ -17,13 +18,15 @@ const parsed = parseSystemAlert(systemAlert);
 const displayIntegrity = integrityScan ?? parsed.integrity ?? (systemAlert ? 100 : undefined);
 
 // If we have parsed any specific field from systemAlert, we should avoid showing the whole thing as fallback
-const hasParsedFields = parsed.integrity !== undefined || parsed.factCheck !== undefined || parsed.action !== undefined;
+const hasParsedFields = parsed.integrity !== undefined || parsed.factCheck !== undefined || parsed.action !== undefined || parsed.analysis !== undefined;
 
 const displayFactCheck = factCheck || parsed.factCheck || (!hasParsedFields && systemAlert ? systemAlert : '');
 const displayAction = action || parsed.action || '';
+const displayAnalysis = analysis || parsed.analysis || '';
 
 const factCheckHtml = await parseMarkdown(displayFactCheck, true);
 const actionHtml = await parseMarkdown(displayAction, true);
+const analysisHtml = await parseMarkdown(displayAnalysis, true);
 ---
 
 <div class="mt-12 border-2 border-orange-600/50 bg-orange-950/10 p-6 font-mono text-[10px] relative overflow-hidden group">
@@ -70,6 +73,14 @@ const actionHtml = await parseMarkdown(displayAction, true);
         <span class="text-orange-600 font-bold shrink-0 uppercase tracking-tighter">Fact-Check:</span>
         <span class="text-orange-200/80 leading-relaxed italic">
           <Fragment set:html={factCheckHtml} />
+        </span>
+      </div>
+    )}
+    {displayAnalysis && (
+      <div class="flex gap-4 items-start">
+        <span class="text-orange-600 font-bold shrink-0 uppercase tracking-tighter">Analysis:</span>
+        <span class="text-orange-200/80 leading-relaxed">
+          <Fragment set:html={analysisHtml} />
         </span>
       </div>
     )}

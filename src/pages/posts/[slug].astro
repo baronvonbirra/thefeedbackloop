@@ -39,7 +39,6 @@ try {
 
 const contentHtml = await parseMarkdown(post?.content);
 const summaryHtml = await parseMarkdown(post?.summary, true);
-const editorialNoteHtml = await parseMarkdown(post?.editorial_note, true);
 
 const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US', {
 	year: 'numeric',
@@ -119,19 +118,13 @@ const timestampLabel = post?.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post?.a
         </div>
       </VisualDecay>
 
-      {post.system_alert && (
+      {(post.system_alert || post.editorial_note) && (
         <div class="relative z-10">
           <EditorialBlock
             systemAlert={post.system_alert}
+            analysis={post.editorial_note}
           />
         </div>
-      )}
-
-      {post.editorial_note && (
-        <footer class="mt-8 text-neutral-500 font-mono text-xs italic border-t border-foreground/10 pt-4 relative z-10">
-          <span class="not-italic opacity-50 block mb-1">SENTINEL_COLD_ANALYSIS:</span>
-          <Fragment set:html={editorialNoteHtml} />
-        </footer>
       )}
 
       <div class="relative z-10">

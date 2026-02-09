@@ -31,7 +31,7 @@ export const parseMarkdown = async (content: string | undefined, inline = false)
  * Parses a system alert string to extract integrity scan %, fact-check, and action.
  */
 export function parseSystemAlert(alert: string | undefined) {
-  if (!alert) return { integrity: undefined, factCheck: undefined, action: undefined };
+  if (!alert) return { integrity: undefined, factCheck: undefined, action: undefined, analysis: undefined };
 
   // 1. Remove the header prefix if present: [SYSTEM ALERT // SENTINEL v4.2] or [SYSTEM ALERT]
   // Robust enough to handle space or underscore before version
@@ -50,7 +50,7 @@ export function parseSystemAlert(alert: string | undefined) {
 
   // 3. Extract Fact-Check
   // Look for FACT-CHECK: and capture everything until the next marker or end of string
-  const nextMarkerLookahead = /(?=(?:ACTION:|NOTE:|INTEGRITY[\s_]SCAN:|\]\s*\[|$))/i;
+  const nextMarkerLookahead = /(?=(?:ACTION:|NOTE:|ANALYSIS:|INTEGRITY[\s_]SCAN:|\]\s*\[|$))/i;
 
   const factCheckMatch = content.match(new RegExp(`FACT-CHECK:\\s*(.*?)${nextMarkerLookahead.source}`, 'si'));
   let factCheck: string | undefined = undefined;
@@ -59,7 +59,15 @@ export function parseSystemAlert(alert: string | undefined) {
     content = content.replace(factCheckMatch[0], '').trim();
   }
 
-  // 4. Extract Action or Note
+  // 4. Extract Analysis
+  const analysisMatch = content.match(new RegExp(`ANALYSIS:\\s*(.*?)${nextMarkerLookahead.source}`, 'si'));
+  let analysis: string | undefined = undefined;
+  if (analysisMatch) {
+    analysis = analysisMatch[1].trim();
+    content = content.replace(analysisMatch[0], '').trim();
+  }
+
+  // 5. Extract Action or Note
   const actionMatch = content.match(/(?:ACTION|NOTE):\s*(.*)/si);
   let action: string | undefined = undefined;
   if (actionMatch) {
@@ -67,7 +75,7 @@ export function parseSystemAlert(alert: string | undefined) {
     content = content.replace(actionMatch[0], '').trim();
   }
 
-  // 5. Fallback: Any remaining content becomes Action
+  // 6. Fallback: Any remaining content becomes Action
   if (content.length > 0) {
     const remaining = content.trim().replace(/^[.\s,]+|[.\s,]+$/g, '');
     if (remaining.length > 0) {
@@ -79,7 +87,7 @@ export function parseSystemAlert(alert: string | undefined) {
     }
   }
 
-  return { integrity, factCheck, action };
+  return { integrity, factCheck, action, analysis };
 }
 
 /**
