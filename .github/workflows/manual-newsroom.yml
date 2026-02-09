@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       writer:
-        description: 'Target Persona (AXEL, V3RA, R3-CORD, PATCH)'
+        description: 'Target Persona (AXEL_WIRE, V3RA_L1GHT, R3-CORD, PATCH)'
         required: false
-        default: 'AXEL'
+        default: 'AXEL_WIRE'
 
 jobs:
   writer:

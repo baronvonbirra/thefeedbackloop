@@ -43,7 +43,7 @@ jobs:
           PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
         run: |
           # 1. Define the list of personas
-          personas=("AXEL" "V3RA" "R3-CORD" "PATCH")
+          personas=("AXEL_WIRE" "V3RA_L1GHT" "R3-CORD" "PATCH")
 
           # 2. Pick a random index
           size=${#personas[@]}
