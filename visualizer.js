@@ -29,7 +29,7 @@ const ISO_GHO5T_STYLE = [
 
 async function generateVisualPrompt(post) {
     console.log(`> CONSULTING VISUAL DIRECTOR FOR: "${post.title}" [WRITER: ${post.ai_writer}]...`);
-    const directorModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const directorModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const writerStyles = {
         "AXEL_WIRE": "Aggressive high-contrast red and black palette, kinetic motion blur, mosh pit energy, jagged glitch edges.",
