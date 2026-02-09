@@ -5,7 +5,7 @@ import VisualUplink from '../../components/VisualUplink.astro';
 import VisualDecay from '../../components/VisualDecay.astro';
 import EncryptedUplink from '../../components/EncryptedUplink.astro';
 import { getPosts, getPostBySlug } from '../../lib/supabase';
-import { parseMarkdown, getPostImageUrl } from '../../lib/utils';
+import { parseMarkdown, getPostImageUrl, getPostGenerativeUrl } from '../../lib/utils';
 
 export async function getStaticPaths() {
   try {
@@ -48,6 +48,7 @@ const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US
 }) : '';
 
 const displayImageUrl = getPostImageUrl(post);
+const fallbackImageUrl = getPostGenerativeUrl(post);
 
 const theme = post?.category === 'deep-trace' ? 'vault-green' : post?.category === 'system-files' ? 'vault-yellow' : undefined;
 const timestampLabel = post?.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post?.ai_writer === 'PATCH' ? 'SIGNAL_FOUND' : '';
@@ -98,6 +99,7 @@ const timestampLabel = post?.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post?.a
 
       <VisualUplink
         imageUrl={displayImageUrl}
+        fallbackUrl={fallbackImageUrl}
         alt={post.title}
         metadata={post.image_metadata}
         className="mb-12 relative z-10"
@@ -151,11 +153,18 @@ const timestampLabel = post?.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post?.a
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {relatedPosts.map((rp) => {
               const rpImageUrl = getPostImageUrl(rp);
+              const rpFallbackUrl = getPostGenerativeUrl(rp);
               return (
                 <a href={`${import.meta.env.BASE_URL}/posts/${rp.slug}`.replace(/\/+/g, '/')} class="group block relative overflow-hidden border border-foreground/20 hover:border-accent transition-colors bg-neutral-900">
                   <div class="radar-sweep"></div>
                   <div class="aspect-video overflow-hidden opacity-50 group-hover:opacity-100 transition-opacity relative">
-                    <img src={rpImageUrl} alt="" class="w-full h-full object-cover grayscale group-hover:grayscale-0" />
+                    <img
+                      src={rpImageUrl}
+                      alt=""
+                      data-fallback={rpFallbackUrl}
+                      onerror="if(!this.getAttribute('data-error')){this.setAttribute('data-error', '1'); this.src=this.getAttribute('data-fallback');}"
+                      class="w-full h-full object-cover grayscale group-hover:grayscale-0"
+                    />
                     <div class="absolute inset-0 bg-accent/20 mix-blend-overlay"></div>
                   </div>
                   <div class="p-4 relative z-10">

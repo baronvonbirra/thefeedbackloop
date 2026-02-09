@@ -83,21 +83,29 @@ export function parseSystemAlert(alert: string | undefined) {
 }
 
 /**
+ * Generates a dynamic generative AI fallback URL using Pollinations AI.
+ */
+export function getPostGenerativeUrl(post: any) {
+  if (!post) return 'https://image.pollinations.ai/prompt/static%20noise%20CRT%20screen%20glitch%20cyberpunk%20aesthetic?width=800&height=600&nologo=true';
+  const prompt = encodeURIComponent(`ISO_GHO5T cyberpunk aesthetic, 32-bit pixel art, CRT scanlines, ${post.title}`);
+  return `https://image.pollinations.ai/prompt/${prompt}?width=1024&height=1024&nologo=true&model=flux`;
+}
+
+/**
  * Generates the best available image URL for a post with a multi-tier fallback system.
- * 1. Supabase Storage (with placeholder repair and filename-to-URL conversion)
- * 2. Pollinations AI (as a final generative fallback, replacing local filesystem)
+ * 1. Supabase Storage (resolves image_url column or falls back to slug.png)
+ * 2. Generative Fallback (as a secondary option for component-level onerror handling)
  */
 export function getPostImageUrl(post: any) {
-  const defaultFallback = 'https://image.pollinations.ai/prompt/static%20noise%20CRT%20screen%20glitch%20cyberpunk%20aesthetic?width=800&height=600&nologo=true';
-  if (!post) return defaultFallback;
+  if (!post) return getPostGenerativeUrl(null);
 
   const placeholderHost = 'your-project-id.supabase.co';
   const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
   const actualHost = supabaseUrl && !supabaseUrl.includes(placeholderHost) ? new URL(supabaseUrl).host : null;
 
-  let url = post.image_url;
+  // Use image_url if present, otherwise default to {slug}.png
+  let url = post.image_url || `${post.slug}.png`;
 
-  // 1. If we have a URL or filename, process it
   if (url && typeof url === 'string') {
     // Repair placeholder URLs if they are full URLs
     if (url.includes(placeholderHost) && actualHost) {
@@ -109,18 +117,13 @@ export function getPostImageUrl(post: any) {
       return url;
     }
 
-    // If it's just a filename (e.g. "my-post-123.png"), construct the Supabase Storage URL
-    // We specifically match the pollination pattern {slug}-{timestamp}.png or any alphanumeric filename
-    const isFilename = /^[a-zA-Z0-9._-]+\.(png|jpg|jpeg|webp)$/i.test(url);
-
-    if (isFilename && supabaseUrl && !supabaseUrl.includes(placeholderHost)) {
+    // If it's just a filename, construct the Supabase Storage URL
+    if (supabaseUrl && !supabaseUrl.includes(placeholderHost)) {
       const cleanBaseUrl = supabaseUrl.replace(/\/$/, '');
       return `${cleanBaseUrl}/storage/v1/object/public/blog-images/${url}`;
     }
   }
 
-  // 2. Final Fallback: Pollinations AI generative URL
-  // (Replacing the deprecated /images/posts/ local folder)
-  const prompt = encodeURIComponent(`ISO_GHO5T cyberpunk aesthetic, 32-bit pixel art, CRT scanlines, ${post.title}`);
-  return `https://image.pollinations.ai/prompt/${prompt}?width=1024&height=1024&nologo=true&model=flux`;
+  // Final Fallback: Pollinations AI generative URL if Supabase URL cannot be constructed
+  return getPostGenerativeUrl(post);
 }

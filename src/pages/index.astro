@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import VisualUplink from '../components/VisualUplink.astro';
 import { getPosts } from '../lib/supabase';
-import { stripMarkdown, getPostImageUrl } from '../lib/utils';
+import { stripMarkdown, getPostImageUrl, getPostGenerativeUrl } from '../lib/utils';
 
 let posts = [];
 try {
@@ -41,6 +41,7 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 							<div class="pointer-events-auto">
 								<VisualUplink
 									imageUrl={getPostImageUrl(latestPost)}
+									fallbackUrl={getPostGenerativeUrl(latestPost)}
 									alt={latestPost.title}
 									metadata={latestPost.image_metadata}
 								/>

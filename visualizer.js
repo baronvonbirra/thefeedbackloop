@@ -118,11 +118,11 @@ async function generateAndUploadImage(post) {
         const finalUrl = publicUrlData.publicUrl;
         console.log(`> ASSET SECURED AT: ${finalUrl}`);
 
-        // 7. LINK IMAGE TO POST
+        // 7. LINK IMAGE TO POST (Saving only the filename as per new protocol)
         console.log(`> UPDATING DATABASE RECORD [ID: ${post.id}]...`);
         const { error: updateError } = await supabase
             .from('posts')
-            .update({ image_url: finalUrl })
+            .update({ image_url: fileName })
             .eq('id', post.id);
 
         if (updateError) throw updateError;
