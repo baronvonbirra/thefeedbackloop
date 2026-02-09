@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import VisualUplink from '../components/VisualUplink.astro';
 import { getPosts } from '../lib/supabase';
-import { stripMarkdown } from '../lib/utils';
+import { stripMarkdown, getPostImageUrl } from '../lib/utils';
 
 let posts = [];
 try {
@@ -40,7 +40,7 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 						<div class="relative z-20 grid grid-cols-1 lg:grid-cols-2 gap-8 h-full pointer-events-none">
 							<div class="pointer-events-auto">
 								<VisualUplink
-									imageUrl={latestPost.image_url || 'https://image.pollinations.ai/prompt/static%20noise%20CRT%20screen%20glitch%20cyberpunk%20aesthetic?width=800&height=600&nologo=true'}
+									imageUrl={getPostImageUrl(latestPost)}
 									alt={latestPost.title}
 									metadata={latestPost.image_metadata}
 								/>

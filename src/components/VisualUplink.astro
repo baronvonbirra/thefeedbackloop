@@ -26,6 +26,8 @@ const { imageUrl, alt, metadata, className = "", fullImage = false } = Astro.pro
         <img
           src={imageUrl}
           alt={alt}
+          data-fallback="https://image.pollinations.ai/prompt/static%20noise%20CRT%20screen%20glitch%20cyberpunk%20aesthetic?width=800&height=600&nologo=true"
+          onerror="if(!this.getAttribute('data-error')){this.setAttribute('data-error', '1'); this.src=this.getAttribute('data-fallback');}"
           class:list={[
             "w-full h-auto transition-all duration-700",
             fullImage ? "max-h-[500px] md:max-h-[800px] object-contain grayscale-0 contrast-100 brightness-100" : "md:h-full md:object-cover grayscale contrast-125 brightness-90 md:group-hover:grayscale-0 md:group-hover:brightness-100"
