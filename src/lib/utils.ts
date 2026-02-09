@@ -81,3 +81,33 @@ export function parseSystemAlert(alert: string | undefined) {
 
   return { integrity, factCheck, action };
 }
+
+/**
+ * Generates the best available image URL for a post with a multi-tier fallback system.
+ * 1. Supabase Storage (with placeholder repair)
+ * 2. Local public folder (/images/posts/[slug].png)
+ * 3. Pollinations AI (as a final generative fallback)
+ */
+export function getPostImageUrl(post: any) {
+  if (!post) return 'https://image.pollinations.ai/prompt/static%20noise%20CRT%20screen%20glitch%20cyberpunk%20aesthetic?width=800&height=600&nologo=true';
+
+  const placeholderHost = 'your-project-id.supabase.co';
+  const actualUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const actualHost = actualUrl && !actualUrl.includes(placeholderHost) ? new URL(actualUrl).host : null;
+
+  let url = post.image_url;
+
+  // 1. Repair placeholder URLs if possible
+  if (url && url.includes(placeholderHost) && actualHost) {
+    url = url.replace(placeholderHost, actualHost);
+  }
+
+  // 2. Return Supabase URL if it's truthy and not a placeholder
+  if (url && !url.includes(placeholderHost)) {
+    return url;
+  }
+
+  // 3. Fallback to local image path
+  const baseUrl = (import.meta.env.BASE_URL || '').replace(/\/$/, '');
+  return `${baseUrl}/images/posts/${post.slug}.png`;
+}
