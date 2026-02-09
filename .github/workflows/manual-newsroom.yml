@@ -1,0 +1,36 @@
+name: "Manual Content Generation"
+
+on:
+  workflow_dispatch:
+    inputs:
+      writer:
+        description: 'Target Persona (AXEL, V3RA, R3-CORD, PATCH)'
+        required: false
+        default: 'AXEL'
+
+jobs:
+  writer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Newsroom Script
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -n "${{ github.event.inputs.writer }}" ]; then
+            node newsroom.js --writer=${{ github.event.inputs.writer }}
+          else
+            node newsroom.js
+          fi

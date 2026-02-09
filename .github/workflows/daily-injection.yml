@@ -31,8 +31,12 @@ jobs:
         run: npm ci
 
       # --- STEP 1: THE NEWSROOM (Writer) ---
+      # Runs on schedule OR when full_loop/writer_only is selected
       - name: Run Newsroom Script
-        if: github.event.inputs.run_mode != 'visualizer_only'
+        if: |
+          github.event_name == 'schedule' ||
+          github.event.inputs.run_mode == 'full_loop' ||
+          github.event.inputs.run_mode == 'writer_only'
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
@@ -40,17 +44,24 @@ jobs:
         run: node newsroom.js
 
       # --- THE 60-SECOND COOL DOWN ---
+      # Runs on schedule OR when full_loop is selected
       - name: Wait for Database Sync
-        if: github.event.inputs.run_mode == 'full_loop'
+        if: |
+          github.event_name == 'schedule' ||
+          github.event.inputs.run_mode == 'full_loop'
         run: sleep 60s
         shell: bash
 
       # --- STEP 2: ISO_GHO5T (Visualizer) ---
+      # Runs on schedule OR when full_loop/visualizer_only is selected
       - name: Run ISO_GHO5T Visualizer
-        if: github.event.inputs.run_mode != 'writer_only'
+        if: |
+          github.event_name == 'schedule' ||
+          github.event.inputs.run_mode == 'full_loop' ||
+          github.event.inputs.run_mode == 'visualizer_only'
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
           PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: node visualizer.js
