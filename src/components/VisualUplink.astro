@@ -2,12 +2,15 @@
 interface Props {
   imageUrl: string;
   alt: string;
+  fallbackUrl?: string;
   metadata?: string;
   className?: string;
   fullImage?: boolean;
 }
 
-const { imageUrl, alt, metadata, className = "", fullImage = false } = Astro.props;
+const { imageUrl, alt, fallbackUrl, metadata, className = "", fullImage = false } = Astro.props;
+
+const defaultFallback = "https://image.pollinations.ai/prompt/static%20noise%20CRT%20screen%20glitch%20cyberpunk%20aesthetic?width=800&height=600&nologo=true";
 ---
 
 <div class:list={["visual-uplink group mt-6 mb-8", className]}>
@@ -26,7 +29,7 @@ const { imageUrl, alt, metadata, className = "", fullImage = false } = Astro.pro
         <img
           src={imageUrl}
           alt={alt}
-          data-fallback="https://image.pollinations.ai/prompt/static%20noise%20CRT%20screen%20glitch%20cyberpunk%20aesthetic?width=800&height=600&nologo=true"
+          data-fallback={fallbackUrl || defaultFallback}
           onerror="if(!this.getAttribute('data-error')){this.setAttribute('data-error', '1'); this.src=this.getAttribute('data-fallback');}"
           class:list={[
             "w-full h-auto transition-all duration-700",

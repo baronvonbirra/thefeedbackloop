@@ -1,6 +1,6 @@
 ---
 import type { Post } from '../lib/supabase';
-import { stripMarkdown, getPostImageUrl } from '../lib/utils';
+import { stripMarkdown, getPostImageUrl, getPostGenerativeUrl } from '../lib/utils';
 import VisualUplink from './VisualUplink.astro';
 
 interface Props {
@@ -12,6 +12,7 @@ const { post, fullImage = false } = Astro.props;
 
 // Use the image_url utility for multi-tier fallbacks.
 const displayImageUrl = getPostImageUrl(post);
+const fallbackImageUrl = getPostGenerativeUrl(post);
 const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
 	year: 'numeric',
 	month: 'short',
@@ -30,6 +31,7 @@ const timestampLabel = post.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post.ai_
 		<div class="mb-4">
 			<VisualUplink
 				imageUrl={displayImageUrl}
+				fallbackUrl={fallbackImageUrl}
 				alt={post.title}
 				metadata={post.image_metadata}
 				fullImage={fullImage}

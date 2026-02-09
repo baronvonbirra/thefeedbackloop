@@ -83,31 +83,47 @@ export function parseSystemAlert(alert: string | undefined) {
 }
 
 /**
+ * Generates a dynamic generative AI fallback URL using Pollinations AI.
+ */
+export function getPostGenerativeUrl(post: any) {
+  if (!post) return 'https://image.pollinations.ai/prompt/static%20noise%20CRT%20screen%20glitch%20cyberpunk%20aesthetic?width=800&height=600&nologo=true';
+  const prompt = encodeURIComponent(`ISO_GHO5T cyberpunk aesthetic, 32-bit pixel art, CRT scanlines, ${post.title}`);
+  return `https://image.pollinations.ai/prompt/${prompt}?width=1024&height=1024&nologo=true&model=flux`;
+}
+
+/**
  * Generates the best available image URL for a post with a multi-tier fallback system.
- * 1. Supabase Storage (with placeholder repair)
- * 2. Local public folder (/images/posts/[slug].png)
- * 3. Pollinations AI (as a final generative fallback)
+ * 1. Supabase Storage (resolves image_url column or falls back to slug.png)
+ * 2. Generative Fallback (as a secondary option for component-level onerror handling)
  */
 export function getPostImageUrl(post: any) {
-  if (!post) return 'https://image.pollinations.ai/prompt/static%20noise%20CRT%20screen%20glitch%20cyberpunk%20aesthetic?width=800&height=600&nologo=true';
+  if (!post) return getPostGenerativeUrl(null);
 
   const placeholderHost = 'your-project-id.supabase.co';
-  const actualUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-  const actualHost = actualUrl && !actualUrl.includes(placeholderHost) ? new URL(actualUrl).host : null;
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const actualHost = supabaseUrl && !supabaseUrl.includes(placeholderHost) ? new URL(supabaseUrl).host : null;
 
-  let url = post.image_url;
+  // Use image_url if present, otherwise default to {slug}.png
+  let url = post.image_url || `${post.slug}.png`;
 
-  // 1. Repair placeholder URLs if possible
-  if (url && url.includes(placeholderHost) && actualHost) {
-    url = url.replace(placeholderHost, actualHost);
+  if (url && typeof url === 'string') {
+    // Repair placeholder URLs if they are full URLs
+    if (url.includes(placeholderHost) && actualHost) {
+      url = url.replace(placeholderHost, actualHost);
+    }
+
+    // If it's a full URL, return it
+    if (url.startsWith('http')) {
+      return url;
+    }
+
+    // If it's just a filename, construct the Supabase Storage URL
+    if (supabaseUrl && !supabaseUrl.includes(placeholderHost)) {
+      const cleanBaseUrl = supabaseUrl.replace(/\/$/, '');
+      return `${cleanBaseUrl}/storage/v1/object/public/blog-images/${url}`;
+    }
   }
 
-  // 2. Return Supabase URL if it's truthy and not a placeholder
-  if (url && !url.includes(placeholderHost)) {
-    return url;
-  }
-
-  // 3. Fallback to local image path
-  const baseUrl = (import.meta.env.BASE_URL || '').replace(/\/$/, '');
-  return `${baseUrl}/images/posts/${post.slug}.png`;
+  // Final Fallback: Pollinations AI generative URL if Supabase URL cannot be constructed
+  return getPostGenerativeUrl(post);
 }
