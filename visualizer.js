@@ -4,16 +4,18 @@ import { createClient } from '@supabase/supabase-js';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // 1. SETUP CLIENTS
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
+// Use names consistent with the project's environment variables.
+const supabaseUrl = process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+// Preferred: Service Role Key for uploads. Fallback: Anon Key.
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.PUBLIC_SUPABASE_ANON_KEY;
 const googleApiKey = process.env.GOOGLE_API_KEY;
 
-if (!supabaseUrl || !supabaseServiceKey || !googleApiKey) {
-    console.error("> FATAL ERROR: Missing environment variables (SUPABASE_URL, SUPABASE_KEY, or GOOGLE_API_KEY)");
+if (!supabaseUrl || !supabaseKey || !googleApiKey) {
+    console.error("> FATAL ERROR: Missing environment variables (PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, or GOOGLE_API_KEY)");
     process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const supabase = createClient(supabaseUrl, supabaseKey);
 const genAI = new GoogleGenerativeAI(googleApiKey);
 
 // 🎨 ISO_GHO5T STYLE MATRIX (Global defaults)
@@ -71,7 +73,7 @@ async function runVisualizer() {
     // 2. FIND TARGET: Get the newest post that DOES NOT have an image yet.
     const { data: posts, error } = await supabase
         .from('posts')
-        .select('id, title, summary, slug, ai_writer') // Added ai_writer
+        .select('id, title, summary, slug, ai_writer')
         .is('image_url', null)
         .order('created_at', { ascending: false })
         .limit(1);
