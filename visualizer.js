@@ -2,6 +2,7 @@
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import fetch from 'node-fetch';
 
 // 1. SETUP CLIENTS
 const supabaseUrl = process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
@@ -9,7 +10,7 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABAS
 const googleApiKey = process.env.GOOGLE_API_KEY;
 
 if (!supabaseUrl || !supabaseKey || !googleApiKey) {
-    console.error("> FATAL ERROR: Missing environment variables (PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, or GOOGLE_API_KEY)");
+    console.error("> FATAL ERROR: Missing environment variables (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, or GOOGLE_API_KEY)");
     process.exit(1);
 }
 
@@ -63,27 +64,33 @@ async function generateVisualPrompt(post) {
     }
 }
 
+async function generateArtifact(prompt) {
+    // 1. Sanitize the prompt for URL safety
+    const cleanPrompt = encodeURIComponent(prompt);
+
+    // 2. Add 'Flux' or 'Turbo' for speed and 'nologo' for a clean look
+    const url = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=1024&height=1024&nologo=true&model=flux`;
+
+    console.log(`> ISO_GHO5T: Requesting pixels from external node...`);
+
+    // 3. Fetch the data as a buffer
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("> SYSTEM FAILURE: Generator Node Unresponsive");
+
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer); // This buffer goes straight to Supabase
+}
+
 async function generateAndUploadImage(post) {
     try {
         // 3. CONSTRUCT THE PROMPT VIA DIRECTOR
         const customPrompt = await generateVisualPrompt(post);
         console.log(`> ISO_GHO5T DIRECTOR CHOSE: ${customPrompt}`);
 
-        console.log(`> SENDING SIGNAL TO GENERATOR NODES [MODEL: gemini-2.5-flash-image]...`);
+        console.log(`> SENDING SIGNAL TO GENERATOR NODES [MODEL: pollination-flux]...`);
 
-        // 4. GENERATE IMAGE VIA GEMINI API
-        const imageModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash-image" });
-        const result = await imageModel.generateContent(customPrompt);
-
-        const response = await result.response;
-        const candidate = response.candidates?.[0];
-        const imagePart = candidate?.content?.parts?.find(p => p.inlineData);
-
-        if (!imagePart || !imagePart.inlineData) {
-            throw new Error("No image data returned from Gemini API");
-        }
-
-        const fileBuffer = Buffer.from(imagePart.inlineData.data, 'base64');
+        // 4. GENERATE IMAGE VIA POLLINATION API
+        const fileBuffer = await generateArtifact(customPrompt);
         console.log(`> ASSET RETRIEVED. SIZE: ${fileBuffer.length} bytes.`);
 
         // 5. UPLOAD TO SUPABASE STORAGE

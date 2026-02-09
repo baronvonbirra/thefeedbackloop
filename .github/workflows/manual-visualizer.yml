@@ -21,7 +21,6 @@ jobs:
       - name: Run ISO_GHO5T Visualizer
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
-          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
         run: node visualizer.js

@@ -56,8 +56,7 @@ jobs:
           node newsroom.js --writer=$selected_writer
 
       # --- THE 60-SECOND COOL DOWN ---
-      # Runs on schedule OR when full_loop is selected
-      - name: Wait for Database Sync
+      - name: Buffer for Database Sync
         if: |
           github.event_name == 'schedule' ||
           github.event.inputs.run_mode == 'full_loop'
@@ -65,7 +64,6 @@ jobs:
         shell: bash
 
       # --- STEP 2: ISO_GHO5T (Visualizer) ---
-      # Runs on schedule OR when full_loop/visualizer_only is selected
       - name: Run ISO_GHO5T Visualizer
         if: |
           github.event_name == 'schedule' ||
@@ -73,7 +71,6 @@ jobs:
           github.event.inputs.run_mode == 'visualizer_only'
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
-          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
         run: node visualizer.js
