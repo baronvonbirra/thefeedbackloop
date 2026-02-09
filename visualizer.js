@@ -1,15 +1,22 @@
 // visualizer.js
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // 1. SETUP CLIENTS
-// CRITICAL: Use the SERVICE_ROLE_KEY for storage uploads to bypass RLS policies if needed.
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY; // Fallback if specific key isn't set
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
+const googleApiKey = process.env.GOOGLE_API_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey || !googleApiKey) {
+    console.error("> FATAL ERROR: Missing environment variables (SUPABASE_URL, SUPABASE_KEY, or GOOGLE_API_KEY)");
+    process.exit(1);
+}
+
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const genAI = new GoogleGenerativeAI(googleApiKey);
 
 // 🎨 ISO_GHO5T STYLE MATRIX
-// These keywords are appended to every prompt to enforce stylistic consistency.
 const ISO_GHO5T_STYLE = [
     "cyberpunk aesthetic",
     "32-bit pixel art",
@@ -21,16 +28,43 @@ const ISO_GHO5T_STYLE = [
     "restricted neon palette (green, purple, cyan, deep black)"
 ].join(", ");
 
+async function generateVisualPrompt(post) {
+    console.log(`> CONSULTING VISUAL DIRECTOR FOR: "${post.title}"...`);
+    // We use the text model to 'direct' the image model
+    const directorModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+    const directorPrompt = `
+      You are the Visual Director for the ISO_GHO5T system.
+      Read this article summary: "${post.summary}"
+
+      Create a highly descriptive, 1-sentence visual prompt for an image generator.
+      Focus on a single striking subject related to the summary.
+
+      CRITICAL AESTHETIC RULES:
+      - Style: ${ISO_GHO5T_STYLE}.
+      - Lighting: Harsh neon, high contrast shadows.
+      - Mood: Cold, mechanical, or chaotic punk.
+
+      Example Output: "A pixel-art close up of a circuit board dripping with glowing purple neon liquid, CRT distortion."
+    `;
+
+    try {
+        const result = await directorModel.generateContent(directorPrompt);
+        return result.response.text().trim();
+    } catch (err) {
+        console.warn(`> DIRECTOR FAILED: ${err.message}. Falling back to default prompt.`);
+        return `${post.summary}. STYLE: ${ISO_GHO5T_STYLE}`;
+    }
+}
 
 async function runVisualizer() {
-    console.log("> BOOTING ISO_GHO5T VISUAL PROTOCOL...");
+    console.log("> BOOTING ISO_GHO5T VISUAL PROTOCOL [V2: DIRECTOR MODE]...");
 
     // 2. FIND TARGET: Get the newest post that DOES NOT have an image yet.
-    // We select 'id' for updating, and 'summary'/'slug' for prompt generation.
     const { data: posts, error } = await supabase
         .from('posts')
         .select('id, title, summary, slug')
-        .is('image_url', null) // The crucial filter
+        .is('image_url', null)
         .order('created_at', { ascending: false })
         .limit(1);
 
@@ -46,17 +80,15 @@ async function runVisualizer() {
 
     const post = posts[0];
     console.log(`> TARGET ACQUIRED: "${post.title}"`);
-    console.log(`> INITIATING GENERATION SEQUENCE...`);
 
     try {
-        // 3. CONSTRUCT THE PROMPT
-        // Combine the article summary with the enforced style matrix.
-        // We encode it to ensure it passes safely in a URL.
-        const rawPrompt = `${post.summary}. STYLE: ${ISO_GHO5T_STYLE}`;
-        const encodedPrompt = encodeURIComponent(rawPrompt);
+        // 3. CONSTRUCT THE PROMPT VIA DIRECTOR
+        const customPrompt = await generateVisualPrompt(post);
+        console.log(`> ISO_GHO5T DIRECTOR CHOSE: ${customPrompt}`);
+
+        const encodedPrompt = encodeURIComponent(customPrompt);
 
         // Use Pollinations.ai (Fast, free, good for this aesthetic)
-        // Adding '/image' ensures it returns binary data, not a redirect site.
         const generationUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}`;
 
         console.log(`> SENDING SIGNAL TO GENERATOR NODES...`);
@@ -70,9 +102,8 @@ async function runVisualizer() {
         console.log(`> ASSET RETRIEVED. SIZE: ${fileBuffer.length} bytes.`);
 
         // 5. UPLOAD TO SUPABASE STORAGE
-        // Create a unique filename using the slug and timestamp
         const fileName = `${post.slug}-${Date.now()}.png`;
-        const bucketName = 'blog-images'; // Must match Step 1
+        const bucketName = 'blog-images';
 
         console.log(`> UPLOADING TO STORAGE BUCKET: ${bucketName}/${fileName}...`);
 
@@ -107,6 +138,8 @@ async function runVisualizer() {
         console.log("> PROTOCOL COMPLETE. VISUALIZATION ACTIVE.");
 
     } catch (err) {
+        // SAFETY MATCH: Log error but don't crash.
+        // We don't update image_url so it will be retried.
         console.error(`> CRITICAL FAILURE IN ISO_GHO5T:`, err.message);
     }
 }

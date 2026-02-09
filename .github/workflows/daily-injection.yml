@@ -44,9 +44,10 @@ jobs:
 
       - name: Run ISO_GHO5T Visualizer
         env:
-          # We only need Supabase keys for this step
+          # We need both Supabase and Google keys for the Director protocol
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           # Note: If you have a separate SUPABASE_SERVICE_ROLE_KEY secret, use that here instead of SUPABASE_KEY for better permission handling.
         run: |
           echo "Starting visual artifact generation..."
