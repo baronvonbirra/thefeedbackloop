@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import VisualUplink from '../components/VisualUplink.astro';
 import { getPosts } from '../lib/supabase';
-import { stripMarkdown } from '../lib/utils';
+import { stripMarkdown, getPostImageUrl, getPostGenerativeUrl } from '../lib/utils';
 
 let posts = [];
 try {
@@ -22,7 +22,11 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 						 import.meta.env.PUBLIC_SUPABASE_URL === 'https://your-project-id.supabase.co';
 ---
 
-<Layout title="News" category="news">
+<Layout
+	title="News"
+	description="Latest transmissions from the underground. Algorithmic reporting on the digital fringe."
+	category="news"
+>
 	<div class="container mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8">
 		<!-- Main Content -->
 		<div class="flex-grow lg:w-2/3">
@@ -38,18 +42,19 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 						<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
 							<div>
 								<VisualUplink
-									imageUrl={latestPost.image_url || 'https://image.pollinations.ai/prompt/static%20noise%20CRT%20screen%20glitch%20cyberpunk%20aesthetic?width=800&height=600&nologo=true'}
+									imageUrl={getPostImageUrl(latestPost)}
+									fallbackUrl={getPostGenerativeUrl(latestPost)}
 									alt={latestPost.title}
 									metadata={latestPost.image_metadata}
 								/>
 							</div>
 							<div class="flex flex-col">
 								<span class="bg-accent text-black px-3 py-1 font-mono text-sm uppercase mb-4 self-start font-bold">Breaking News</span>
-								<h1 class="text-3xl md:text-5xl font-bold mb-4 leading-tight">
+								<h2 class="text-3xl md:text-5xl font-bold mb-4 leading-tight">
 									<a href={`${import.meta.env.BASE_URL}/posts/${latestPost.slug}`.replace(/\/+/g, '/')} class="hover:text-accent transition-colors">
 										{latestPost.title}
 									</a>
-								</h1>
+								</h2>
 								<p class="text-lg mb-6 opacity-90 font-mono line-clamp-4 leading-relaxed italic">{latestSummary}</p>
 								<div class="mt-auto pt-4 border-t border-foreground/20 flex items-center justify-between font-mono text-xs">
 									<div class="flex items-center gap-3">

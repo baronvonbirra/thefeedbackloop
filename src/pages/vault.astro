@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import VisualUplink from '../components/VisualUplink.astro';
 import { getPosts } from '../lib/supabase';
+import { getPostImageUrl, getPostGenerativeUrl } from '../lib/utils';
 
 let posts = [];
 try {
@@ -21,7 +22,12 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 						 import.meta.env.PUBLIC_SUPABASE_URL === 'https://your-project-id.supabase.co';
 ---
 
-<Layout title="The Vault" theme={vaultTheme} category={latestPost?.category}>
+<Layout
+	title="The Vault"
+	description="Recovered data packets and system files. The history of the loop, decrypted."
+	theme={vaultTheme}
+	category={latestPost?.category}
+>
 	<div class="container mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8">
 		<!-- Main Content -->
 		<div class="flex-grow lg:w-2/3">
@@ -36,7 +42,8 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 						<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 							<div class="relative z-10">
 								<VisualUplink
-									imageUrl={latestPost.image_url || 'https://image.pollinations.ai/prompt/static%20noise%20CRT%20screen%20glitch%20cyberpunk%20aesthetic?width=800&height=600&nologo=true'}
+									imageUrl={getPostImageUrl(latestPost)}
+									fallbackUrl={getPostGenerativeUrl(latestPost)}
 									alt={latestPost.title}
 									metadata={latestPost.image_metadata}
 									fullImage={true}

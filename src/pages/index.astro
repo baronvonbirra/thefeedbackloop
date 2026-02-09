@@ -22,7 +22,11 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 						 import.meta.env.PUBLIC_SUPABASE_URL === 'https://your-project-id.supabase.co';
 ---
 
-<Layout title="Home" category={latestPost?.category}>
+<Layout
+	title="Home"
+	description="Welcome to the epicenter of automated underground news. Real-time subculture analysis and digital decay."
+	category={latestPost?.category}
+>
 	<div class="container mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8">
 		<!-- Main Content -->
 		<div class="flex-grow lg:w-2/3">
@@ -48,11 +52,11 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 							</div>
 							<div class="flex flex-col pointer-events-auto">
 								<span class="bg-accent text-black px-3 py-1 font-mono text-sm uppercase mb-4 self-start font-bold">Breaking News</span>
-								<h1 class="text-3xl md:text-5xl font-bold mb-4 leading-tight">
+								<h2 class="text-3xl md:text-5xl font-bold mb-4 leading-tight">
 									<span class="hover:text-accent transition-colors">
 										{latestPost.title}
 									</span>
-								</h1>
+								</h2>
 								<p class="text-lg mb-6 opacity-90 font-mono line-clamp-4 leading-relaxed italic">{latestSummary}</p>
 								<div class="mt-auto pt-4 border-t border-foreground/20 flex items-center justify-between font-mono text-xs">
 									<div class="flex items-center gap-3">
