@@ -1,0 +1,119 @@
+---
+import type { Post } from '../lib/supabase';
+
+interface Props {
+	posts: Post[];
+	title?: string;
+	pageSize?: number;
+	accentClass?: string;
+}
+
+const { posts, title = "Terminal Log", pageSize = 5, accentClass = "text-accent-green" } = Astro.props;
+const baseUrl = import.meta.env.BASE_URL;
+
+// Initial slice for SSR
+const initialPosts = posts.slice(0, pageSize);
+const totalPages = Math.ceil(posts.length / pageSize);
+---
+
+<div class="terminal-log-container" data-posts={JSON.stringify(posts)} data-page-size={pageSize} data-base-url={baseUrl} data-accent-class={accentClass}>
+	<h3 class="text-2xl font-bold mb-6 flex items-center gap-2 font-mono">
+		<span class="w-3 h-3 bg-accent-green animate-pulse"></span>
+		{title}
+	</h3>
+
+	<ul id="terminal-log-list" class="space-y-4 font-mono text-sm min-h-[150px]">
+		{initialPosts.map((post) => (
+			<li class="border-b border-foreground/20 pb-2">
+				<a href={`${baseUrl}/posts/${post.slug}`.replace(/\/+/g, '/')} class={`hover:opacity-80 block ${accentClass}`}>
+					<span class="mr-2">>></span>
+					<span class="text-foreground group-hover:text-inherit transition-colors">{post.title}</span>
+				</a>
+			</li>
+		))}
+		{posts.length === 0 && (
+			<li class="opacity-50 italic">Empty log...</li>
+		)}
+	</ul>
+
+	{posts.length > pageSize && (
+		<div class="mt-6 flex items-center justify-between font-mono text-xs border-t border-foreground/10 pt-4">
+			<div class="flex items-center gap-4">
+				<button id="prev-log" class="hover:text-accent disabled:opacity-20 disabled:cursor-not-allowed transition-colors" disabled>
+					[PREV]
+				</button>
+				<button id="next-log" class="hover:text-accent disabled:opacity-20 disabled:cursor-not-allowed transition-colors">
+					[NEXT]
+				</button>
+			</div>
+			<span id="log-page-info" class="opacity-50 text-[10px]">
+				01 / {totalPages.toString().padStart(2, '0')}
+			</span>
+		</div>
+	)}
+</div>
+
+<script>
+	function initTerminalLog() {
+		const containers = document.querySelectorAll('.terminal-log-container');
+
+		containers.forEach(container => {
+			// Avoid multiple initializations
+			if (container.hasAttribute('data-initialized')) return;
+			container.setAttribute('data-initialized', 'true');
+
+			const posts = JSON.parse(container.getAttribute('data-posts') || '[]');
+			const pageSize = parseInt(container.getAttribute('data-page-size') || '5');
+			const baseUrl = container.getAttribute('data-base-url') || '';
+			const accentClass = container.getAttribute('data-accent-class') || 'text-accent-green';
+
+			const list = container.querySelector('#terminal-log-list');
+			const prevBtn = container.querySelector('#prev-log') as HTMLButtonElement;
+			const nextBtn = container.querySelector('#next-log') as HTMLButtonElement;
+			const pageInfo = container.querySelector('#log-page-info');
+
+			let currentPage = 0;
+			const totalPages = Math.ceil(posts.length / pageSize);
+
+			function updateDisplay() {
+				if (!list || !pageInfo) return;
+
+				const start = currentPage * pageSize;
+				const end = start + pageSize;
+				const visiblePosts = posts.slice(start, end);
+
+				list.innerHTML = visiblePosts.map(post => `
+					<li class="border-b border-foreground/20 pb-2">
+						<a href="${(baseUrl + '/posts/' + post.slug).replace(/\/+/g, '/')}" class="hover:opacity-80 block ${accentClass}">
+							<span class="mr-2">>></span>
+							<span class="text-foreground transition-colors">${post.title}</span>
+						</a>
+					</li>
+				`).join('');
+
+				pageInfo.textContent = `${(currentPage + 1).toString().padStart(2, '0')} / ${totalPages.toString().padStart(2, '0')}`;
+
+				if (prevBtn) prevBtn.disabled = currentPage === 0;
+				if (nextBtn) nextBtn.disabled = currentPage === totalPages - 1;
+			}
+
+			prevBtn?.addEventListener('click', () => {
+				if (currentPage > 0) {
+					currentPage--;
+					updateDisplay();
+				}
+			});
+
+			nextBtn?.addEventListener('click', () => {
+				if (currentPage < totalPages - 1) {
+					currentPage++;
+					updateDisplay();
+				}
+			});
+		});
+	}
+
+	// Initialize on load and on page navigation (Astro View Transitions)
+	document.addEventListener('DOMContentLoaded', initTerminalLog);
+	document.addEventListener('astro:page-load', initTerminalLog);
+</script>
