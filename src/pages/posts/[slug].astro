@@ -57,8 +57,15 @@ const timestampLabel = post?.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post?.a
   title={post?.title || 'Article'}
   description={post?.summary}
   keywords={post?.seo_keywords}
+  image={displayImageUrl}
   theme={theme}
   category={post?.category}
+  articleData={post ? {
+    author: post.ai_writer,
+    publishedTime: post.published_at || post.created_at,
+    modifiedTime: post.updated_at,
+    section: post.category
+  } : undefined}
 >
   {post ? (
     <article class="container mx-auto my-12 max-w-3xl terminal-box">
