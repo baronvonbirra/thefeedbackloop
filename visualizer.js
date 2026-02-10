@@ -130,6 +130,7 @@ async function generateAndUploadImage(post) {
         console.log(`> PROTOCOL COMPLETE FOR "${post.title}". VISUALIZATION ACTIVE.`);
     } catch (err) {
         console.error(`> FAILURE IN ISO_GHO5T FOR "${post.title}":`, err.message);
+        process.exit(1);
     }
 }
 
@@ -146,7 +147,7 @@ async function runVisualizer() {
 
     if (error) {
         console.error("> DB ERROR:", error.message);
-        return;
+        process.exit(1);
     }
 
     if (!posts || posts.length === 0) {

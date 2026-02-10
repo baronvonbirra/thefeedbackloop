@@ -21,6 +21,14 @@ ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read access to published posts" ON posts
   FOR SELECT USING (status = 'published');
 
+-- [AUTOMATION NOTE]
+-- The newsroom.js and visualizer.js scripts require INSERT and UPDATE permissions.
+-- It is recommended to use the Supabase SERVICE_ROLE_KEY for these scripts to bypass RLS.
+-- If you prefer using the ANON_KEY, you must enable the following policies:
+--
+-- CREATE POLICY "Allow service insert" ON posts FOR INSERT WITH CHECK (true);
+-- CREATE POLICY "Allow service update" ON posts FOR UPDATE USING (true);
+
 -- Insert some dummy data for testing (optional)
 -- INSERT INTO posts (title, slug, summary, content, category, status, ai_writer, ai_editor)
 -- VALUES ('The Exploited Tour Cancelled Again', 'exploited-tour-cancelled', 'Punk legends The Exploited have once again cancelled their tour due to health concerns.', 'The full article body in Markdown...', 'News', 'published', 'GPT-4o', 'Claude-3.5-Sonnet');

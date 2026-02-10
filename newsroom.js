@@ -15,7 +15,11 @@ if (missingEnv.length > 0) {
 
 // INIT CLIENTS
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-const supabase = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.PUBLIC_SUPABASE_ANON_KEY);
+
+// Use Service Role Key if available to bypass RLS, fallback to Anon Key
+const supabaseUrl = process.env.PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -198,7 +202,8 @@ async function runNewsroom() {
             .insert([payload]);
 
         if (insertError) {
-            console.error('> DB ERROR:', insertError);
+            console.error('> DB ERROR:', insertError.message || insertError);
+            process.exit(1);
         } else {
             console.log(`> SIGNAL INJECTED: /posts/${finalData.slug}`);
             console.log(`> SCHEDULED FOR: ${publishDate.toISOString()}`);
@@ -206,6 +211,7 @@ async function runNewsroom() {
     } catch (err) {
         console.error(`> CRITICAL SYSTEM FAILURE:`, err.message);
         if (err.stack && !err.message.includes("JSON")) console.error(err.stack);
+        process.exit(1);
     }
 }
 
