@@ -4,11 +4,12 @@ import { createClient } from '@supabase/supabase-js';
 import minimist from 'minimist';
 
 // VALIDATE ENV
-const REQUIRED_ENV = ['GOOGLE_API_KEY', 'PUBLIC_SUPABASE_URL', 'PUBLIC_SUPABASE_ANON_KEY'];
-const missingEnv = REQUIRED_ENV.filter(key => !process.env[key]);
+const googleKey = process.env.GOOGLE_API_KEY;
+const sUrl = process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const sKey = process.env.PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
 
-if (missingEnv.length > 0) {
-    console.error(`> FATAL ERROR: Missing environment variables: ${missingEnv.join(', ')}`);
+if (!googleKey || !sUrl || !sKey) {
+    console.error(`> FATAL ERROR: Missing environment variables: GOOGLE_API_KEY, (PUBLIC_)SUPABASE_URL, (PUBLIC_)SUPABASE_ANON_KEY`);
     console.log(`> Please ensure these are set in your environment or .env file.`);
     process.exit(1);
 }
@@ -17,8 +18,8 @@ if (missingEnv.length > 0) {
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
 // Use Service Role Key if available to bypass RLS, fallback to Anon Key
-const supabaseUrl = process.env.PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));

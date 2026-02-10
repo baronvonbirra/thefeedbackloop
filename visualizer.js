@@ -5,12 +5,12 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import fetch from 'node-fetch';
 
 // 1. SETUP CLIENTS
-const supabaseUrl = process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.PUBLIC_SUPABASE_ANON_KEY;
 const googleApiKey = process.env.GOOGLE_API_KEY;
+const supabaseUrl = process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_KEY;
 
 if (!supabaseUrl || !supabaseKey || !googleApiKey || supabaseUrl.includes('your-project-id.supabase.co')) {
-    console.error("> FATAL ERROR: Missing or placeholder environment variables (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, or GOOGLE_API_KEY)");
+    console.error("> FATAL ERROR: Missing or placeholder environment variables (GOOGLE_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY/ANON_KEY)");
     process.exit(1);
 }
 
