@@ -6,6 +6,7 @@ import fetch from 'node-fetch';
 
 // 1. SETUP CLIENTS
 const googleApiKey = process.env.GOOGLE_API_KEY;
+const pollinationApiKey = process.env.POLLINATION_API_KEY;
 const supabaseUrl = process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_KEY;
 
@@ -71,8 +72,8 @@ async function generateArtifact(prompt) {
     const maxRetries = 3;
     let lastError = null;
 
-    // Try Flux first with retries, then fallback to Turbo, then default
-    const models = ['flux', 'turbo', 'default'];
+    // Try the full matrix of models provided by Pollinations AI
+    const models = ['flux', 'zimage', 'imagen-4', 'klein', 'klein-large', 'gptimage', 'default'];
 
     for (const model of models) {
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -80,12 +81,16 @@ async function generateArtifact(prompt) {
                 const url = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=1024&height=1024&nologo=true${model !== 'default' ? `&model=${model}` : ''}`;
                 console.log(`> ISO_GHO5T: Requesting pixels [MODEL: ${model}] [ATTEMPT: ${attempt}/${maxRetries}]...`);
 
-                const response = await fetch(url, {
-                    headers: {
-                        'User-Agent': USER_AGENT,
-                        'Referer': 'https://pollinations.ai/'
-                    }
-                });
+                const headers = {
+                    'User-Agent': USER_AGENT,
+                    'Referer': 'https://pollinations.ai/'
+                };
+
+                if (pollinationApiKey) {
+                    headers['Authorization'] = `Bearer ${pollinationApiKey}`;
+                }
+
+                const response = await fetch(url, { headers });
 
                 if (response.ok) {
                     const arrayBuffer = await response.arrayBuffer();
