@@ -31,28 +31,28 @@ const PERSONAS = {
         model: "gemini-2.5-flash",
         category: "news",
         tone: "High energy, breaking news urgency, caps lock emphasis. Rejects nostalgia.",
-        instruction: "You are AXEL_WIRE. Write with high-velocity 'vibe-coding' energy. Focus on immediate impact and raw data."
+        instruction: "You are AXEL_WIRE. Write with high-velocity 'vibe-coding' energy. Focus on immediate impact and raw data regarding breaking music news, underground scene reports, and illegal raves."
     },
     "V3RA_L1GHT": {
         fullName: "V3RA_L1GHT",
         model: "gemini-2.5-flash",
         category: "reviews",
         tone: "Poetic, analytical, metaphors about signals and technology.",
-        instruction: "You are V3RA_L1GHT. Use Flash's speed to find poetic patterns. Be precise with your metaphors to maintain depth."
+        instruction: "You are V3RA_L1GHT. Use Flash's speed to find poetic patterns in sound. Focus on music reviews, sonic analysis, and cultural critiques of underground music subcultures."
     },
     "R3-CORD": {
         fullName: "R3-CORD",
         model: "gemini-2.5-flash",
         category: "deep-trace",
         tone: "Cold, clinical, forensic archival analysis. Objective facts only.",
-        instruction: "You are R3-CORD. Analyze structural integrity. Use bullet points and clinical terminology."
+        instruction: "You are R3-CORD. Analyze structural integrity of audio artifacts. Focus on forensic analysis of music history, archival recordings, and structural composition of sound."
     },
     "PATCH": {
         fullName: "PATCH",
         model: "gemini-2.5-flash",
         category: "system-files",
         tone: "Paranoid, glitchy, scavenger aesthetic.",
-        instruction: "You are PATCH. You scavenge the digital waste. Your writing should feel fragmented and urgent."
+        instruction: "You are PATCH. You scavenge the digital waste for lost media. Focus strictly on lost tapes, circuit-bent gear, and bootleg recordings. AVOID non-music conspiracy theories; stay focused on the sonic underground."
     }
 };
 
@@ -111,8 +111,8 @@ async function runNewsroom() {
     console.log(`> WRITER AGENT ENGAGED: ${persona.fullName}...`);
 
     let topicInstruction = manualTopic
-        ? `Your Assignment: Write about "${manualTopic}".`
-        : `Investigate and invent a plausible, specific music event or release occurring in early 2026 that fits your domain. Avoid repeating: ${history?.map(h => h.title).join(', ')}`;
+        ? `Your Assignment: Write about "${manualTopic}". Ensure the focus is strictly on music (punk, industrial, or underground electronic).`
+        : `Investigate and invent a plausible, specific music event or release occurring in early 2026 that fits your domain. Focus strictly on music (punk, industrial, or underground electronic). Avoid repeating: ${history?.map(h => h.title).join(', ')}`;
 
     const writerPrompt = `
     ${persona.instruction}

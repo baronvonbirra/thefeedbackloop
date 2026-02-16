@@ -65,20 +65,44 @@ async function generateVisualPrompt(post) {
 }
 
 async function generateArtifact(prompt) {
-    // 1. Sanitize the prompt for URL safety
     const cleanPrompt = encodeURIComponent(prompt);
+    const maxRetries = 3;
+    let lastError = null;
 
-    // 2. Add 'Flux' or 'Turbo' for speed and 'nologo' for a clean look
-    const url = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=1024&height=1024&nologo=true&model=flux`;
+    // Try Flux first with retries, then fallback to Turbo
+    const models = ['flux', 'turbo'];
 
-    console.log(`> ISO_GHO5T: Requesting pixels from external node...`);
+    for (const model of models) {
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                const url = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=1024&height=1024&nologo=true&model=${model}`;
+                console.log(`> ISO_GHO5T: Requesting pixels [MODEL: ${model}] [ATTEMPT: ${attempt}/${maxRetries}]...`);
 
-    // 3. Fetch the data as a buffer
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("> SYSTEM FAILURE: Generator Node Unresponsive");
+                const response = await fetch(url);
 
-    const arrayBuffer = await response.arrayBuffer();
-    return Buffer.from(arrayBuffer); // This buffer goes straight to Supabase
+                if (response.ok) {
+                    const arrayBuffer = await response.arrayBuffer();
+                    return Buffer.from(arrayBuffer);
+                }
+
+                const errorText = await response.text().catch(() => "No error body");
+                console.warn(`> NODE WARNING: Model ${model} returned ${response.status}: ${errorText.substring(0, 100)}`);
+                lastError = `Status ${response.status}`;
+
+            } catch (err) {
+                console.warn(`> CONNECTION ERROR [ATTEMPT ${attempt}]: ${err.message}`);
+                lastError = err.message;
+            }
+
+            if (attempt < maxRetries) {
+                const delay = Math.pow(2, attempt) * 1000;
+                await new Promise(res => setTimeout(res, delay));
+            }
+        }
+        console.warn(`> MODEL ${model} FAILED AFTER ${maxRetries} ATTEMPTS. TRYING FALLBACK...`);
+    }
+
+    throw new Error(`> SYSTEM FAILURE: All generator nodes unresponsive. Last error: ${lastError}`);
 }
 
 async function generateAndUploadImage(post) {
