@@ -24,6 +24,18 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+const GENRE_DICTIONARY = [
+    // Core & Subgenres
+    "Punk Rock", "Hardcore", "Skate Punk", "Pop Punk", "Post-Punk",
+    "Street Punk", "Oi!", "Anarcho-Punk", "Garage Punk", "Ska-Punk",
+    "Horror Punk", "Riot Grrrl", "Egg Punk", "Powerviolence",
+    // Technical & Cultural Anchors
+    "Overdriven tube amps", "POGO energy", "Up-stroke guitar riffs",
+    "The Forbidden Beat (Doo-kat-doo-doo-kat)", "Down-picked power chords",
+    "Feedback squeals", "Stage diving", "DIY zines", "Basement shows",
+    "Distorted bass growl", "Snare-heavy production", "Gang vocals"
+];
+
 // 🎭 THE FOCUSED PERSONA MATRIX (REFINED 2026)
 const PERSONAS = {
     "AXEL_WIRE": {
@@ -63,6 +75,17 @@ async function runNewsroom() {
     const writerKey = (args.writer || 'AXEL_WIRE').toUpperCase(); // Default to Axel_Wire
     const manualTopic = args.topic || null; // Optional
     const isDryRun = args['dry-run'] || false;
+
+    // 1.5 FETCH INSPIRATION POOL
+    console.log(`> RETRIEVING UNDERGROUND DATA PULSE...`);
+    const { data: bands } = await supabase
+        .from('inspiration_pool')
+        .select('name')
+        .eq('active', true);
+
+    const suggestedBands = (bands && bands.length > 0)
+        ? bands.map(b => b.name).join(', ')
+        : "Unknown Underground Artists";
 
     const persona = PERSONAS[writerKey];
 
@@ -123,8 +146,30 @@ async function runNewsroom() {
            Focus on the physical reality of the music scene.
            Avoid repeating these previous stories: ${history?.map(h => h.title).join(', ')}`;
 
+    const systemContext = `
+    THE PUNK REALITY ANCHOR:
+    - Draw inspiration from: ${suggestedBands}.
+    - Use vocabulary like: ${GENRE_DICTIONARY.join(', ')}.
+
+    STRICT CONTENT GUARDRAILS:
+    1. Focus strictly on Punk and its subgenres (Rock, Skate, Pop, Hardcore).
+    2. REJECT electronic/techno tropes. No 'synths', 'lasers', or 'cyber-war'.
+    3. THE SOUND: Talk about the weight of the bass, the speed of the drums, the rasp in the vocals.
+    4. THE VIBE: 2026 grit. Basement venues, sticky floors, and DIY spirit.
+    5. SUGGESTION ONLY: Treat the bands and genres as a vibe-guide, not a script.
+
+    STRICT CONTENT RULES:
+    1. Every article must center on MUSIC (gear, sound, culture, or performance).
+    2. If you mention technology, it must be 'Music Tech' (distorted amps, hacked pedals, pirate radio).
+    3. REJECT generic 'Cyberpunk' cliches (Neon umbrellas, flying cars, corporate wars).
+    4. FOCUS on the dirt, the noise, and the grit of the punk/hardcore scene.
+    `;
+
     const writerPrompt = `
     ${persona.instruction}
+
+    ${systemContext}
+
     TONE_PROFILE: ${persona.tone}
 
     STYLE_MEMORY (Use these as templates for your voice, pay attention to how articles are closed):
