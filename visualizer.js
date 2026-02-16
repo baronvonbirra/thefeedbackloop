@@ -69,16 +69,20 @@ async function generateArtifact(prompt) {
     const maxRetries = 3;
     let lastError = null;
 
-    // Try Flux first with retries, then fallback to Turbo
-    const models = ['flux', 'turbo'];
+    // Try Flux first with retries, then fallback to Turbo, then default
+    const models = ['flux', 'turbo', 'default'];
 
     for (const model of models) {
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                const url = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=1024&height=1024&nologo=true&model=${model}`;
+                const url = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=1024&height=1024&nologo=true${model !== 'default' ? `&model=${model}` : ''}`;
                 console.log(`> ISO_GHO5T: Requesting pixels [MODEL: ${model}] [ATTEMPT: ${attempt}/${maxRetries}]...`);
 
-                const response = await fetch(url);
+                const response = await fetch(url, {
+                    headers: {
+                        'User-Agent': 'curl/8.5.0'
+                    }
+                });
 
                 if (response.ok) {
                     const arrayBuffer = await response.arrayBuffer();
