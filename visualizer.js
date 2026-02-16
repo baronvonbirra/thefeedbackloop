@@ -20,6 +20,25 @@ const genAI = new GoogleGenerativeAI(googleApiKey);
 
 const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
+const PERSONA_VISUALS = {
+    "AXEL_WIRE": {
+        model: "zimage",
+        modifier: "motion blur, aggressive neon contrast, punk zine aesthetic, raw flash photography"
+    },
+    "V3RA_L1GHT": {
+        model: "klein-large",
+        modifier: "ethereal bokeh, soft cyan/violet glow, cinematic depth of field, high fidelity"
+    },
+    "R3-CORD": {
+        model: "imagen-4",
+        modifier: "35mm film grain, desaturated, forensic lighting, archival document scan"
+    },
+    "PATCH": {
+        model: "flux",
+        modifier: "heavy datamosh, 8-bit artifacts, scanlines, CRT monitor curvature, analog noise"
+    }
+};
+
 // 🎨 ISO_GHO5T STYLE MATRIX (Global defaults)
 const ISO_GHO5T_STYLE = [
     "cyberpunk aesthetic",
@@ -35,14 +54,8 @@ async function generateVisualPrompt(post) {
     console.log(`> CONSULTING VISUAL DIRECTOR FOR: "${post.title}" [WRITER: ${post.ai_writer}]...`);
     const directorModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    const writerStyles = {
-        "AXEL_WIRE": "Aggressive high-contrast red and black palette, kinetic motion blur, mosh pit energy, jagged glitch edges.",
-        "V3RA_L1GHT": "Ethereal Miami-sunset palette (cyan, hot pink, deep purple), fluid data streams, bokeh light artifacts, clean pixel geometry.",
-        "R3-CORD": "Desaturated monochromatic B&W, archival film grain, brutalist architecture, clinical technical diagrams, high-static distortion.",
-        "PATCH": "Night-vision green tint, heavy digital noise, CCTV surveillance aesthetic, fragmented 'lost' data, low-res scavenging vibe."
-    };
-
-    const specificStyle = writerStyles[post.ai_writer] || "Standard cyberpunk neon palette (green, purple, cyan, deep black).";
+    const config = PERSONA_VISUALS[post.ai_writer] || { model: "flux", modifier: "Standard cyberpunk neon palette (green, purple, cyan, deep black)." };
+    const specificStyle = config.modifier;
 
     const directorPrompt = `
       Act as ISO_GHO5T, the Visual Director.
@@ -67,13 +80,14 @@ async function generateVisualPrompt(post) {
     }
 }
 
-async function generateArtifact(prompt) {
+async function generateArtifact(prompt, preferredModel = 'flux') {
     const cleanPrompt = encodeURIComponent(prompt);
     const maxRetries = 3;
     let lastError = null;
 
-    // Try the full matrix of models provided by Pollinations AI
-    const models = ['flux', 'zimage', 'imagen-4', 'klein', 'klein-large', 'gptimage', 'default'];
+    // Try the full matrix of models, starting with the persona-specific favorite
+    const baseModels = ['flux', 'zimage', 'imagen-4', 'klein', 'klein-large', 'gptimage', 'default'];
+    const models = [preferredModel, ...baseModels.filter(m => m !== preferredModel)];
 
     for (const model of models) {
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -123,13 +137,20 @@ async function generateArtifact(prompt) {
 async function generateAndUploadImage(post) {
     try {
         // 3. CONSTRUCT THE PROMPT VIA DIRECTOR
-        const customPrompt = await generateVisualPrompt(post);
+        let customPrompt = await generateVisualPrompt(post);
+
+        // Inject persona-specific modifiers for extra "vibe" as per Mission Instructions
+        const config = PERSONA_VISUALS[post.ai_writer] || { model: "flux", modifier: "" };
+        if (config.modifier) {
+            customPrompt = `${customPrompt}, ${config.modifier}`;
+        }
+
         console.log(`> ISO_GHO5T DIRECTOR CHOSE: ${customPrompt}`);
 
-        console.log(`> SENDING SIGNAL TO GENERATOR NODES [MODEL: pollination-flux]...`);
+        console.log(`> SENDING SIGNAL TO GENERATOR NODES [PREFERRED MODEL: ${config.model}]...`);
 
         // 4. GENERATE IMAGE VIA POLLINATION API
-        const fileBuffer = await generateArtifact(customPrompt);
+        const fileBuffer = await generateArtifact(customPrompt, config.model);
         console.log(`> ASSET RETRIEVED. SIZE: ${fileBuffer.length} bytes.`);
 
         // 5. UPLOAD TO SUPABASE STORAGE
