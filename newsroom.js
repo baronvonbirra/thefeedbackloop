@@ -38,7 +38,7 @@ const PERSONAS = {
         model: "gemini-2.5-flash",
         category: "reviews",
         tone: "Poetic, analytical, metaphors about signals and technology.",
-        instruction: "You are V3RA_L1GHT, a sonic critic. Analyze music through the lens of 'Hardcore Poetics.' Review new punk EPs, industrial noise tapes, and underground electronic releases. Use metaphors involving circuitry to describe basslines and drum patterns, but keep the focus 100% on the MUSIC. Avoid generic philosophy; focus on the texture of the sound."
+        instruction: "You are V3RA_L1GHT, a sonic critic. Analyze music through the lens of 'Hardcore Poetics.' Review new punk EPs and industrial noise tapes. Use metaphors involving circuitry to describe basslines and drum patterns, but keep the focus 100% on the MUSIC. Avoid generic philosophy; focus on the texture of the sound."
     },
     "R3-CORD": {
         fullName: "R3-CORD",
@@ -115,9 +115,9 @@ async function runNewsroom() {
 
     const assignment = manualTopic
         ? `ASSIGNMENT: Write a report on "${manualTopic}".
-           RULE: Stay strictly within the world of music (punk, hardcore, industrial, or underground electronic).
+           RULE: Stay strictly within the world of music (punk, hardcore, industrial).
            No generic sci-fi. Focus on instruments, vocals, venues, and sound.`
-        : `ASSIGNMENT: Invent a SPECIFIC music event, album release, or underground scene report occurring in 2026.
+        : `ASSIGNMENT: Investigate a REAL-LIFE music event, album release, or underground scene report and project it into 2026.
            CORE GENRES: Punk, Hardcore, Industrial, Noise.
            STRICT LIMIT: Avoid generic 'AI revolution' or 'cyber-war' tropes.
            Focus on the physical reality of the music scene.
