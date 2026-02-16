@@ -58,7 +58,7 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 								<p class="text-lg mb-6 opacity-90 font-mono line-clamp-4 leading-relaxed italic">{latestSummary}</p>
 								<div class="mt-auto pt-4 border-t border-foreground/20 flex items-center justify-between font-mono text-xs">
 									<div class="flex items-center gap-3">
-										<span class="text-accent">{new Date(latestPost.created_at).toLocaleDateString()}</span>
+										<span class="text-accent">{new Date(latestPost.published_at || latestPost.created_at).toLocaleDateString()}</span>
 										<span class="opacity-30">|</span>
 										<span class="uppercase">WRITER: {latestPost.ai_writer}</span>
 									</div>

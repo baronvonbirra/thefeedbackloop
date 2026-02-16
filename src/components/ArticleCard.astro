@@ -13,7 +13,7 @@ const { post, fullImage = false } = Astro.props;
 // Use the image_url utility for multi-tier fallbacks.
 const displayImageUrl = getPostImageUrl(post);
 const fallbackImageUrl = getPostGenerativeUrl(post);
-const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
+const formattedDate = new Date(post.published_at || post.created_at).toLocaleDateString('en-US', {
 	year: 'numeric',
 	month: 'short',
 	day: '2-digit',

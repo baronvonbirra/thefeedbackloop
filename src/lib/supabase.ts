@@ -51,6 +51,7 @@ export async function getPosts(category?: string | string[]) {
     .select('*')
     .filter('published_at', 'lte', new Date().toISOString())
     .eq('status', 'published')
+    .order('published_at', { ascending: false })
     .order('created_at', { ascending: false });
 
   if (category) {

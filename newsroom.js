@@ -191,6 +191,7 @@ async function runNewsroom() {
         // Set published_at to 7 days in the future
         const publishDate = new Date();
         publishDate.setDate(publishDate.getDate() + 7);
+        publishDate.setUTCHours(0, 0, 0, 0); // Normalize to start of day for build compatibility
 
         const payload = {
             ...finalData,

@@ -40,7 +40,7 @@ try {
 const contentHtml = await parseMarkdown(post?.content);
 const summaryHtml = await parseMarkdown(post?.summary, true);
 
-const formattedDate = post ? new Date(post.created_at).toLocaleDateString('en-US', {
+const formattedDate = post ? new Date(post.published_at || post.created_at).toLocaleDateString('en-US', {
 	year: 'numeric',
 	month: 'long',
 	day: 'numeric',
@@ -171,7 +171,7 @@ const timestampLabel = post?.ai_writer === 'R3-CORD' ? 'RECOVERY_DATE' : post?.a
                     <span class="text-[10px] font-mono text-accent block mb-2">INCOMING_TRANSMISSION...</span>
                     <h4 class="font-bold text-sm leading-tight group-hover:text-accent transition-colors">{rp.title}</h4>
                     <div class="mt-4 flex items-center justify-between text-[9px] font-mono opacity-50">
-                      <span>{new Date(rp.created_at).toLocaleDateString()}</span>
+                      <span>{new Date(rp.published_at || rp.created_at).toLocaleDateString()}</span>
                       <span>VIEW_DECRYPTED →</span>
                     </div>
                   </div>
