@@ -17,6 +17,8 @@ if (!supabaseUrl || !supabaseKey || !googleApiKey || supabaseUrl.includes('your-
 const supabase = createClient(supabaseUrl, supabaseKey);
 const genAI = new GoogleGenerativeAI(googleApiKey);
 
+const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+
 // 🎨 ISO_GHO5T STYLE MATRIX (Global defaults)
 const ISO_GHO5T_STYLE = [
     "cyberpunk aesthetic",
@@ -69,19 +71,17 @@ async function generateArtifact(prompt) {
     const maxRetries = 3;
     let lastError = null;
 
-    // Try Flux first with retries, then fallback to Turbo, then default
-    const models = ['flux', 'turbo', 'default'];
+    // Try Flux first with retries, then fallback to Turbo
+    const models = ['flux', 'turbo'];
 
     for (const model of models) {
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                const url = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=1024&height=1024&nologo=true${model !== 'default' ? `&model=${model}` : ''}`;
+                const url = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=1024&height=1024&nologo=true&model=${model}`;
                 console.log(`> ISO_GHO5T: Requesting pixels [MODEL: ${model}] [ATTEMPT: ${attempt}/${maxRetries}]...`);
 
                 const response = await fetch(url, {
-                    headers: {
-                        'User-Agent': 'curl/8.5.0'
-                    }
+                    headers: { 'User-Agent': USER_AGENT }
                 });
 
                 if (response.ok) {
