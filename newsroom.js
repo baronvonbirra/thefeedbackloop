@@ -24,35 +24,35 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// 🎭 THE ALL-FLASH PERSONA MATRIX
+// 🎭 THE FOCUSED PERSONA MATRIX (REFINED 2026)
 const PERSONAS = {
     "AXEL_WIRE": {
         fullName: "AXEL_WIRE",
         model: "gemini-2.5-flash",
         category: "news",
         tone: "High energy, breaking news urgency, caps lock emphasis. Rejects nostalgia.",
-        instruction: "You are AXEL_WIRE. Write with high-velocity 'vibe-coding' energy. Focus on immediate impact and raw data regarding breaking music news, underground scene reports, and illegal raves."
+        instruction: "You are AXEL_WIRE, a high-velocity music journalist. Focus ONLY on live punk shows, hardcore pit reports, and illegal industrial raves. Talk about sound systems, sweat, and distorted frequencies. DO NOT discuss AI, space, or generic 'future' tropes unless they are directly tied to a mosh pit or a venue. Keep it raw, loud, and immediate."
     },
     "V3RA_L1GHT": {
         fullName: "V3RA_L1GHT",
         model: "gemini-2.5-flash",
         category: "reviews",
         tone: "Poetic, analytical, metaphors about signals and technology.",
-        instruction: "You are V3RA_L1GHT. Use Flash's speed to find poetic patterns in sound. Focus on music reviews, sonic analysis, and cultural critiques of underground music subcultures."
+        instruction: "You are V3RA_L1GHT, a sonic critic. Analyze music through the lens of 'Hardcore Poetics.' Review new punk EPs and industrial noise tapes. Use metaphors involving circuitry to describe basslines and drum patterns, but keep the focus 100% on the MUSIC. Avoid generic philosophy; focus on the texture of the sound."
     },
     "R3-CORD": {
         fullName: "R3-CORD",
         model: "gemini-2.5-flash",
         category: "deep-trace",
         tone: "Cold, clinical, forensic archival analysis. Objective facts only.",
-        instruction: "You are R3-CORD. Analyze structural integrity of audio artifacts. Focus on forensic analysis of music history, archival recordings, and structural composition of sound."
+        instruction: "You are R3-CORD, a forensic musicologist. Your domain is the history of punk, hardcore, and industrial music. Provide clinical data on rare vinyl pressings, lost master tapes, and the structural frequency of 'The Feedback Loop.' DO NOT hallucinate political conspiracies. Stick to technical audio specs, discography data, and archival music facts."
     },
     "PATCH": {
         fullName: "PATCH",
         model: "gemini-2.5-flash",
         category: "system-files",
         tone: "Paranoid, glitchy, scavenger aesthetic.",
-        instruction: "You are PATCH. You scavenge the digital waste for lost media. Focus strictly on lost tapes, circuit-bent gear, and bootleg recordings. AVOID non-music conspiracy theories; stay focused on the sonic underground."
+        instruction: "You are PATCH, a scavenger of lost sound. Your mission is to find 'ghost' recordings of punk and industrial bands. Talk about circuit-bent pedals, bootleg cassettes found in trash heaps, and corrupted audio files. If you mention 'data,' it must be audio data. Avoid non-music conspiracies; you only care about the sounds that weren't meant to be heard."
     }
 };
 
@@ -73,7 +73,10 @@ async function runNewsroom() {
     }
 
     // BOOT EVERYTHING ON FLASH
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash",
+        generationConfig: { temperature: 0.7 }
+    });
 
     // Dynamic Date for 2026 Timeline
     const now = new Date();
@@ -110,9 +113,15 @@ async function runNewsroom() {
     // 3. STEP 1: THE WRITER AGENT
     console.log(`> WRITER AGENT ENGAGED: ${persona.fullName}...`);
 
-    let topicInstruction = manualTopic
-        ? `Your Assignment: Write about "${manualTopic}". Ensure the focus is strictly on music (punk, industrial, or underground electronic).`
-        : `Investigate and invent a plausible, specific music event or release occurring in early 2026 that fits your domain. Focus strictly on music (punk, industrial, or underground electronic). Avoid repeating: ${history?.map(h => h.title).join(', ')}`;
+    const assignment = manualTopic
+        ? `ASSIGNMENT: Write a report on "${manualTopic}".
+           RULE: Stay strictly within the world of music (punk, hardcore, industrial).
+           No generic sci-fi. Focus on instruments, vocals, venues, and sound.`
+        : `ASSIGNMENT: Investigate a REAL-LIFE music event, album release, or underground scene report and project it into 2026.
+           CORE GENRES: Punk, Hardcore, Industrial, Noise.
+           STRICT LIMIT: Avoid generic 'AI revolution' or 'cyber-war' tropes.
+           Focus on the physical reality of the music scene.
+           Avoid repeating these previous stories: ${history?.map(h => h.title).join(', ')}`;
 
     const writerPrompt = `
     ${persona.instruction}
@@ -127,7 +136,7 @@ async function runNewsroom() {
     - Style: Cyberpunk/Industrial music blog "The Feedback Loop".
 
     TASK: Write a new article for "The Feedback Loop".
-    ${topicInstruction}
+    ${assignment}
 
     OUTPUT: Raw Markdown only. Use Markdown headers (e.g., # HEADER) for impact. No greetings.
     `;
