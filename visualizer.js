@@ -78,7 +78,10 @@ async function generateArtifact(prompt) {
     for (const model of models) {
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                const url = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=1024&height=1024&nologo=true${model !== 'default' ? `&model=${model}` : ''}`;
+                // Use gen.pollinations.ai for authenticated requests, otherwise use image.pollinations.ai
+                const baseUrl = pollinationApiKey ? 'https://gen.pollinations.ai/image' : 'https://image.pollinations.ai/prompt';
+                const url = `${baseUrl}/${cleanPrompt}?width=1024&height=1024&nologo=true${model !== 'default' ? `&model=${model}` : ''}`;
+
                 console.log(`> ISO_GHO5T: Requesting pixels [MODEL: ${model}] [ATTEMPT: ${attempt}/${maxRetries}]...`);
 
                 const headers = {
