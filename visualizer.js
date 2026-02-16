@@ -17,8 +17,6 @@ if (!supabaseUrl || !supabaseKey || !googleApiKey || supabaseUrl.includes('your-
 const supabase = createClient(supabaseUrl, supabaseKey);
 const genAI = new GoogleGenerativeAI(googleApiKey);
 
-// 📺 DEAD CHANNEL FAIL-SAFE (Signal Lost)
-const DEAD_CHANNEL_URL = "https://media.giphy.com/media/oEI9uWUicKgR2R0H8X/giphy.gif";
 const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
 // 🎨 ISO_GHO5T STYLE MATRIX (Global defaults)
@@ -111,16 +109,6 @@ async function generateArtifact(prompt) {
     throw new Error(`> SYSTEM FAILURE: All generator nodes unresponsive. Last error: ${lastError}`);
 }
 
-async function downloadDeadChannel() {
-    console.log(`> RETRIEVING DEAD CHANNEL SIGNAL FROM: ${DEAD_CHANNEL_URL}`);
-    const response = await fetch(DEAD_CHANNEL_URL, {
-        headers: { 'User-Agent': USER_AGENT }
-    });
-    if (!response.ok) throw new Error(`Dead channel blackout. Status: ${response.status}`);
-    const arrayBuffer = await response.arrayBuffer();
-    return Buffer.from(arrayBuffer);
-}
-
 async function generateAndUploadImage(post) {
     try {
         // 3. CONSTRUCT THE PROMPT VIA DIRECTOR
@@ -129,21 +117,12 @@ async function generateAndUploadImage(post) {
 
         console.log(`> SENDING SIGNAL TO GENERATOR NODES [MODEL: pollination-flux]...`);
 
-        // 4. GENERATE IMAGE VIA POLLINATION API WITH FAIL-SAFE
-        let fileBuffer;
-        let isDeadChannel = false;
-        try {
-            fileBuffer = await generateArtifact(customPrompt);
-            console.log(`> ASSET RETRIEVED. SIZE: ${fileBuffer.length} bytes.`);
-        } catch (err) {
-            console.warn(`> AI GENERATION BLACKOUT FOR "${post.title}":`, err.message);
-            fileBuffer = await downloadDeadChannel();
-            isDeadChannel = true;
-            console.log(`> FAIL-SAFE SECURED: Dead channel artifact acquired.`);
-        }
+        // 4. GENERATE IMAGE VIA POLLINATION API
+        const fileBuffer = await generateArtifact(customPrompt);
+        console.log(`> ASSET RETRIEVED. SIZE: ${fileBuffer.length} bytes.`);
 
         // 5. UPLOAD TO SUPABASE STORAGE
-        const fileName = `${post.slug}-${Date.now()}.${isDeadChannel ? 'gif' : 'png'}`;
+        const fileName = `${post.slug}-${Date.now()}.png`;
         const bucketName = 'blog-images';
 
         console.log(`> UPLOADING TO STORAGE BUCKET: ${bucketName}/${fileName}...`);
@@ -152,7 +131,7 @@ async function generateAndUploadImage(post) {
             .storage
             .from(bucketName)
             .upload(fileName, fileBuffer, {
-                contentType: isDeadChannel ? 'image/gif' : 'image/png',
+                contentType: 'image/png',
                 upsert: false
             });
 
