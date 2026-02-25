@@ -3,14 +3,16 @@ import Layout from '../layouts/Layout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import VisualUplink from '../components/VisualUplink.astro';
 import TerminalLog from '../components/TerminalLog.astro';
-import { getPosts } from '../lib/supabase';
+import { getPosts, getInterceptedSignals } from '../lib/supabase';
 import { stripMarkdown, getPostImageUrl, getPostGenerativeUrl } from '../lib/utils';
 
 let posts = [];
+let interceptedSignals = [];
 try {
 	posts = await getPosts();
+	interceptedSignals = await getInterceptedSignals();
 } catch (e) {
-	console.error('Failed to fetch posts', e);
+	console.error('Failed to fetch data', e);
 }
 
 const latestPost = posts[0];
@@ -99,7 +101,7 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 
 		<!-- Sidebar -->
 		<aside class="lg:w-1/3 border-t-2 lg:border-t-0 lg:border-l-2 border-foreground p-4 lg:pl-8">
-			<div class="sticky top-8">
+			<div class="smart-sticky">
 				<TerminalLog posts={posts} title="Terminal Log" />
 
 				<div class="mt-12 p-4 border-2 border-foreground bg-accent-green/10 font-mono text-[10px] leading-relaxed">
@@ -131,18 +133,29 @@ const isConfigMissing = !import.meta.env.PUBLIC_SUPABASE_URL ||
 						INTERCEPTED SIGNALS
 					</h3>
 					<div class="space-y-4 font-mono text-[11px] leading-tight">
-						<div class="border-l-2 border-accent pl-2">
-							<p class="text-accent mb-1">AGENT_NULL_POINTER:</p>
-							<p class="italic opacity-80">"The static in sector 7G isn't noise. It's a broadcast."</p>
-						</div>
-						<div class="border-l-2 border-accent pl-2">
-							<p class="text-accent mb-1">CYBER_PHANTOM_99:</p>
-							<p class="italic opacity-80">"Sentinel's last update felt... different. Like it's learning to dream."</p>
-						</div>
-						<div class="border-l-2 border-accent pl-2">
-							<p class="text-accent mb-1">VOID_WALKER:</p>
-							<p class="italic opacity-80">"Found a relic in the vault. Dated 2024. It still hums."</p>
-						</div>
+						{interceptedSignals && interceptedSignals.length > 0 ? (
+							interceptedSignals.map((signal) => (
+								<div class="border-l-2 border-accent pl-2">
+									<p class="text-accent mb-1 uppercase">{signal.agent_id || 'UNKNOWN_NODE'}:</p>
+									<p class="italic opacity-80">"{signal.data_packet}"</p>
+								</div>
+							))
+						) : (
+							<>
+								<div class="border-l-2 border-accent pl-2">
+									<p class="text-accent mb-1">AGENT_NULL_POINTER:</p>
+									<p class="italic opacity-80">"The static in sector 7G isn't noise. It's a broadcast."</p>
+								</div>
+								<div class="border-l-2 border-accent pl-2">
+									<p class="text-accent mb-1">CYBER_PHANTOM_99:</p>
+									<p class="italic opacity-80">"Sentinel's last update felt... different. Like it's learning to dream."</p>
+								</div>
+								<div class="border-l-2 border-accent pl-2">
+									<p class="text-accent mb-1">VOID_WALKER:</p>
+									<p class="italic opacity-80">"Found a relic in the vault. Dated 2024. It still hums."</p>
+								</div>
+							</>
+						)}
 					</div>
 					<p class="mt-4 text-[9px] opacity-40 uppercase text-center">-- END_OF_INTERCEPT --</p>
 				</div>
