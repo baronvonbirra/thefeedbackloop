@@ -24,6 +24,12 @@ export interface UplinkMessage {
   data_packet: string;
 }
 
+export interface Suggestion {
+  id?: number;
+  created_at?: string;
+  suggestion: string;
+}
+
 export interface Post {
   id: number;
   created_at: string;
@@ -96,6 +102,19 @@ export async function submitUplinkMessage(message: Omit<UplinkMessage, 'id' | 'c
 
   if (error) {
     console.error('Error submitting uplink message:', error.message, error);
+    throw error;
+  }
+
+  return data;
+}
+
+export async function submitSuggestion(suggestion: string) {
+  const { data, error } = await supabase
+    .from('suggestions')
+    .insert([{ suggestion }]);
+
+  if (error) {
+    console.error('Error submitting suggestion:', error.message, error);
     throw error;
   }
 

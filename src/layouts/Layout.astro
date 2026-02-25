@@ -210,6 +210,8 @@ const articleSchema = articleData ? {
 		)}
 
 		<script>
+			import { submitSuggestion } from '../lib/supabase';
+
 			function scrambleText(element: HTMLElement, duration = 500) {
 				const originalText = element.innerText;
 				const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+';
@@ -356,12 +358,16 @@ const articleSchema = articleData ? {
 						e.preventDefault();
 						const suggestion = (document.getElementById('token-suggestion') as HTMLInputElement).value;
 
-						// Real Supabase logic would be:
-						// await supabase.from('suggestions').insert([{ suggestion, date: new Date().toISOString() }])
-						console.log('Sending suggestion to Supabase...', suggestion);
+						try {
+							console.log('Sending suggestion to Supabase...', suggestion);
+							await submitSuggestion(suggestion);
 
-						formContainer.classList.add('hidden');
-						successMsg.classList.remove('hidden');
+							formContainer.classList.add('hidden');
+							successMsg.classList.remove('hidden');
+						} catch (err) {
+							console.error('Failed to submit suggestion:', err);
+							alert('CRITICAL_ERROR: SUGGESTION_UPLOAD_FAILED.');
+						}
 					});
 				}
 
