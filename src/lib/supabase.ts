@@ -22,6 +22,7 @@ export interface UplinkMessage {
   created_at?: string;
   agent_id: string;
   data_packet: string;
+  status?: string;
 }
 
 export interface Suggestion {
@@ -95,10 +96,26 @@ export async function getPostBySlug(slug: string) {
   return data as Post;
 }
 
+export async function getInterceptedSignals() {
+  const { data, error } = await supabase
+    .from('uplink_messages')
+    .select('*')
+    .eq('status', 'intercepted')
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  if (error) {
+    console.error('Error fetching intercepted signals:', error.message, error);
+    return [];
+  }
+
+  return data as UplinkMessage[];
+}
+
 export async function submitUplinkMessage(message: Omit<UplinkMessage, 'id' | 'created_at'>) {
   const { data, error } = await supabase
     .from('uplink_messages')
-    .insert([message]);
+    .insert([{ ...message, status: 'pending' }]);
 
   if (error) {
     console.error('Error submitting uplink message:', error.message, error);

@@ -147,6 +147,12 @@ body.category-system-files { --accent-color: #FFD300; } /* PATCH: Hazard Yellow 
     }
   }
 
+  .smart-sticky {
+    @apply sticky self-start;
+    bottom: 2rem;
+    top: auto;
+  }
+
   .monitor-frame {
     @apply border-[12px] border-neutral-800 rounded-sm shadow-[0_0_20px_rgba(0,0,0,0.8)] relative overflow-hidden bg-black;
     box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.8);
